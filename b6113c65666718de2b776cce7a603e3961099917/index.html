@@ -1,204 +1,116 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
   <head>
-    <title>Correcting Batch Effects in Covariance</title>
+    <title>Covariance Harmonization Updates</title>
     <meta charset="utf-8" />
     <meta name="author" content="Andrew Chen" />
-    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <meta name="author" content="Advisors Taki Shinohara and Haochang Shou" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Correcting Batch Effects in Covariance
+# Covariance Harmonization Updates
 ### Andrew Chen
-### Advised by Haochang Shou and Taki Shinohara
+### Advisors Taki Shinohara and Haochang Shou
 
 ---
 
 
 
 
-# Batch Effects in Neuroimaging
-- Scanner variation exists due to differences in field strength, manufacturer, and other mechanical properties
-- Site effects exist in raw magnetic resonance images (MRIs) as well as derived measurements
-    - e.g. cortical thickness, grey matter density
-    
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-1-1.png" width="720" style="display: block; margin: auto;" /&gt;
-
----
-
-# ADNI Data Description
-- MRI images downloaded from the Alzheimer’s Disease Neuroimaging Initiative (ADNI) 
-- Cortical thickness (CT) values obtained via ANTs SST pipeline (credit to Joanne Beer)
-- Identified largest groups with same site and scanner
-    - 23 subjects imaged using Siemens Symphony 1.5T at site 23
-    - 20 subjects with GE Signa Excite 1.5T at site 27
-    - 20 subjects with GE Signa Excite 1.5T at site 33
+# ADNI Example
+- Cortical thickness (CT) values obtained via ANTs SST pipeline (credit to Joanne)
+- Only looked at baseline CT values
+- Identified largest same site/scanner groups
+    - Same scanner assumed if same manufacturer/model/coil/strength
+- Looked at three largest (manufac_model_coil_strength_siteID)
+    - 23 subjects with Siemens_Symphony_HE_1.5T_23
+    - 20 subjects with GE_SIGNA EXCITE_8HRBRAIN_1.5T_27
+    - 20 subjects with GE_SIGNA EXCITE_8HRBRAIN_1.5T_33
     
 &lt;!-- html table generated in R 3.5.3 by xtable 1.8-4 package --&gt;
-&lt;!-- Wed Aug 28 03:48:02 2019 --&gt;
+&lt;!-- Tue Aug 20 01:21:04 2019 --&gt;
 &lt;table border=1&gt;
 &lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; 23 &lt;/th&gt; &lt;th&gt; 27 &lt;/th&gt; &lt;th&gt; 33 &lt;/th&gt; &lt;th&gt; p &lt;/th&gt;  &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; Number of Subjects &lt;/td&gt; &lt;td&gt; 23 &lt;/td&gt; &lt;td&gt; 20 &lt;/td&gt; &lt;td&gt; 20 &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; Age (mean (SD)) &lt;/td&gt; &lt;td&gt; 74.48 (5.13) &lt;/td&gt; &lt;td&gt; 78.78 (6.19) &lt;/td&gt; &lt;td&gt; 76.90 (8.18) &lt;/td&gt; &lt;td&gt; 0.106 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; Diagnosis (%) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt; 0.573 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; n &lt;/td&gt; &lt;td&gt; 23 &lt;/td&gt; &lt;td&gt; 20 &lt;/td&gt; &lt;td&gt; 20 &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; AGE (mean (SD)) &lt;/td&gt; &lt;td&gt; 74.48 (5.13) &lt;/td&gt; &lt;td&gt; 78.78 (6.19) &lt;/td&gt; &lt;td&gt; 76.90 (8.18) &lt;/td&gt; &lt;td&gt; 0.106 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; DIAGNOSIS (%) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt; 0.573 &lt;/td&gt; &lt;/tr&gt;
   &lt;tr&gt; &lt;td align="right"&gt;    AD &lt;/td&gt; &lt;td&gt; 7 (30.4) &lt;/td&gt; &lt;td&gt; 5 (25.0) &lt;/td&gt; &lt;td&gt; 6 (30.0) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
   &lt;tr&gt; &lt;td align="right"&gt;    CN &lt;/td&gt; &lt;td&gt; 6 (26.1) &lt;/td&gt; &lt;td&gt; 2 (10.0) &lt;/td&gt; &lt;td&gt; 5 (25.0) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
   &lt;tr&gt; &lt;td align="right"&gt;    LMCI &lt;/td&gt; &lt;td&gt; 10 (43.5) &lt;/td&gt; &lt;td&gt; 13 (65.0) &lt;/td&gt; &lt;td&gt; 9 (45.0) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; Male (%) &lt;/td&gt; &lt;td&gt; 10 (43.5) &lt;/td&gt; &lt;td&gt; 16 (80.0) &lt;/td&gt; &lt;td&gt; 13 (65.0) &lt;/td&gt; &lt;td&gt; 0.046 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; SEX = M (%) &lt;/td&gt; &lt;td&gt; 10 (43.5) &lt;/td&gt; &lt;td&gt; 16 (80.0) &lt;/td&gt; &lt;td&gt; 13 (65.0) &lt;/td&gt; &lt;td&gt; 0.046 &lt;/td&gt; &lt;/tr&gt;
    &lt;/table&gt;
 
----
-
-# Site 23
-
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 27
-
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 33
-
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# All Subjects
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# ComBat for Correcting Batch Effects
-Method applied to neuroimaging data by Fortin, Parker, TunÃ§, Watanabe, Elliott, Ruparel, Roalf, Satterthwaite, Gur, Gur, Schultz, Verma, and Shinohara (2017). Assume that the observations follow
-
-`$$y_{ijv} = \alpha_v + X_{ij}^T \beta_v + \gamma_{iv} + \delta_{iv} \epsilon_{ijv}$$`
-
-where `\(\alpha_v\)` is the mean CT value for the `\(v\)`th value in the CT vector, `\(X_{ij}\)` is the design matrix for subject `\(j\)` in site `\(i\)`, `\(\beta_v\)` is the vector of regression coefficients for the covariates on the `\(v\)`th connectivity value. The center and scale effects ( `\(\gamma_{iv}\)` and `\(\delta_{iv}\)` ) are estimated via empirical Bayes. The ComBat-corrected CT values are then given as
-
-`$$y_{iv}^{ComBat} = \frac{y_{iv} - \hat{\alpha}_v - X_{ij}^T \hat{\beta}_v - \gamma_{iv}^*}{\delta_{iv}^*} + \hat{\alpha}_v + X_{ij}^T \hat{\beta}_v$$`
-
-
-
----
-
-# ComBat for ADNI CT Data
-- Applied ComBat to observations for sites 23, 27, 33
-- Included design matrix with age, sex, diagnosis
-- Harmonizes mean and variance across sites
-
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-7-1.png" width="576" style="display: block; margin: auto;" /&gt;
-
-- Almost no difference in correlations
-
----
-
-# Pre-ComBat Site 33
-
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-8-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Post-ComBat Site 33
-
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-9-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Introducing CovBat
-- Dubbed Correcting **Cov**ariance **Bat**ch Effects
-- Corrects for site effects in principal component scores
-- Two-step procedure starting with ComBat to remove mean and variance batch effects
-    - Also residualize on intercept and covariates to obtain `\(y_{ij}^{ComBat} \sim N(\mathbf{0}, \Sigma_i)\)`
-- Then perform PCA on the ComBat-adjusted data matrix
-- We assume that the site effect lies within the first `\(K\)` principal component scores `\(\lambda_{ijk}\)`, `\(k = 1, \ldots, K\)` such that 
-
-  `$$\lambda_{ijk} = \mu_{ik} + \rho_{ik} \epsilon_{ijk}$$` 
-  where `\(\epsilon_{ijk} \sim N(0, \tau_{k})\)` and `\(\mu_{ik}\)`, `\(\rho_{ik}\)` are the center and scale parameters corresponding to each principal component, each having their own prior distribution
-- After obtaining Bayesian point estimates for all of the site effect parameters, we obtain CovBat-adjusted observations via
-`\(\lambda_{ijk}^{CovBat} = \frac{\lambda_{ijk} - \hat{\mu}_{ik}}{\hat{\rho}_{ik}}\)` and
-
-`$$y_{ij}^{CovBat} = \sum_{k=1}^K \lambda_{ijk}^{CovBat} \phi_k + \sum_{l=K+1}^p \lambda_{ijl} \phi_l + \hat{\alpha} + X_{ij}^T \hat{\beta}$$`
+# CovBat ADNI Example
+- Applied CovBat to ADNI dataset with three largest sites
+    - CovBat implemented with scale adjustment in initial ComBat step
+    - First 36 PCs used (explain 90% of the variation in post-ComBat data)
+- Some differences visible before and after
 
 ---
 
 # Site 23
 
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-10-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="Covariance_Harmonization_Updates_8-20_CovBat_files/figure-html/unnamed-chunk-1-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 23 Post-CovBat
 
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-11-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="Covariance_Harmonization_Updates_8-20_CovBat_files/figure-html/unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 27
 
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-12-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="Covariance_Harmonization_Updates_8-20_CovBat_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 27 Post-CovBat
 
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-13-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="Covariance_Harmonization_Updates_8-20_CovBat_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 33
 
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-14-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="Covariance_Harmonization_Updates_8-20_CovBat_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Site 33 Post-CovBat
+# Site 27 Post-CovBat
 
-&lt;img src="Covariance_Harmonization_Chalk_Talk_files/figure-html/unnamed-chunk-15-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Simulation Design
-- Aim to first determine if ComBat performs poorly in any situations
-- Generate observations from
-  `$$y_{ij} = \alpha + x_{ij}' \beta + \gamma_i + \Delta_i' e_{ij}$$`
-  where `\(\gamma_i\)` and the `\(p \times p\)` matrix `\(\Delta_i\)` are drawn from some multivariate distributions and `\(e_ij \sim N(\mathbf{0}, \Sigma)\)` and `\(\Sigma\)` is not necessarily diagonal
-- When `\(\gamma_{iv}\)` are i.i.d drawn from the same normal distribution, `\(\Delta_{i}\)` is diagonal with elements i.i.d drawn from the same inverse gamma distribution, and `\(\Sigma\)` is diagonal, this is exactly the ComBat model
-- Preliminary results suggest that ComBat performs adequately regardless of `\(\Sigma\)` and `\(\Delta_i\)`
-    - Scaling parameter estimated well even when `\(\Delta_i\)` are not diagonal
+&lt;img src="Covariance_Harmonization_Updates_8-20_CovBat_files/figure-html/unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Discussion
-- ComBat applied to observations succeeds in shifting mean and variance, removes batch effect in real data
-- Fails to affect correlation between corrected variables
-- CovBat shows promise for correcting covariance batch effects
-- Initial simulations suggest that ComBat performs well in most settings
+# All Sites/Scanners
+&lt;img src="Covariance_Harmonization_Updates_8-20_CovBat_files/figure-html/unnamed-chunk-7-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Future Directions
-- Design additional simulations to test current CovBat model
-- Test alternative covariance batch effect correction models
-- Determine how covariance batch effect influences hypothesis testing
-- Extend methods to functional connectivity setting
+# 23, 27, 33 Pre-CovBat
+
+&lt;img src="Covariance_Harmonization_Updates_8-20_CovBat_files/figure-html/unnamed-chunk-8-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# References
-&lt;p&gt;&lt;cite&gt;Fortin, J, D. Parker, B. TunÃƒÆ’Ã‚Â§, et al.
-(2017).
-&amp;ldquo;Harmonization of multi-site diffusion tensor imaging data&amp;rdquo;.
-In: &lt;em&gt;NeuroImage&lt;/em&gt; 161, pp. 149&amp;ndash;170.
-ISSN: 1053-8119.
-DOI: &lt;a href="https://doi.org/10.1016/j.neuroimage.2017.08.047"&gt;10.1016/j.neuroimage.2017.08.047&lt;/a&gt;.
-URL: &lt;a href="http://www.sciencedirect.com/science/article/pii/S1053811917306948"&gt;http://www.sciencedirect.com/science/article/pii/S1053811917306948&lt;/a&gt; (visited on Jun. 13, 2019).&lt;/cite&gt;&lt;/p&gt;
+# 23, 27, 33 Post-CovBat
+
+&lt;img src="Covariance_Harmonization_Updates_8-20_CovBat_files/figure-html/unnamed-chunk-9-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Numerical Results
+- Norm between 23 and 27 before: 27.29
+    - After: 18.36
+- Norm between 23 and 33 before: 22.10
+    - After: 12.33
+- Norm between 27 and 33 before: 17.97
+    - After: 17.18
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
