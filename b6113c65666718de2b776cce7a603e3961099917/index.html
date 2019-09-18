@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
   <head>
-    <title>CovBat: Power Tests</title>
+    <title>ComBat vs. CovBat: Further Comparisons</title>
     <meta charset="utf-8" />
     <meta name="author" content="Andrew Chen" />
     <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
@@ -11,7 +11,7 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# CovBat: Power Tests
+# ComBat vs. CovBat: Further Comparisons
 ### Andrew Chen
 ### Advised by Haochang Shou and Taki Shinohara
 
@@ -41,46 +41,72 @@ class: center, middle, inverse, title-slide
 - Should initial ComBat step include variance scaling?
     - Empirical testing shows that correlation differences increase if variance is not scaled
     - Possibly due to high variance ROI dominating PCs
-- No empirical bayes in PC score adjustment
-    - Determines scaling by standardization then looking at ratio of site variance to pooled variance
-- Very small shifts in mean PC score
-    - Maximum shift for one site ~ 0.004 even in extreme situation
+- Covariance changes with variance of site score
+
+`$$Cov(Y) = Cov(\sum_{k=1}^P \Lambda_{k} \phi_k) = \sum_{k=1}^P Var(\Lambda_k) \phi_k \phi_k^T$$`
 
 ---
 
 # Site 23
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-1-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-1-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 23 Post-CovBat
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 27
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 27 Post-CovBat
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 33
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 33 Post-CovBat
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Real Data PCs
+- Ratio of score variances to pooled score variances before (solid) and after (dashed) ComBat step
+
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Real Data PCs: PC 1 (13.2%)
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-8-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Real Data PCs: PC 2 (8.1%)
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-9-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Real Data PCs: PC 3 (5.1%)
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-10-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Real Data PCs: PC 4 (4.3%)
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-11-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -99,110 +125,13 @@ class: center, middle, inverse, title-slide
     - Initial tests showed that it is unreasonable to expect ComBat to recover true variance without reference site
 - Type I error evaluated via setting betas to zero and performing univariate regressions of covariate on every ROI
     - Should only be affected by violations of regression assumption, such as correlated ROIs
-- Power evaluated by setting a single beta not equal to zero then doing the same regression
-
----
-
-# ComBat Model
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-7-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# ComBat Model
-- Mean absolute variance difference between site pairs
-    - Calculated before any adjustment, after ComBat, and after CovBat
-
-
-
-&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
-&lt;!-- Wed Sep 11 00:50:56 2019 --&gt;
-&lt;table border=1&gt;
-&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 0.07 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 0.07 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 0.03 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;/tr&gt;
-   &lt;/table&gt;
-
----
-
-# ComBat Model
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-10-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Correlated Model
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-11-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Correlated Model
-
-
-&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
-&lt;!-- Wed Sep 11 00:50:58 2019 --&gt;
-&lt;table border=1&gt;
-&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 0.06 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 0.06 &lt;/td&gt; &lt;td align="right"&gt; 0.01 &lt;/td&gt; &lt;td align="right"&gt; 0.01 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 0.03 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;/tr&gt;
-   &lt;/table&gt;
-
-- Evaluate correlation effects via pairwise Frobenius distances between site correlation matrices
-
-&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
-&lt;!-- Wed Sep 11 00:50:58 2019 --&gt;
-&lt;table border=1&gt;
-&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 9.32 &lt;/td&gt; &lt;td align="right"&gt; 9.27 &lt;/td&gt; &lt;td align="right"&gt; 7.81 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 22.95 &lt;/td&gt; &lt;td align="right"&gt; 22.55 &lt;/td&gt; &lt;td align="right"&gt; 11.88 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 17.27 &lt;/td&gt; &lt;td align="right"&gt; 16.92 &lt;/td&gt; &lt;td align="right"&gt; 9.25 &lt;/td&gt; &lt;/tr&gt;
-   &lt;/table&gt;
-
----
-
-# Correlated Model
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-15-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Correlated Model: Site 1 Before
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-16-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Correlated Model: Site 1 After
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-17-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Correlated Model: Site 2 Before
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-18-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Correlated Model: Site 2 After
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-19-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Correlated Model: Site 3 Before
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-20-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Correlated Model: Site 3 After
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-21-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+- Power evaluated by setting a single beta (or set of betas) not equal to zero then doing the same regression
+    - In both cases and under many different types of multiple comparisons corrections, no difference between ComBat and CovBat power curves
 
 ---
 
 # Cat Matrix
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-22-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-12-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -216,215 +145,146 @@ class: center, middle, inverse, title-slide
 `$$\Delta_{i} = diag(\mathbf{\delta_i}) \times K$$`
 
 where each `\(\mathbf{\delta_i}\)` is a vector of draws from a site-specific distribution `\(F_i\)`
-- As is, no mean cat matrix shift for each site
-- In last sim, add additional scaling `$$\Delta_{i} = \sqrt{\delta_i} \times diag(\mathbf{\delta_i}) \times K$$` where `\(\delta_i\)` is a single draw from the site-specific distribution
 
 ---
 
-# Cat Matrix, Diagonal Covariance
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-23-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-
-
-&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
-&lt;!-- Wed Sep 11 00:51:10 2019 --&gt;
-&lt;table border=1&gt;
-&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 0.08 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 0.08 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 0.03 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;/tr&gt;
-   &lt;/table&gt;
-
-- Evaluate correlation effects via pairwise Frobenius distances between site correlation matrices
-
-&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
-&lt;!-- Wed Sep 11 00:51:10 2019 --&gt;
-&lt;table border=1&gt;
-&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 15.51 &lt;/td&gt; &lt;td align="right"&gt; 15.50 &lt;/td&gt; &lt;td align="right"&gt; 11.52 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 17.57 &lt;/td&gt; &lt;td align="right"&gt; 17.60 &lt;/td&gt; &lt;td align="right"&gt; 13.26 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 12.29 &lt;/td&gt; &lt;td align="right"&gt; 12.30 &lt;/td&gt; &lt;td align="right"&gt; 12.06 &lt;/td&gt; &lt;/tr&gt;
-   &lt;/table&gt;
-
----
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-27-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 1 Before
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-28-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 1 After
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-29-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 2 Before
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-30-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 2 After
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-31-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 3 Before
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-32-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 3 After
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-33-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Cat Matrix, Site 33 Covariance
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-34-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-
-
-&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
-&lt;!-- Wed Sep 11 00:51:22 2019 --&gt;
-&lt;table border=1&gt;
-&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 0.36 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 0.36 &lt;/td&gt; &lt;td align="right"&gt; 0.01 &lt;/td&gt; &lt;td align="right"&gt; 0.01 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 0.13 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;/tr&gt;
-   &lt;/table&gt;
-
-- Evaluate correlation effects via pairwise Frobenius distances between site correlation matrices
-
-&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
-&lt;!-- Wed Sep 11 00:51:22 2019 --&gt;
-&lt;table border=1&gt;
-&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 1.84 &lt;/td&gt; &lt;td align="right"&gt; 1.83 &lt;/td&gt; &lt;td align="right"&gt; 1.08 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 2.19 &lt;/td&gt; &lt;td align="right"&gt; 2.36 &lt;/td&gt; &lt;td align="right"&gt; 2.10 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 2.00 &lt;/td&gt; &lt;td align="right"&gt; 2.13 &lt;/td&gt; &lt;td align="right"&gt; 1.85 &lt;/td&gt; &lt;/tr&gt;
-   &lt;/table&gt;
-
----
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-38-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 1 Before
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-39-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 1 After
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-40-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 2 Before
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-41-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 2 After
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-42-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 3 Before
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-43-1.png" width="70%" style="display: block; margin: auto;" /&gt;
-
----
-
-# Site 3 After
-
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-44-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+# Cat Matrix Simulation
+- In this sim, add additional scaling `$$K^* = \sqrt{\delta_i} \times K$$` where `\(\delta_i\)` is a single draw from the site-specific distribution, then set `\(diag(K^*) = [1, \ldots, 1]\)`
+    - Enables overall shift in covariance elements per site, better differentiates between site covariances
+- Use site specific distributions: `\(InvGamma(2, 0.5), InvGamma(3, 1), InvGamma(4, 2)\)`
 
 ---
 
 # Cat Matrix, Site 33 Covariance w/ Global
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-45-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-13-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 
 
 &lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
-&lt;!-- Wed Sep 11 00:51:34 2019 --&gt;
+&lt;!-- Wed Sep 18 13:01:15 2019 --&gt;
 &lt;table border=1&gt;
 &lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 0.28 &lt;/td&gt; &lt;td align="right"&gt; 0.03 &lt;/td&gt; &lt;td align="right"&gt; 0.03 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 0.45 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 0.44 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 0.21 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 0.31 &lt;/td&gt; &lt;td align="right"&gt; 0.01 &lt;/td&gt; &lt;td align="right"&gt; 0.01 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 0.21 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;/tr&gt;
    &lt;/table&gt;
 
 - Evaluate correlation effects via pairwise Frobenius distances between site correlation matrices
 
 &lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
-&lt;!-- Wed Sep 11 00:51:34 2019 --&gt;
+&lt;!-- Wed Sep 18 13:01:15 2019 --&gt;
 &lt;table border=1&gt;
 &lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 1.50 &lt;/td&gt; &lt;td align="right"&gt; 1.49 &lt;/td&gt; &lt;td align="right"&gt; 1.37 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 2.35 &lt;/td&gt; &lt;td align="right"&gt; 2.36 &lt;/td&gt; &lt;td align="right"&gt; 1.28 &lt;/td&gt; &lt;/tr&gt;
-  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 2.88 &lt;/td&gt; &lt;td align="right"&gt; 2.88 &lt;/td&gt; &lt;td align="right"&gt; 1.23 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 5.83 &lt;/td&gt; &lt;td align="right"&gt; 5.82 &lt;/td&gt; &lt;td align="right"&gt; 4.44 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 4.41 &lt;/td&gt; &lt;td align="right"&gt; 4.39 &lt;/td&gt; &lt;td align="right"&gt; 3.24 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 3.47 &lt;/td&gt; &lt;td align="right"&gt; 3.46 &lt;/td&gt; &lt;td align="right"&gt; 2.48 &lt;/td&gt; &lt;/tr&gt;
    &lt;/table&gt;
 
 ---
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-49-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-17-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# More Severe Site Effect
+
+
+- Trying site specific distributions: `\(InvGamma(2, 0.25), InvGamma(3, 1), InvGamma(5, 10)\)`
+- Pairwise correlation differences
+
+&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
+&lt;!-- Wed Sep 18 13:01:16 2019 --&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 3.89 &lt;/td&gt; &lt;td align="right"&gt; 3.87 &lt;/td&gt; &lt;td align="right"&gt; 2.42 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 7.69 &lt;/td&gt; &lt;td align="right"&gt; 7.69 &lt;/td&gt; &lt;td align="right"&gt; 5.34 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 11.23 &lt;/td&gt; &lt;td align="right"&gt; 11.19 &lt;/td&gt; &lt;td align="right"&gt; 5.14 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
 
 ---
 
 # Site 1 Before
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-50-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-20-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 1 After
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-51-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-21-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 2 Before
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-52-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-22-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 2 After
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-53-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-23-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 3 Before
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-54-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-24-1.png" width="70%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 # Site 3 After
 
-&lt;img src="9-10-CovBat-Power-Simulations-copy_files/figure-html/unnamed-chunk-55-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-25-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# PC Regression Test
+- Very preliminary results: `\(p\)`-value of univariate regression of PC on covariate
+
+
+
+&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
+&lt;!-- Wed Sep 18 13:01:27 2019 --&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1 &lt;/td&gt; &lt;td align="right"&gt; 0.37 &lt;/td&gt; &lt;td align="right"&gt; 0.90 &lt;/td&gt; &lt;td align="right"&gt; 0.90 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 2 &lt;/td&gt; &lt;td align="right"&gt; 0.14 &lt;/td&gt; &lt;td align="right"&gt; 0.96 &lt;/td&gt; &lt;td align="right"&gt; 0.87 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 3 &lt;/td&gt; &lt;td align="right"&gt; 0.06 &lt;/td&gt; &lt;td align="right"&gt; 0.15 &lt;/td&gt; &lt;td align="right"&gt; 0.14 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 4 &lt;/td&gt; &lt;td align="right"&gt; 0.17 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 5 &lt;/td&gt; &lt;td align="right"&gt; 0.05 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 6 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.76 &lt;/td&gt; &lt;td align="right"&gt; 0.96 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 7 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.89 &lt;/td&gt; &lt;td align="right"&gt; 0.92 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 8 &lt;/td&gt; &lt;td align="right"&gt; 0.28 &lt;/td&gt; &lt;td align="right"&gt; 0.81 &lt;/td&gt; &lt;td align="right"&gt; 0.81 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 9 &lt;/td&gt; &lt;td align="right"&gt; 0.90 &lt;/td&gt; &lt;td align="right"&gt; 0.47 &lt;/td&gt; &lt;td align="right"&gt; 0.46 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 10 &lt;/td&gt; &lt;td align="right"&gt; 0.72 &lt;/td&gt; &lt;td align="right"&gt; 0.68 &lt;/td&gt; &lt;td align="right"&gt; 0.68 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# MVPA Test for Simulated Data
+- Repeated Taki's analysis for the simulated data
+    - Split into 80/20 train/test for original, ComBat, and CovBat datasets
+    - Train random forest on binary classification site 1 vs. other site
+    - Report AUC for test set classifiation
+    - Repeat these steps 100 times and report distributions of AUC
+
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-28-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+# MVPA Test for Real Data
+- Repeated Taki's analysis for the real data
+    - Split into 70/30 train/test for original, ComBat, and CovBat datasets
+    - Train random forest on binary classification site 1 (Siemens) vs. other sites (GE)
+    - Report AUC for test set classifiation
+    - Repeat these steps 100 times and report distributions of AUC
+
+&lt;img src="9-17-CovBat-Power-and-Multilevel_files/figure-html/unnamed-chunk-30-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
 
