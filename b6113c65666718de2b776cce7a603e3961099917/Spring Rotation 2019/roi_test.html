@@ -1,0 +1,464 @@
+
+<html>
+<!-- WebGL Export for 3D Slicer4 powered by XTK -- http://goXTK.com -->
+  <head>
+    <title>WebGL Export</title>
+    <script type="text/javascript" src="xtk_edge.js"></script>
+	<script type="text/javascript" src="xtk_xdat.gui.js"></script>    
+    <script type="text/javascript">
+      var run = function() {
+
+        renderer0 = new X.renderer3D();
+        renderer0.container = 'r0';
+        renderer0.init();
+
+        scene = new X.object();
+        // %ADDBRAIN%
+
+        Hierarchy = new X.object();
+        scene.children.push(Hierarchy);
+        
+
+        ROI1= new X.mesh();
+        ROI1.file = 'roi_mask_1.stl';
+        ROI1.visible = true;
+        scene.children.push(ROI1);
+        ROI1.caption = 'Brain';
+        ROI1.color = [1.9921875, 1.9921875, 1.9921875];
+        ROI1.opacity = 0.8;
+
+ROI2= new X.object();
+scene.children.push(ROI2);
+ROI2.visible = true;
+
+        ROI2_1= new X.mesh();
+        ROI2_1.file = 'roi_mask_2_1.stl';
+        ROI2_1.visible = true;
+        ROI2.children.push(ROI2_1);
+        ROI2_1.caption = 'Heschl_R';
+        ROI2_1.color = [1.9921875, 1.9921875, 1.8828125];
+        ROI2_1.opacity = 1;
+
+        ROI2_2= new X.mesh();
+        ROI2_2.file = 'roi_mask_2_2.stl';
+        ROI2_2.visible = true;
+        ROI2.children.push(ROI2_2);
+        ROI2_2.caption = 'Heschl_R';
+        ROI2_2.color = [1.9921875, 1.9921875, 1.8828125];
+        ROI2_2.opacity = 1;
+
+        ROI2_3= new X.mesh();
+        ROI2_3.file = 'roi_mask_2_3.stl';
+        ROI2_3.visible = true;
+        ROI2.children.push(ROI2_3);
+        ROI2_3.caption = 'Heschl_R';
+        ROI2_3.color = [1.9921875, 1.9921875, 1.8828125];
+        ROI2_3.opacity = 1;
+
+        ROI2_4= new X.mesh();
+        ROI2_4.file = 'roi_mask_2_4.stl';
+        ROI2_4.visible = true;
+        ROI2.children.push(ROI2_4);
+        ROI2_4.caption = 'Heschl_R';
+        ROI2_4.color = [1.9921875, 1.9921875, 1.8828125];
+        ROI2_4.opacity = 1;
+
+
+ROI3= new X.object();
+scene.children.push(ROI3);
+ROI3.visible = true;
+
+        ROI3_1= new X.mesh();
+        ROI3_1.file = 'roi_mask_3_1.stl';
+        ROI3_1.visible = true;
+        ROI3.children.push(ROI3_1);
+        ROI3_1.caption = 'Insula_R';
+        ROI3_1.color = [1.9921875, 1.9921875, 1.0078125];
+        ROI3_1.opacity = 1;
+
+        ROI3_2= new X.mesh();
+        ROI3_2.file = 'roi_mask_3_2.stl';
+        ROI3_2.visible = true;
+        ROI3.children.push(ROI3_2);
+        ROI3_2.caption = 'Insula_R';
+        ROI3_2.color = [1.9921875, 1.9921875, 1.0078125];
+        ROI3_2.opacity = 1;
+
+
+ROI4= new X.object();
+scene.children.push(ROI4);
+ROI4.visible = true;
+
+        ROI4_1= new X.mesh();
+        ROI4_1.file = 'roi_mask_4_1.stl';
+        ROI4_1.visible = true;
+        ROI4.children.push(ROI4_1);
+        ROI4_1.caption = 'Vermis_6';
+        ROI4_1.color = [1.9921875, 1.9921875, 0.140625];
+        ROI4_1.opacity = 1;
+
+        ROI4_2= new X.mesh();
+        ROI4_2.file = 'roi_mask_4_2.stl';
+        ROI4_2.visible = true;
+        ROI4.children.push(ROI4_2);
+        ROI4_2.caption = 'Vermis_6';
+        ROI4_2.color = [1.9921875, 1.9921875, 0.140625];
+        ROI4_2.opacity = 1;
+
+
+ROI5= new X.object();
+scene.children.push(ROI5);
+ROI5.visible = true;
+
+        ROI5_1= new X.mesh();
+        ROI5_1.file = 'roi_mask_5_1.stl';
+        ROI5_1.visible = true;
+        ROI5.children.push(ROI5_1);
+        ROI5_1.caption = 'ParaHippocampal_R';
+        ROI5_1.color = [1.9921875, 1.5078125, 0];
+        ROI5_1.opacity = 1;
+
+        ROI5_2= new X.mesh();
+        ROI5_2.file = 'roi_mask_5_2.stl';
+        ROI5_2.visible = true;
+        ROI5.children.push(ROI5_2);
+        ROI5_2.caption = 'ParaHippocampal_R';
+        ROI5_2.color = [1.9921875, 1.5078125, 0];
+        ROI5_2.opacity = 1;
+
+
+ROI6= new X.object();
+scene.children.push(ROI6);
+ROI6.visible = true;
+
+        ROI6_1= new X.mesh();
+        ROI6_1.file = 'roi_mask_6_1.stl';
+        ROI6_1.visible = true;
+        ROI6.children.push(ROI6_1);
+        ROI6_1.caption = 'Cerebelum_Crus1_L';
+        ROI6_1.color = [1.9921875, 0.921875, 0];
+        ROI6_1.opacity = 1;
+
+        ROI6_2= new X.mesh();
+        ROI6_2.file = 'roi_mask_6_2.stl';
+        ROI6_2.visible = true;
+        ROI6.children.push(ROI6_2);
+        ROI6_2.caption = 'Cerebelum_Crus1_L';
+        ROI6_2.color = [1.9921875, 0.921875, 0];
+        ROI6_2.opacity = 1;
+
+
+ROI7= new X.object();
+scene.children.push(ROI7);
+ROI7.visible = true;
+
+        ROI7_1= new X.mesh();
+        ROI7_1.file = 'roi_mask_7_1.stl';
+        ROI7_1.visible = true;
+        ROI7.children.push(ROI7_1);
+        ROI7_1.caption = 'Olfactory_R';
+        ROI7_1.color = [1.9921875, 0.34375, 0];
+        ROI7_1.opacity = 1;
+
+        ROI7_2= new X.mesh();
+        ROI7_2.file = 'roi_mask_7_2.stl';
+        ROI7_2.visible = true;
+        ROI7.children.push(ROI7_2);
+        ROI7_2.caption = 'Olfactory_R';
+        ROI7_2.color = [1.9921875, 0.34375, 0];
+        ROI7_2.opacity = 1;
+
+
+ROI8= new X.object();
+scene.children.push(ROI8);
+ROI8.visible = true;
+
+        ROI8_1= new X.mesh();
+        ROI8_1.file = 'roi_mask_8_1.stl';
+        ROI8_1.visible = true;
+        ROI8.children.push(ROI8_1);
+        ROI8_1.caption = 'Vermis_7';
+        ROI8_1.color = [1.75, 0, 0];
+        ROI8_1.opacity = 1;
+
+        ROI8_2= new X.mesh();
+        ROI8_2.file = 'roi_mask_8_2.stl';
+        ROI8_2.visible = true;
+        ROI8.children.push(ROI8_2);
+        ROI8_2.caption = 'Vermis_7';
+        ROI8_2.color = [1.75, 0, 0];
+        ROI8_2.opacity = 1;
+
+
+ROI9= new X.object();
+scene.children.push(ROI9);
+ROI9.visible = true;
+
+        ROI9_1= new X.mesh();
+        ROI9_1.file = 'roi_mask_9_1.stl';
+        ROI9_1.visible = true;
+        ROI9.children.push(ROI9_1);
+        ROI9_1.caption = 'Heschl_L';
+        ROI9_1.color = [1.171875, 0, 0];
+        ROI9_1.opacity = 1;
+
+        ROI9_2= new X.mesh();
+        ROI9_2.file = 'roi_mask_9_2.stl';
+        ROI9_2.visible = true;
+        ROI9.children.push(ROI9_2);
+        ROI9_2.caption = 'Heschl_L';
+        ROI9_2.color = [1.171875, 0, 0];
+        ROI9_2.opacity = 1;
+
+
+ROI10= new X.object();
+scene.children.push(ROI10);
+ROI10.visible = true;
+
+        ROI10_1= new X.mesh();
+        ROI10_1.file = 'roi_mask_10_1.stl';
+        ROI10_1.visible = true;
+        ROI10.children.push(ROI10_1);
+        ROI10_1.caption = 'Olfactory_L';
+        ROI10_1.color = [0.59375, 0, 0];
+        ROI10_1.opacity = 1;
+
+        ROI10_2= new X.mesh();
+        ROI10_2.file = 'roi_mask_10_2.stl';
+        ROI10_2.visible = true;
+        ROI10.children.push(ROI10_2);
+        ROI10_2.caption = 'Olfactory_L';
+        ROI10_2.color = [0.59375, 0, 0];
+        ROI10_2.opacity = 1;
+
+
+ROI11= new X.object();
+scene.children.push(ROI11);
+ROI11.visible = true;
+
+        ROI11_1= new X.mesh();
+        ROI11_1.file = 'roi_mask_11_1.stl';
+        ROI11_1.visible = true;
+        ROI11.children.push(ROI11_1);
+        ROI11_1.caption = 'Hippocampus_R';
+        ROI11_1.color = [0.0078125, 0, 0];
+        ROI11_1.opacity = 1;
+
+        ROI11_2= new X.mesh();
+        ROI11_2.file = 'roi_mask_11_2.stl';
+        ROI11_2.visible = true;
+        ROI11.children.push(ROI11_2);
+        ROI11_2.caption = 'Hippocampus_R';
+        ROI11_2.color = [0.0078125, 0, 0];
+        ROI11_2.opacity = 1;
+
+
+        renderer0.add(scene);
+        renderer0.camera.position = [0.0, 100, 0.0];
+        renderer0.camera.up = [0.0, 0.0, 1.0];
+        renderer0.render();
+
+
+      };
+ROIS = ['ROI2', 'ROI3', 'ROI4', 'ROI5', 'ROI6', 'ROI7', 'ROI8', 'ROI9', 'ROI10', 'ROI11'];
+brains = ['ROI1'];
+function GetSelectedItem() {
+
+	chosen = ""
+	len = document.f1.r2.length;
+	if(typeof len == 'undefined') {
+		len = 1;
+	}
+	doc = document.f1.r2;
+	console.log("len = " + len);
+
+	for (i = 0; i < len; i++) {
+		obj = document.f1.r2[i];
+		if (len == 1) obj = document.f1.r2;
+		check = obj.value;
+		console.log("check = " + check);
+
+        	    o = eval(check);
+	            o.visible = false;
+		
+		if (obj.checked) {
+			chosen = obj.value;
+            o = eval(chosen);
+            o.visible = true;
+            // o.opacity = 1;
+		console.log("o = " + o);
+		console.log("o.opacity = " + o.opacity);
+					
+		}
+	}
+	
+}
+
+function GetradioSelectedItem() {
+
+	chosen = ""
+	len = document.f1.r1.length;
+	if(typeof len == 'undefined') {
+		len = 1;
+	}	
+	// start with 1 because first is the brain
+	for (i = 0; i <len; i++) {
+		check = document.f1.r1[i].value
+        	    o = eval(check);
+	            o.visible = false;
+		if (document.f1.r1[i].checked) {
+			chosen = document.f1.r1[i].value
+		}
+	}
+	
+	if (chosen == "") {
+		alert("No Location Chosen")
+	}
+	else {
+            o = eval(chosen);
+            o.visible = true;
+            o.opacity = 1;
+	}
+}
+
+function GetSliderItem(sliderID) {
+    var y = document.getElementById(sliderID);
+    var val = ['ROI' + y.value];
+	for (iroi in ROIS) {
+		o = eval(ROIS[iroi]);
+		if (ROIS[iroi] != val){
+		console.log("o = " + o);            
+		console.log("iroi = " + iroi);
+		o.visible = false;
+		// o.opacity = 1.0;
+		} else {
+			o.visible = true;
+		}
+	}    
+
+};
+		
+		  function highlight(what) {
+		    
+		    document.getElementById('all').style.backgroundColor = '#000000';
+		    document.getElementById('ROIS').style.backgroundColor = '#000000';
+		    document.getElementById('brains').style.backgroundColor = '#000000';
+		    
+		    document.getElementById(what).style.backgroundColor = '#736AFF';
+		    
+		  };
+
+		  function show(whatstring, opac) {
+		        
+		    // highlight the div
+		    //    highlight(whatstring); 
+		    
+		    if (whatstring == 'all') {		      
+		      
+		      // show everything
+		      scene.opacity = opac;
+		      scene.visible = true;
+		      
+		    } else {
+		      
+		      // show specific anatomy
+          		what = eval(whatstring);
+		        what.opacity = opac;
+		        what.visible = true;     
+ 			console.log("what = " + what);
+			    
+		    }
+		    
+		  };
+		  
+
+		  
+		  function toggleCheckBox() {
+		    
+		    document.getElementById('showOverlay').checked = !document.getElementById('showOverlay').checked;		    
+		    
+		  };
+		  
+        function printValue(sliderID, textbox) {
+            var x = document.getElementById(textbox);
+            var y = document.getElementById(sliderID);
+            x.value = y.value;
+        };
+
+		  function show2(sliderID, textbox) {
+	            var x = document.getElementById(textbox);
+	            var y = document.getElementById(sliderID);
+		    val = y.value;
+			console.log("scene = " + scene);
+			//scene.opacity = 0;
+/*
+			console.log("brains[1] = " + brains[1]);
+			brains.visible = true;
+			console.log("brains = " + brains);
+			show(brains, 0.5);
+*/
+			for (o in ROIS) {
+				o = eval(ROIS[o]);
+				o.visible = false;
+				// o.opacity = 1.0;
+			}
+
+			//show(brains, 0.5);
+			low = Math.floor(val);
+			op_low = 1 - (val - low);
+			chosen = ROIS[low];
+		        show(chosen, op_low);
+			console.log("low = " + chosen);
+			console.log("op_low = " + op_high);
+/*
+			for (o in ROIS) {
+				console.log("o = ", o);
+			}
+*/
+
+			high = Math.ceil(val);
+
+			op_high = val - low;
+			chosen = ROIS[high];
+			x.value = chosen;
+			show(chosen, op_high);
+			console.log("high = " + chosen);
+			console.log("op_high = " + op_high);
+
+		};
+
+		
+function opac_brain(sliderID, textbox) {
+            var x = document.getElementById(textbox);
+            var y = document.getElementById(sliderID);
+    var val = y.value;
+    x.value = val;
+	low = Math.floor(val);
+	op_low = (val - low);
+	ROI1.opacity = op_low;
+	ROI1.visible = true;
+};
+    </script>
+  </head>
+  <body style="margin:0px; padding:0px;" onload="run()">
+        <div id="r0" style="background-color: #ffffff;; width: 80%; height: 80%;"></div>
+
+<FORM NAME = f1>
+<P align="center">
+<Input type = checkbox Name = r2 , Value = "ROI1" onClick = GetSelectedItem() checked>Brain
+<Input type = checkbox Name = r2 , Value = "ROI2" onClick = GetSelectedItem() checked>Heschl_R
+<Input type = checkbox Name = r2 , Value = "ROI3" onClick = GetSelectedItem() checked>Insula_R
+<Input type = checkbox Name = r2 , Value = "ROI4" onClick = GetSelectedItem() checked>Vermis_6
+<Input type = checkbox Name = r2 , Value = "ROI5" onClick = GetSelectedItem() checked>ParaHippocampal_R
+<Input type = checkbox Name = r2 , Value = "ROI6" onClick = GetSelectedItem() checked>Cerebelum_Crus1_L
+<Input type = checkbox Name = r2 , Value = "ROI7" onClick = GetSelectedItem() checked>Olfactory_R
+<Input type = checkbox Name = r2 , Value = "ROI8" onClick = GetSelectedItem() checked>Vermis_7
+<Input type = checkbox Name = r2 , Value = "ROI9" onClick = GetSelectedItem() checked>Heschl_L
+<Input type = checkbox Name = r2 , Value = "ROI10" onClick = GetSelectedItem() checked>Olfactory_L
+<Input type = checkbox Name = r2 , Value = "ROI11" onClick = GetSelectedItem() checked>Hippocampus_R
+</P>
+</FORM>
+Brain Alpha Blending Slider <input id="slider_brain" type="range" min="0.01" max="0.99" step="0.01" value="0.8" onchange="opac_brain('slider_brain','range_brain');"/>
+<input id="range_brain" type="text" size="10"/>
+  </body>
+</html>
