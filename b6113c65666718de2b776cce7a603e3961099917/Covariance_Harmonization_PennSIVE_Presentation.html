@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Exploration of Site Effects in Covariance</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Exploration of Site Effects in Covariance
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+# ADNI Example
+- Cortical thickness (CT) values obtained via ANTs SST pipeline (credit to Joanne)
+- Only looked at baseline CT values
+- Identified largest same site/scanner groups
+    - Same scanner assumed if same manufacturer/model/coil/strength
+- Looked at three largest (manufac_model_coil_strength_siteID)
+    - 23 subjects with Siemens_Symphony_HE_1.5T_23
+    - 20 subjects with GE_SIGNA EXCITE_8HRBRAIN_1.5T_27
+    - 20 subjects with GE_SIGNA EXCITE_8HRBRAIN_1.5T_33
+    
+&lt;!-- html table generated in R 3.5.3 by xtable 1.8-4 package --&gt;
+&lt;!-- Tue Aug 06 04:20:36 2019 --&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; 23 &lt;/th&gt; &lt;th&gt; 27 &lt;/th&gt; &lt;th&gt; 33 &lt;/th&gt; &lt;th&gt; p &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; n &lt;/td&gt; &lt;td&gt; 23 &lt;/td&gt; &lt;td&gt; 20 &lt;/td&gt; &lt;td&gt; 20 &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; AGE (mean (SD)) &lt;/td&gt; &lt;td&gt; 74.48 (5.13) &lt;/td&gt; &lt;td&gt; 78.78 (6.19) &lt;/td&gt; &lt;td&gt; 76.90 (8.18) &lt;/td&gt; &lt;td&gt; 0.106 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; DIAGNOSIS (%) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt; 0.573 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt;    AD &lt;/td&gt; &lt;td&gt; 7 (30.4) &lt;/td&gt; &lt;td&gt; 5 (25.0) &lt;/td&gt; &lt;td&gt; 6 (30.0) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt;    CN &lt;/td&gt; &lt;td&gt; 6 (26.1) &lt;/td&gt; &lt;td&gt; 2 (10.0) &lt;/td&gt; &lt;td&gt; 5 (25.0) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt;    LMCI &lt;/td&gt; &lt;td&gt; 10 (43.5) &lt;/td&gt; &lt;td&gt; 13 (65.0) &lt;/td&gt; &lt;td&gt; 9 (45.0) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; SEX = M (%) &lt;/td&gt; &lt;td&gt; 10 (43.5) &lt;/td&gt; &lt;td&gt; 16 (80.0) &lt;/td&gt; &lt;td&gt; 13 (65.0) &lt;/td&gt; &lt;td&gt; 0.046 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# Site 23
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-1-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 23 Ordered
+
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 27
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 27 Ordered
+
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 33
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 33 Ordered
+
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# All Sites/Scanners
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-7-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# ComBat Model
+`$$y_{ijv} = \alpha_v + X_{ij}^T \beta_v + \gamma_{iv} + \delta_{iv} \epsilon_{ijv}$$`
+
+where `\(\alpha_v\)` is the mean CT value for the `\(v\)`th value in the CT vector, `\(X_{ij}\)` is the design matrix for subject `\(j\)` in site `\(i\)`, `\(\beta_v\)` is the vector of regression coefficients for the covariates on the `\(v\)`th connectivity value. The center and scale effects ( `\(\gamma_{iv}\)` and `\(\delta_{iv}\)` ) are estimated via empirical Bayes. The ComBat-corrected CT values are then given as
+
+`$$y_{iv}^{ComBat} = \frac{y_{iv} - \hat{\alpha}_v - X_{ij}^T \hat{\beta}_v - \gamma_{iv}^*}{\delta_{iv}^*} + \hat{\alpha}_v + X_{ij}^T \hat{\beta}_v$$`
+
+---
+
+# Real Data ComBat Test
+- Applied ComBat to observations for sites 23, 27, 33
+- Included design matrix with age, sex, diagnosis
+- Almost no difference in correlations
+
+---
+
+# Pre-ComBat Site 33
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-8-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Post-ComBat Site 33
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-9-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-10-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-11-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# ComBat affects Mean and Variance 
+- For real data site 33, not residualized
+- Sample mean shifts (post-ComBat mean minus pre-ComBat mean)
+
+&lt;!-- html table generated in R 3.5.3 by xtable 1.8-4 package --&gt;
+&lt;!-- Tue Aug 06 04:20:43 2019 --&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt; 1 &lt;/th&gt; &lt;th&gt; 2 &lt;/th&gt; &lt;th&gt; 3 &lt;/th&gt; &lt;th&gt; 4 &lt;/th&gt; &lt;th&gt; 5 &lt;/th&gt; &lt;th&gt; 6 &lt;/th&gt; &lt;th&gt; 7 &lt;/th&gt; &lt;th&gt; 8 &lt;/th&gt; &lt;th&gt; 9 &lt;/th&gt; &lt;th&gt; 10 &lt;/th&gt; &lt;th&gt; 11 &lt;/th&gt; &lt;th&gt; 12 &lt;/th&gt; &lt;th&gt; 13 &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; -0.03 &lt;/td&gt; &lt;td align="right"&gt; -0.05 &lt;/td&gt; &lt;td align="right"&gt; -0.04 &lt;/td&gt; &lt;td align="right"&gt; -0.13 &lt;/td&gt; &lt;td align="right"&gt; -0.11 &lt;/td&gt; &lt;td align="right"&gt; -0.08 &lt;/td&gt; &lt;td align="right"&gt; -0.17 &lt;/td&gt; &lt;td align="right"&gt; -0.01 &lt;/td&gt; &lt;td align="right"&gt; -0.04 &lt;/td&gt; &lt;td align="right"&gt; -0.13 &lt;/td&gt; &lt;td align="right"&gt; -0.08 &lt;/td&gt; &lt;td align="right"&gt; -0.09 &lt;/td&gt; &lt;td align="right"&gt; -0.10 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+- Sample SD shifts (post-ComBat mean minus pre-ComBat mean)
+
+&lt;!-- html table generated in R 3.5.3 by xtable 1.8-4 package --&gt;
+&lt;!-- Tue Aug 06 04:20:43 2019 --&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt; 1 &lt;/th&gt; &lt;th&gt; 2 &lt;/th&gt; &lt;th&gt; 3 &lt;/th&gt; &lt;th&gt; 4 &lt;/th&gt; &lt;th&gt; 5 &lt;/th&gt; &lt;th&gt; 6 &lt;/th&gt; &lt;th&gt; 7 &lt;/th&gt; &lt;th&gt; 8 &lt;/th&gt; &lt;th&gt; 9 &lt;/th&gt; &lt;th&gt; 10 &lt;/th&gt; &lt;th&gt; 11 &lt;/th&gt; &lt;th&gt; 12 &lt;/th&gt; &lt;th&gt; 13 &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 0.03 &lt;/td&gt; &lt;td align="right"&gt; -0.02 &lt;/td&gt; &lt;td align="right"&gt; -0.01 &lt;/td&gt; &lt;td align="right"&gt; -0.02 &lt;/td&gt; &lt;td align="right"&gt; 0.05 &lt;/td&gt; &lt;td align="right"&gt; -0.02 &lt;/td&gt; &lt;td align="right"&gt; 0.03 &lt;/td&gt; &lt;td align="right"&gt; 0.02 &lt;/td&gt; &lt;td align="right"&gt; -0.02 &lt;/td&gt; &lt;td align="right"&gt; 0.04 &lt;/td&gt; &lt;td align="right"&gt; 0.00 &lt;/td&gt; &lt;td align="right"&gt; 0.03 &lt;/td&gt; &lt;td align="right"&gt; 0.03 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# Simulation Design
+- Performed PCA on a reference site (site 33), `\(n = 20\)`
+- Let `\(\mathbf{w}_1, \mathbf{w}_2, \ldots, \mathbf{w}_B\)` be the first `\(B = 5\)` PCs for site 33 and `\(s_1, s_2, \ldots, s_b\)` be the sample variances for the scores
+- Denote `\(x_{j1}, x_{j2}, \ldots, x_{jB}\)` be samples taken from `\(B\)` normal random variables `\(X_{j1}, X_{j2}, \ldots, X_{jB}\)` where 
+`\(X_{jb} \sim N(0, s_b)\)`, `\(j = 1, 2, \ldots, N\)`
+- For `\(B = 5\)` we simulate ground truth by generating `\(N = 100\)` subjects' observations via 
+`\(\mathbf{y}_{j} = \sum_{b = 1}^B x_{jb} \mathbf{w}_b\)` where `\(j = 1, 2, \ldots, N\)` and `\(k = 1, 2, \ldots, M\)`
+- Then for site 23 simulated, we find the first PC orthogonal to the first `\(B\)` PCs from site 33 denoted `\(\mathbf{u}\)` with score sample variance `\(t\)`
+- Then we simulate a common site effect via a single sample `\(x\)` from a random normal variable `\(X \sim N(0, \lambda t)\)` and a subject-specific site effect via samples `\(x_j\)` from `\(X_j \sim N(0, \gamma t)\)`, `\(j = 1, 2, \ldots, N\)` where `\(\lambda\)` and `\(\gamma\)` are chosen to control the magnitude of the site effects
+- The observations for simulated site 23 are then generated as
+`$$\mathbf{y}_{1j} = \mathbf{y}_{j} + x\mathbf{u} + x_j \mathbf{u}$$`
+- Site 27 observations `\(y_{2j}\)`, `\(j = 1, 2, \ldots, N\)` are simulated similarly
+
+---
+
+# Truth Simulated
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-12-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 23 Simulated
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-13-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 27 Simulated
+
+&lt;img src="Covariance_Harmonization_PennSIVE_Presentation_files/figure-html/unnamed-chunk-14-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Does remaining site effect influence testing?
+- Outcome variable generated to be tied to CT values and confounded by site effect
+- Let `\(z_1, \ldots, z_N\)` be the outcome variables generated as `\(z_j = y_j \beta + x + x_j + e_j\)` where `\(e_j \sim N(0,1)\)`
+    - `\(x\)` and `\(x_j\)` are the random samples influencing degree of site effect
+- To examine type I error effects, we set `\(\beta = \mathbf{0}\)`
+- For each simulation setting, we evaluate associations before and after ComBat
+    - Marginal: simple linear regression on single CT value
+    - Multiple comparisons: five simple linear regressions with Bonferroni adjustment
+    - Multiple: multiple linear regression on five CT values
+
+---
+
+# Simulation results: Type I error
+- 1000 simulations for each scenario
+- `\(\lambda = 1\)`, `\(\gamma = 0\)`, no covariance site effect
+    - Marginal: 0.068, 0.189, 0.047 (truth, before ComBat, after ComBat)
+    - Multiple comparisons: 0.049, 0.243, 0.025
+    - Multiple: 0.045, 0.457, 0.033
+- `\(\lambda = 1\)`, `\(\gamma = 0.5\)`, mild covariance site effect
+    - Marginal: 0.058, 0.224, 0.072
+    - Multiple comparisons: 0.046, 0.295, 0.057
+    - Multiple: 0.049, 0.637, 0.298
+- `\(\lambda = 1\)`, `\(\gamma = 1\)`, substantial covariance site effect
+    - Marginal: 0.054, 0.434, 0.278
+    - Multiple comparisons: 0.047, 0.669, 0.387
+    - Multiple: 0.052, 0.994, 0.995
+    
+---
+
+# Discussion
+- ComBat applied to observations succeeds in shifting mean and variance, removes batch effect in testing
+- Fails to affect correlation between corrected variables
+- Remaining covariance site effect has consequences when fitting multiple linear regression models
+- Larger site covariance effect may even influence marginal testing
+
+---
+
+# Future Directions
+- Extension of ComBat model to handle effects on the covariance matrix
+- Developing new methods for harmonization of functional connectivity matrices
+    - Separate problem where each subject's observation is a correlation matrix
+    - Existing methods do not account for this data structure
+
+---
+
+# References
+
+```
+## You haven't cited any references in this bibliography yet.
+```
+
+NULL
+
+---
+
+# References
+
+
+```
+## You haven't cited any references in this bibliography yet.
+```
+
+NULL
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
