@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Covariance Harmonization
 PennSIVE Presentation (8/6/2019) [Slides](Covariance Harmonization/Covariance_Harmonization_PennSIVE_Presentation.html)  
-DBEI Chalk Talk (8/28/2019) [Slides](Covariance Harmonization/Covariance_Harmonization_Chalk_Talk.html)  
+DBEI Summer Chalk Talk (8/28/2019) [Slides](Covariance Harmonization/Covariance_Harmonization_Chalk_Talk.html)  
 
 ### Write-Ups
 CovBat Method Write-Up [PDF](Covariance Harmonization/ComBat-with-Covariance-Effect-Write-Up.pdf)  
@@ -21,7 +21,7 @@ Summer Rotation 2019 Literature Review [PDF](Covariance Harmonization/Covariance
 9/17: CovBat Investigation and MVPA [Slides](Covariance Harmonization/9-17-CovBat-Power-and-Multilevel.html)  
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
-DBEI Chalk Talk (1/15/2018) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
+DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
 
 # Spring Rotation 2019: Penalized Co-Inertia Analysis
 DBEI Chalk Talk (4/23/2019) [Slides](Spring Rotation 2019/ADNI_CIA_presentation_abridged.html)
