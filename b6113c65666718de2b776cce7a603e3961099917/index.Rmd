@@ -13,7 +13,7 @@ DBEI Summer Chalk Talk (8/28/2019) [Slides](Covariance Harmonization/Covariance_
 
 ### Write-Ups
 CovBat Method Write-Up [PDF](Covariance Harmonization/ComBat-with-Covariance-Effect-Write-Up.pdf)  
-Multilevel CovBat [PDF](Multilevel-CovBat.pdf)  
+Multilevel CovBat [PDF](Covariance Harmonization/Multilevel-CovBat.pdf)  
 Summer Rotation 2019 Literature Review [PDF](Covariance Harmonization/Covariance_Harmonization_Review.pdf)  
 
 ### Meetings
