@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>CovBat: Multilevel and Additive Simulations</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# CovBat: Multilevel and Additive Simulations
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+# Introducing CovBat
+- Dubbed Correcting **Cov**ariance **Bat**ch Effects
+- Corrects for site effects in principal component scores
+- Two-step procedure starting with ComBat to remove mean and variance batch effects
+    - Also residualize on intercept and covariates to obtain `\(y_{ij}^{ComBat} \sim N(\mathbf{0}, \Sigma_i)\)`
+- Then perform PCA on the ComBat-adjusted data matrix
+- We assume that the site effect lies within the first `\(K\)` principal component scores `\(\lambda_{ijk}\)`, `\(k = 1, \ldots, K\)` such that 
+
+  `$$\lambda_{ijk} = \mu_{ik} + \rho_{ik} \epsilon_{ijk}$$` 
+  where `\(\epsilon_{ijk} \sim N(0, \tau_{k})\)` and `\(\mu_{ik}\)`, `\(\rho_{ik}\)` are the center and scale parameters corresponding to each principal component, each having their own prior distribution
+- After obtaining Bayesian point estimates for all of the site effect parameters, we obtain CovBat-adjusted observations via
+`\(\lambda_{ijk}^{CovBat} = \frac{\lambda_{ijk} - \hat{\mu}_{ik}}{\hat{\rho}_{ik}}\)` and
+
+`$$y_{ij}^{CovBat} = \sum_{k=1}^K \lambda_{ijk}^{CovBat} \phi_k + \sum_{l=K+1}^p \lambda_{ijl} \phi_l + \hat{\alpha} + X_{ij}^T \hat{\beta}$$`
+
+---
+
+# Multilevel CovBat
+- Perform multilevel PCA on full dataset then correct on between-site PCs, affects `\(Var(\Lambda_{k}^{(1)})\)` in
+`$$Cov(Y) = \sum_{k=1}^D Var(\Lambda_{k}^{(1)}) \phi_k^{(1)} \phi_k^{(1)^T} + \sum_{l=1}^D Var(\Lambda_{l}^{(2)}) \phi_l^{(2)} \phi_l^{(2)^T}$$`
+
+- Note that correcting on between-site PCs does not affect site covariance matrices since
+
+`$$Cov(Y_i) = \sum_{l=1}^D Var(\Lambda_{il}^{(2)}) \phi_l^{(2)} \phi_l^{(2)^T}$$`
+
+- How to perform the harmonization step?
+    - One score per site, cannot apply ComBat directly
+    - Could simply bring between-site PC scores to the mean score for all `\(k\)`, then no variance in the scores and between-site covariance no longer affects full data covariance
+    - Alternatively, correct on only a subset of the `\(k\)` between-site PC scores
+
+---
+
+# Site 23
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-1-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 23 Post-CovBat
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 23 Sum of Squared Correlations
+&lt;img src="adni_ssc1.png" width="50%" /&gt;&lt;img src="adni_ssc1_r_180.png" width="50%" /&gt;&lt;img src="adni_ssc1_180.png" width="50%" /&gt;&lt;img src="adni_ssc1_r.png" width="50%" /&gt;
+
+---
+
+# Site 27
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 27 Post-CovBat
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 27 Sum of Squared Correlations
+&lt;img src="adni_ssc2.png" width="50%" /&gt;&lt;img src="adni_ssc2_r_180.png" width="50%" /&gt;&lt;img src="adni_ssc2_180.png" width="50%" /&gt;&lt;img src="adni_ssc2_r.png" width="50%" /&gt;
+
+---
+
+# Site 33
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-7-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 33 Post-CovBat
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-8-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 33 Sum of Squared Correlations
+&lt;img src="adni_ssc3.png" width="50%" /&gt;&lt;img src="adni_ssc3_r_180.png" width="50%" /&gt;&lt;img src="adni_ssc3_180.png" width="50%" /&gt;&lt;img src="adni_ssc3_r.png" width="50%" /&gt;
+
+---
+
+# Variance Correction
+- Updated to residualize after ComBat/CovBat
+&lt;img src="adni_var_combat.png" width="50%" /&gt;&lt;img src="adni_var_covbat.png" width="50%" /&gt;
+
+---
+
+# PC Score Correction
+&lt;img src="adni_scores_combat.png" width="50%" /&gt;&lt;img src="adni_scores.png" width="50%" /&gt;
+
+---
+
+# MVPA Results
+- Fixed to no longer residualize on covariates in either test
+
+&lt;img src="adni_auc.png" width="50%" /&gt;&lt;img src="adni_auc_AD.png" width="50%" /&gt;
+
+---
+
+# Real Data PCs: PC 1 (13.2%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-13-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Real Data PCs: PC 1 (13.2%)
+&lt;img src="adni_pc1.png" width="50%" /&gt;&lt;img src="adni_pc1_r_180.png" width="50%" /&gt;&lt;img src="adni_pc1_180.png" width="50%" /&gt;&lt;img src="adni_pc1_r.png" width="50%" /&gt;
+
+---
+
+# Real Data PCs: PC 2 (8.1%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-15-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Real Data PCs: PC 2 (8.1%)
+&lt;img src="adni_pc2.png" width="50%" /&gt;&lt;img src="adni_pc2_r_180.png" width="50%" /&gt;&lt;img src="adni_pc2_180.png" width="50%" /&gt;&lt;img src="adni_pc2_r.png" width="50%" /&gt;
+
+---
+
+# Real Data PCs: PC 3 (5.1%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-17-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Real Data PCs: PC 3 (5.1%)
+&lt;img src="adni_pc3.png" width="50%" /&gt;&lt;img src="adni_pc3_r_180.png" width="50%" /&gt;&lt;img src="adni_pc3_180.png" width="50%" /&gt;&lt;img src="adni_pc3_r.png" width="50%" /&gt;
+
+---
+
+# Real Data PCs: PC 4 (4.3%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-19-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Real Data PCs: PC 4 (4.3%)
+&lt;img src="adni_pc4.png" width="50%" /&gt;&lt;img src="adni_pc4_r_180.png" width="50%" /&gt;&lt;img src="adni_pc4_180.png" width="50%" /&gt;&lt;img src="adni_pc4_r.png" width="50%" /&gt;
+
+---
+
+# Alternative Simulation Design
+- Instead of scaling by a chosen matrix, separate out variance and covariance effects
+- Covariance site effect introduced via addition of symmetric positive semi-definite matrix `\(\Omega_i\)`
+- Generate observations from
+  `$$y_{ij} = \alpha + x_{ij}' \beta + \gamma_i + \Delta_i' e_{ij}$$`
+  where `\(\gamma_i\)` and the `\(p \times p\)` matrix `\(\Delta_i\)` are drawn from some multivariate distributions and `\(e_{ij} \sim N(\mathbf{0}, \Sigma + z_i\Omega_i)\)` where `\(z_i \sim F\)`
+- Constrain `\(\Delta_{i}\)` to be diagonal with elements i.i.d drawn from the same inverse gamma distribution
+
+---
+
+# Peeking Cat
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-21-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Symmetric PSD Peking Duckling
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-22-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Peeking Pig
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-23-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Animal Matrix Simulations
+- For these simulations, we used site specific distributions: `\(InvGamma(2, 0.5), InvGamma(3, 0.5), InvGamma(4, 0.5)\)`
+- We have `\(z_i \sim N(0,1)\)` so that there can be negative covariance site effects
+
+---
+
+# Animal Matrix, Site 33 Covariance
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-24-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Animal Matrix, Site 33 Covariance
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-25-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Animal Matrix, Site 33 Covariance
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-26-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+
+Pairwise Frobenius distances between site correlation matrices:
+
+&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
+&lt;!-- Wed Oct  2 13:00:46 2019 --&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 30.70 &lt;/td&gt; &lt;td align="right"&gt; 30.70 &lt;/td&gt; &lt;td align="right"&gt; 22.05 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 27.78 &lt;/td&gt; &lt;td align="right"&gt; 27.78 &lt;/td&gt; &lt;td align="right"&gt; 25.93 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 46.08 &lt;/td&gt; &lt;td align="right"&gt; 46.08 &lt;/td&gt; &lt;td align="right"&gt; 29.52 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# Site 1 Before
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-29-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 1 After
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-30-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 2 Before
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-31-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 2 After
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-32-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 3 Before
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-33-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 3 After
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-34-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# MVPA Results
+&lt;img src="allmat_add_auc.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Animal Matrix PCs: PC 1 (3.3%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-36-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Animal Matrix PCs: PC 2 (2.2%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-37-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Animal Matrix PCs: PC 3 (2.1%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-38-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Block Matrix Simulations
+- Not the usual block matrix, just a matrix with a square in it
+- Intended to be a very simple setting where the covariance site effect matrix is the same across sites
+- `\(z_i \sim N(2,1)\)` to have mainly positive and visible covariance scaling
+
+---
+
+# Block Matrices, Site 33 Covariance
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-39-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Block Matrices, Site 33 Covariance
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-40-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Block Matrices, Site 33 Covariance
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-41-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+
+Pairwise Frobenius distances between site correlation matrices:
+
+&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
+&lt;!-- Wed Oct  2 13:01:00 2019 --&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 29.03 &lt;/td&gt; &lt;td align="right"&gt; 29.03 &lt;/td&gt; &lt;td align="right"&gt; 15.79 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 17.71 &lt;/td&gt; &lt;td align="right"&gt; 17.71 &lt;/td&gt; &lt;td align="right"&gt; 16.76 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 27.34 &lt;/td&gt; &lt;td align="right"&gt; 27.35 &lt;/td&gt; &lt;td align="right"&gt; 17.24 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# Site 1 Before
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-44-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 1 After
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-45-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 2 Before
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-46-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 2 After
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-47-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 3 Before
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-48-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 3 After
+
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-49-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# MVPA Results
+&lt;img src="boring_add_auc.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Block Matrix PC and Multilevel PCs
+
+
+- Using this simple example to illustrate how covariance site effect is captured through PCs and multilevel PCs
+- The covariance site effect in this case is rank 1 and optimally would be captured in a single PC
+- Multilevel PCs included to show what kind of patterns a multilevel CovBat method could potentially change
+- Both forms of PCA applied to ComBat-adjusted dataset
+
+---
+
+# Block Matrix PCs: PC 1 (4.6%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-52-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Block Matrix PCs: PC 2 (2.4%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-53-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Block Matrix PCs: PC 3 (2.2%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-54-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+--- 
+
+# Block Matrix Total Covariance
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-55-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Block Matrix Within Covariance
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-56-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Block Matrix Between Covariance
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-57-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Block Matrix Between (NearPD)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-58-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Block Matrix Within PC 1 (12.2%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-59-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+---
+
+# Block Matrix Within PC 2 (3.2%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-60-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Block Matrix Between PC 1 (13.1%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-61-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+---
+
+# Block Matrix Between PC 2 (9.6%)
+&lt;img src="10-1-Multilevel-and-Additive-Simulations_files/figure-html/unnamed-chunk-62-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -13,13 +13,15 @@ DBEI Summer Chalk Talk (8/28/2019) [Slides](Covariance Harmonization/Covariance_
 
 ### Write-Ups
 CovBat Method Write-Up [PDF](Covariance Harmonization/ComBat-with-Covariance-Effect-Write-Up.pdf)  
+Multilevel CovBat [PDF](Multilevel-CovBat.pdf)  
 Summer Rotation 2019 Literature Review [PDF](Covariance Harmonization/Covariance_Harmonization_Review.pdf)  
 
 ### Meetings
 9/3: Initial CovBat Simulations [Slides](Covariance Harmonization/9-3_CovBat_Simulations.html)  
 9/10: Power Tests for ComBat vs. CovBat [Slides](Covariance Harmonization/9-10-CovBat-Power-Simulations.html)  
 9/17: CovBat Investigation and MVPA [Slides](Covariance Harmonization/9-17-CovBat-Power-and-Multilevel.html)  
-9/24: PC Exploration and MVPA Results [Slides](Covariance Harmonization/9-24-ADNI-PC-Exploration-and-Multilevel.html)  
+9/24: PC Exploration and MVPA Results [Slides](Covariance Harmonization/9-24-2019/9-24-ADNI-PC-Exploration-and-Multilevel.html)  
+10/2: Multilevel and Additive Simulations [Slides](Covariance Harmonization/10-1-Multilevel-and-Additive-Simulations.html)
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
