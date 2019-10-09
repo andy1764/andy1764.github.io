@@ -21,7 +21,8 @@ Summer Rotation 2019 Literature Review [PDF](Covariance Harmonization/Covariance
 9/10: Power Tests for ComBat vs. CovBat [Slides](Covariance Harmonization/9-10-CovBat-Power-Simulations.html)  
 9/17: CovBat Investigation and MVPA [Slides](Covariance Harmonization/9-17-CovBat-Power-and-Multilevel.html)  
 9/24: PC Exploration and MVPA Results [Slides](Covariance Harmonization/9-24-2019/9-24-ADNI-PC-Exploration-and-Multilevel.html)  
-10/2: Multilevel and Additive Simulations [Slides](Covariance Harmonization/10-1-Multilevel-and-Additive-Simulations.html)
+10/2: Multilevel and Additive Simulations [Slides](Covariance Harmonization/10-1-Multilevel-and-Additive-Simulations.html)  
+10/9: Preliminary FC and Multilevel CovBat Findings [Slides](Covariance Harmonization/10-9-Preliminary-FC-and-Multilevel-CovBat.html)  
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)

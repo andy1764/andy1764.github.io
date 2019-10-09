@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Preliminary FC and Multilevel CovBat Findings</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Preliminary FC and Multilevel CovBat Findings
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+# Title/Abstract Feedback
+**Title**: Removal of Scanner Effects in Covariance of Cortical Thickness Measurements
+
+**Abstract**: To acquire larger samples for answering complex questions in neuroscience, researchers have increasingly turned to multi-site neuroimaging studies. However, these studies are marred by the existence of scanner effects in the raw images and derived measurements. These effects have been shown to hinder comparison between sites, mask biologically meaningful associations, and even introduce new unwanted associations. Previous methods have focused on harmonizing the mean and variance of measurements across sites in order to remove these effects, but none have addressed how covariance between measurements can vary across scanners. Using the Alzheimer's Disease Neuroimaging Initiative (ADNI) dataset, we show that considerable differences in covariance exist across sites and that current harmonizations do not address this issue. We then propose a new method that is able to harmonize covariance across sites and demonstrate that it performs better on both removal of scanner effects and detection of clinically relevant associations.
+
+---
+
+# Introducing CovBat for Functional Connectivity
+- Similar idea as regular CovBat but instead on matrix observations
+- Use PVD (Crainiceanu et al. 2011) to reduce dimension of matrices to `\(A \times A\)` before performing PCA
+
+`$$\Sigma_{ij} = \mathbf{P} \mathbf{V}_{ij} \mathbf{P}^T + \mathbf{E}_{ij}$$`
+
+- Vectorize subject-specific matrices then perform PCA to obtain `\(\boldsymbol{\phi}_k\)`, which are just the eigenvectors arranged as `\(A \times A\)` symmetric matrices
+- Left and right multiply by population-level matrix `\(P\)` to obtain
+
+`$$\Sigma_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \mathbf{P} \boldsymbol{\phi}_k \mathbf{P}^T + \mathbf{P} \boldsymbol{\eta}_i \mathbf{P}^T + \mathbf{E}_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \mathbf{\Phi}_k + \mathbf{e}_{ij}$$`
+
+- Apply ComBat including covariates to the `\(\Lambda_{ijk}\)`, harmonizing across sites indexed by `\(i\)`
+- Recover CovBat-adjusted FC matrices by applying population-level framing
+
+---
+
+# Problems with FC CovBat Method
+- Harmonized FC matrices are not constrained to be correlation matrices
+    - Can fix diagonals to equal one but off-diagonal elements not constrained to `\([0, 1]\)`
+- Does not leverage structure of original matrices
+    - Could apply PCA only to lower triangular elements, but then problem with off-diagonal elements
+- Initial tests suggest that the harmonization is removing desired features of the matrices
+
+---
+
+# BLSA/Cardia Dataset
+- 742 subjects across two sites and 5 scanners (4 different scanners in CARDIA)
+- Initial tests using just BLSA and CARDIA_1, 50 subjects included from each
+
+
+
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; BLSA &lt;/th&gt; &lt;th&gt; CARDIA_1 &lt;/th&gt; &lt;th&gt; CARDIA_2 &lt;/th&gt; &lt;th&gt; CARDIA_3 &lt;/th&gt; &lt;th&gt; CARDIA_4 &lt;/th&gt; &lt;th&gt; p &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; n &lt;/td&gt; &lt;td&gt;   359 &lt;/td&gt; &lt;td&gt;    57 &lt;/td&gt; &lt;td&gt;     4 &lt;/td&gt; &lt;td&gt;   184 &lt;/td&gt; &lt;td&gt;   139 &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; age_at_scan (mean (SD)) &lt;/td&gt; &lt;td&gt; 72.65 (9.51) &lt;/td&gt; &lt;td&gt; 50.12 (3.42) &lt;/td&gt; &lt;td&gt; 52.00 (1.15) &lt;/td&gt; &lt;td&gt; 50.27 (3.30) &lt;/td&gt; &lt;td&gt; 50.12 (3.64) &lt;/td&gt; &lt;td&gt; &amp;lt;0.001 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; sex = M (%) &lt;/td&gt; &lt;td&gt;   151 (42.1)  &lt;/td&gt; &lt;td&gt;    22 (38.6)  &lt;/td&gt; &lt;td&gt;     1 (25.0)  &lt;/td&gt; &lt;td&gt;    78 (42.4)  &lt;/td&gt; &lt;td&gt;    55 (39.6)  &lt;/td&gt; &lt;td&gt;  0.916 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# BLSA Subject 1
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# BLSA Subject 1 Harmonized
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# CARDIA_1 Subject 1
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# CARDIA_1 Subject 1 Harmonized
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Off-Diagonal Elements
+- Plot of max values in FC matrices after constraining diagonal to 1
+
+![](10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+---
+
+# Multilevel CovBat
+- Perform multilevel PCA on full dataset then correct on between-site PCs, affects `\(Var(\Lambda_{k}^{(1)})\)` in
+`$$Cov(Y) = \sum_{k=1}^D Var(\Lambda_{k}^{(1)}) \phi_k^{(1)} \phi_k^{(1)^T} + \sum_{l=1}^D Var(\Lambda_{l}^{(2)}) \phi_l^{(2)} \phi_l^{(2)^T}$$`
+
+- Note that correcting on between-site PCs does not affect site covariance matrices since
+
+`$$Cov(Y_i) = \sum_{l=1}^D Var(\Lambda_{il}^{(2)}) \phi_l^{(2)} \phi_l^{(2)^T}$$`
+
+- How to perform the harmonization step?
+    - One score per site, cannot apply ComBat directly
+    - Could simply bring between-site PC scores to the mean score for all `\(k\)`, then no variance in the scores and between-site covariance no longer affects full data covariance
+    - Alternatively, correct on only a subset of the `\(k\)` between-site PC scores
+
+---
+
+# Site 23
+
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-7-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 27
+
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-8-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 33
+
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-9-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Multilevel PCA Test
+- Implemented multilevel PCA via *denseFLMM* without smoothing
+- Preliminary visualizations of within-site and between-site covariance matrices and associated PCs
+- PC scores also plotted to provide some insight
+
+---
+
+# Between-Site (Level 1) Covariance
+
+
+
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-11-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Between-Site PC1
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-12-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Between-Site PC2
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-13-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Within-Site (Level 2) Covariance
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-14-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Within-Site PC1
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-15-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Within-Site PC2
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-16-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Between-Site PC Scores
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-17-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Within-Site PC Scores
+
+&lt;img src="10-9-Preliminary-FC-and-Multilevel-CovBat_files/figure-html/unnamed-chunk-18-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
