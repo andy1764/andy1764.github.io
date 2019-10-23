@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>CovBat Manuscript Simulation Tests</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# CovBat Manuscript Simulation Tests
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+# Current Issues
+- Inconsistent AUC results for detection of site 1
+    - Depends on multiple of site effect covariance matrix added
+    - Also depends on Frobenius norm between site 1 and other sites (makes sense)
+    - For now, fixing the amount of site-specific scaling matrices instead of adding random amount
+- Simulations fail to replicate improved detection of covariate (AD in ADNI dataset)
+    - Current model imposes effect of covariate on mean, but not variance or covariance
+    - ComBat and CovBat perform similarly in current design
+    
+---
+
+# Current Simulation Design
+To test our harmonization method, we create simulated datasets based on a modified version of the ComBat model. `\(y_{ij}\)`, `\(i = 1, \ldots, 3\)`, `\(j = 1, \ldots, 100\)` be the `\(62 \times 1\)` simulated observation vectors where are chosen for the simulation. We generate observations via
+`\begin{equation*}
+y_{ij} = \alpha + x_{ij}' \beta + \gamma_i + \delta_i' e_{ij}
+\end{equation*}`
+where `\(\gamma_i\)` are vectors of draws from standard normal distributions and `\(\delta_i\)` are vectors of draws from site-specific inverse gamma distrbutions with chosen parameters. For our simulations, we chose to sufficiently distinguish the site-specific scaling factors by having `\(\delta_1 ~ \text{Inverse Gamma}(2, 0.5)\)`, `\(\delta_2 ~ \text{Inverse Gamma}(3, 1)\)`, and `\(\delta_3 ~ \text{Inverse Gamma}(4, 2)\)`. The error vectors `\(e_{ij} \sim \text{N}(\mathbf{0}, \Sigma + \Omega_i)\)` where `\(\Sigma\)` is the sample covariance matrix of site B and `\(\Omega_i\)` are positive semi-definite matrices generated from pre-specified matrices by multiplying the off-diagonal elements by either fixed constants or draws from a chosen distribution.
+- `\(\beta\)` currently fixed to be -0.25 for first 10 ROIs in both hemispheres: left.caudal.anterior.cingulate, left.caudal.middle.frontal, left.cuneus, left.entorhinal, left.fusiform, left.inferior.parietal, left.inferior.temporal, left.isthmus.cingulate, left.lateral.occipital, left.lateral.orbitofrontal
+
+---
+
+# Proposed Modification
+- Current design does not have any effect of covariate on covariance
+    - Is this realistic? Let's check the real data
+    
+---
+
+# Correlation of AD vs No AD (F = 27.88)
+
+&lt;img src="10-23-Manuscript-Simulations_files/figure-html/unnamed-chunk-1-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Correlation of M vs F (F = 86.83)
+
+&lt;img src="10-23-Manuscript-Simulations_files/figure-html/unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Proposed Modification
+- Confound site covariance and covariate covariance effects
+    - For now, model covariate effect as the same matrix as a site effect
+    
+`\begin{equation*}
+y_{ij} = \alpha + x_{ij}' \beta + \gamma_i + \delta_i' e_{ij}
+\end{equation*}`
+
+- Modify `\(e_{ij} \sim \text{N}(\mathbf{0}, \Sigma + \Omega_i)\)` to be `\(e_{ij} \sim \text{N}(\mathbf{0}, \Sigma_j + \Omega_i)\)` where `\(\Sigma_j\)` = `\(\Sigma + x_j A_2\)` and `\(A_2\)` is the prespecified matrix that `\(\Omega_2\)` is derived from
+- We hope that removal of `\(\Omega_2\)` site effect would allow for better recovery via random forests of covariate association
+- Note that this new model also imposes association between variances and the covariate
+    - Since `\(A_2\)` diagonal with positive values, covariate related to higher variances
+    
+---
+
+# Confounded Simulations
+- For simplicity, fix the amount of pre-specified matrices added to each site
+- Examine multiple cases
+    - Site 1 similar to other cases, constants fixed as (5, 5, 5)
+    - Site 1 different (-5, 5, 2)
+    - Site 1 very different (-10, 10, 2)
+    - Site 1 very different and Site 2 confounded (-10, 10, 2) and binary covariate adding (0, -5, 0)
+
+---
+
+# Peeking Cat
+&lt;img src="10-23-Manuscript-Simulations_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Symmetric PSD Peking Duckling
+&lt;img src="10-23-Manuscript-Simulations_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Peeking Pig
+&lt;img src="10-23-Manuscript-Simulations_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 1 Similar
+&lt;img src="10-23/5 5 5/allmat_corr.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 1 Similar
+
+
+&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
+&lt;!-- Wed Oct 23 12:05:22 2019 --&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 161.29 &lt;/td&gt; &lt;td align="right"&gt; 161.26 &lt;/td&gt; &lt;td align="right"&gt; 115.26 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 122.18 &lt;/td&gt; &lt;td align="right"&gt; 121.54 &lt;/td&gt; &lt;td align="right"&gt; 113.96 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 160.15 &lt;/td&gt; &lt;td align="right"&gt; 159.74 &lt;/td&gt; &lt;td align="right"&gt; 109.63 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# Site 1 Similar
+&lt;img src="10-23/5 5 5/allmat_add_auc.png" width="50%" /&gt;&lt;img src="10-23/5 5 5/allmat_add_auc_dx.png" width="50%" /&gt;
+
+---
+
+# Site 1 Different
+&lt;img src="10-23/-5 5 2/allmat_corr.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 1 Different
+
+
+&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
+&lt;!-- Wed Oct 23 12:05:22 2019 --&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 1010.09 &lt;/td&gt; &lt;td align="right"&gt; 1024.30 &lt;/td&gt; &lt;td align="right"&gt; 311.20 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 321.97 &lt;/td&gt; &lt;td align="right"&gt; 317.83 &lt;/td&gt; &lt;td align="right"&gt; 225.52 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 436.20 &lt;/td&gt; &lt;td align="right"&gt; 449.97 &lt;/td&gt; &lt;td align="right"&gt; 217.18 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# Site 1 Different
+&lt;img src="10-23/-5 5 2/allmat_add_auc.png" width="50%" /&gt;&lt;img src="10-23/-5 5 2/allmat_add_auc_dx.png" width="50%" /&gt;
+
+---
+
+# Site 1 Very Different
+&lt;img src="10-23/-10 10 2/allmat_corr.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 1 Very Different
+
+
+&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
+&lt;!-- Wed Oct 23 12:05:22 2019 --&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 396.39 &lt;/td&gt; &lt;td align="right"&gt; 397.42 &lt;/td&gt; &lt;td align="right"&gt; 131.53 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 159.04 &lt;/td&gt; &lt;td align="right"&gt; 148.55 &lt;/td&gt; &lt;td align="right"&gt; 130.21 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 211.15 &lt;/td&gt; &lt;td align="right"&gt; 221.47 &lt;/td&gt; &lt;td align="right"&gt; 115.25 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# Site 1 Very Different
+&lt;img src="10-23/-10 10 2/allmat_add_auc.png" width="50%" /&gt;&lt;img src="10-23/-10 10 2/allmat_add_auc_dx.png" width="50%" /&gt;
+
+---
+
+# Site 1 Confounded
+&lt;img src="10-23/-10 10 2 confounded/allmat_corr.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 1 Confounded (DX = 0)
+&lt;img src="10-23-Manuscript-Simulations_files/figure-html/unnamed-chunk-19-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 1 Confounded (DX = 1)
+&lt;img src="10-23-Manuscript-Simulations_files/figure-html/unnamed-chunk-20-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 1 Confounded CovBat (DX = 0)
+&lt;img src="10-23-Manuscript-Simulations_files/figure-html/unnamed-chunk-21-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 1 Confounded CovBat (DX = 1)
+&lt;img src="10-23-Manuscript-Simulations_files/figure-html/unnamed-chunk-22-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Site 1 Confounded
+
+
+&lt;!-- html table generated in R 3.6.1 by xtable 1.8-4 package --&gt;
+&lt;!-- Wed Oct 23 12:05:23 2019 --&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Original &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,2 &lt;/td&gt; &lt;td align="right"&gt; 230.96 &lt;/td&gt; &lt;td align="right"&gt; 230.82 &lt;/td&gt; &lt;td align="right"&gt; 129.44 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1,3 &lt;/td&gt; &lt;td align="right"&gt; 122.96 &lt;/td&gt; &lt;td align="right"&gt; 122.25 &lt;/td&gt; &lt;td align="right"&gt; 107.50 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 2,3 &lt;/td&gt; &lt;td align="right"&gt; 175.38 &lt;/td&gt; &lt;td align="right"&gt; 176.33 &lt;/td&gt; &lt;td align="right"&gt; 133.18 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# Site 1 Confounded
+&lt;img src="10-23/-10 10 2 confounded/allmat_add_auc.png" width="50%" /&gt;&lt;img src="10-23/-10 10 2 confounded/allmat_add_auc_dx.png" width="50%" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
