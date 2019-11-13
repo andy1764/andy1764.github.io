@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>CovBat Controlling for Covariates</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# CovBat Controlling for Covariates
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+## Regression of Variance on Covariates
+For observation `\(i\)`, let `\(x_i\)` and `\(z_i\)` be vectors of explanatory variables (which can have common values). We consider the linear model
+`$$Y_i = x_i' \beta + e_i$$`
+where `\(\beta\)` is a vector of unknown parameters and `\(e_i \sim N(0, \sigma_i^2)\)` are independent. We do not make any assumption of homoscedasticity and instead assume a log-linear relationship between the variances and `\(z_i\)` such that
+`$$log(\sigma_i^2) = z_i \gamma$$`
+where `\(\gamma\)` is another vector of unknown parameters.
+
+---
+
+## Estimation of Parameters
+Harvey (1976) find the MLEs for this model via Fisher scoring
+`$$\hat{\beta}_{m+1} = (X' \Sigma_m^{-1}X)^{-1}X' \Sigma_m^{-1} Y$$`
+`$$\hat{\gamma}_{m+1} = (Z'Z)^{-1} Z' (\Sigma_m^{-1} d_m - I + Z \gamma_m)$$`
+where `\(X\)` and `\(Z\)` are the model matrices, `\(\Sigma_m^-1\)` is the diagonal matrix of `\(\sigma_1^2, \ldots, \sigma_n^2\)` and `\(d\)` is the vector of estimated squared residuals `\(d_{mi} = (Y_i - x_i'\hat{\beta}_m)^2\)`. Aitkin (1987) noted that this estimation procedure is equivalent to using the weighted least squares estimate with weights `\(1/\sigma_i^2\)` for `\(\beta\)` after fixing `\(\hat{\gamma}_m\)` and using a GLM with log link and gamma responses `\(d_i\)` with scale parameter 2 for a fixed `\(\hat{\beta}_m\)`
+
+---
+
+## Recent Extensions and Applications ##
+- Spady and Stouli (2018) relax the normality assumption on the errors and impose a linear relationship of the `\(z_i\)` and the errors
+- Spady and Stouli (2019) further generalizes to allow for any relationship of the `\(z_i\)` and the errors so long as the variance remains positive
+- Zhao et al. (2018) assume a log-linear relationship between the PC score variances and covariates of interest and simulatenously estimate the PC directions
+
+---
+
+## Incorporation into ComBat Model ##
+After ComBat step we have
+`$$\xi_{ijk} = \mu_{ik} + \rho_{ik} \epsilon_{ijk}$$`
+Instead of assuming `\(\epsilon_{ijk} \sim N(0, \tau_{k}^2)\)`, let's assume `\(\epsilon_{ijk} \sim N(0, \tau_{ik})\)` where `\(log(\tau_{ik}^2) = z_ij' \theta_k + x_ij' \eta_k\)` where `\(x_i\)` are the vector of covariates and `\(z_i\)` are the vector of indicators for site. Our goal is to regress the score variances on the covariates and site then residualize with respect to the covariates before adjusting the variances for site. After estimation, we remove the covariate effect on the variances then find `\(\mu_{ik}\)` and `\(\rho_{ik}\)` that bring the residual variance to the pooled residual variance. Once we multiply back the covariate effect on the variance, the adjusted scores are
+`$$\xi_{ijk}^{CovBat} = \left(\frac{\xi_{ijk}}{e^{x_{ij}' \hat{\eta}_k}}  - \hat{\mu}_{ik}\right)\frac{e^{x_{ij}' \hat{\eta}_k}}{\hat{\rho}_{ik} }$$`
+The main difference between this model and the original CovBat model is that the `\(\hat{\rho}_{ik}\)` are estimated using the variances residualized on covariates.
+
+---
+
+## Results in ADNI Data ##
+&lt;img src="adni_auc_score_ctrl.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Results in ADNI Data ##
+&lt;img src="adni_auc_score_cov_AD_ctrl.png" width="50%" /&gt;&lt;img src="adni_auc_m_ctrl.png" width="50%" /&gt;
+
+---
+
+## Results in Simulated Data ##
+&lt;img src="allmat_corr_dx_test.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Results in Simulated Data ##
+&lt;img src="allmat_auc_site_ctrl.png" width="50%" /&gt;&lt;img src="allmat_auc_dx_ctrl.png" width="50%" /&gt;
+
+---
+
+## References
+&lt;p&gt;&lt;cite&gt;Aitkin, M.
+(1987).
+&amp;ldquo;Modelling Variance Heterogeneity in Normal Regression Using GLIM&amp;rdquo;.
+In: &lt;em&gt;Journal of the Royal Statistical Society. Series C (Applied Statistics)&lt;/em&gt; 36.3, pp. 332-339.
+ISSN: 0035-9254.
+DOI: &lt;a href="https://doi.org/10.2307/2347792"&gt;10.2307/2347792&lt;/a&gt;.&lt;/cite&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;cite&gt;Harvey, A. C.
+(1976).
+&amp;ldquo;Estimating Regression Models with Multiplicative Heteroscedasticity&amp;rdquo;.
+In: &lt;em&gt;Econometrica (pre-1986); Evanston&lt;/em&gt; 44.3, pp. 461&amp;ndash;465.
+ISSN: 00129682.&lt;/cite&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;cite&gt;Spady, R. H. and S. Stouli
+(2018a).
+&amp;ldquo;Dual Regression&amp;rdquo;.
+En.
+In: &lt;em&gt;Biometrika&lt;/em&gt; 105.1, pp. 1-18.
+ISSN: 0006-3444.
+DOI: &lt;a href="https://doi.org/10.1093/biomet/asx074"&gt;10.1093/biomet/asx074&lt;/a&gt;.&lt;/cite&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;cite&gt;Spady, R. and S. Stouli
+(2018b).
+&lt;em&gt;Simultaneous Mean-Variance Regression&lt;/em&gt;.
+https://www.ifs.org.uk/publications/12902.
+DOI: &lt;a href="https://doi.org/10.1920/wp.cem.2018.2518"&gt;10.1920/wp.cem.2018.2518&lt;/a&gt;.&lt;/cite&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;cite&gt;Zhao, Y, B. Wang, S. Mostofsky, et al.
+(2018).
+&amp;ldquo;Covariate Assisted Principal Regression for Covariance Matrix Outcomes&amp;rdquo;.
+In: &lt;em&gt;bioRxiv&lt;/em&gt;, p. 425033.&lt;/cite&gt;&lt;/p&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
