@@ -1,0 +1,189 @@
+---
+title: "CovBat: Further Improvements"
+author:
+  - Andrew Chen
+  - Advised by Haochang Shou and Taki Shinohara
+fontsize: 16pt
+always_allow_html: yes
+output:
+  xaringan::moon_reader:
+    css: ["xaringan-themer.css"]
+    nature:
+      slideNumberFormat: "%current%"
+  beamer_presentation:
+    theme: "Szeged"
+    colortheme: "dolphin"
+header_includes: 
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(reshape2)
+library(ggplot2)
+library(xaringanthemer)
+library(RefManageR)
+library(xtable)
+
+base_color = "#008080"
+white_color = "#FFFFFF"
+black_color = "#000000"
+mono_accent(
+  base_color = base_color,
+  header_font_google = google_font("Source Sans Pro", "600"),
+  text_font_google   = google_font("Source Sans Pro", "400", "400i"),
+  code_font_google   = google_font("IBM Plex Mono"),
+  title_slide_text_color = base_color,
+  title_slide_background_color = white_color,
+  table_row_even_background_color = white_color,
+  header_h1_font_size = "45px"
+)
+
+BibOptions(check.entries = FALSE, 
+           bib.style = "authoryear", 
+           cite.style = 'alphabetic', 
+           style = "html",
+           hyperlink = FALSE, 
+           dashed = FALSE,
+           bibpunct = c("(",")","(",")",";",","))
+bib <- ReadBib("../../Literature Review/Citations_FC_Harmonization.bib", check = FALSE)
+
+theme_set(theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
+options(digits = 4)
+
+plot_mat <- function(cov, lims = c(-max(abs(cov_melt$value)), max(abs(cov_melt$value)))) {
+  cov_melt <- melt(cov)
+  ggplot(data = cov_melt, aes(x=Var1, y=Var2, fill=value)) + 
+    geom_tile() + 
+    scale_fill_gradientn(
+      colours = c("red", "white", "blue"), 
+      limits = lims) +
+    labs(fill = "") + 
+    theme_classic() +
+    theme(axis.line = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank())
+  
+}
+```
+
+## CovBat Modified for MVPA
+- Previous ComBat/CovBat methods both utilized test set data in parameter estimation
+- Now, split sample retaining all sites in both training and test data
+    - Slightly larger training set (270/235 train/test)
+- Results similar but slightly more variability in performance for both ComBat and CovBat
+
+```{r out.width='33%', fig.show='hold', fig.align='default'}
+knitr::include_graphics(c("adni_auc.png", "adni_auc_AD.png", "adni_auc_m.png"))
+```
+
+---
+
+## CovBat Residualize Confounders
+- Also restricted to just the training set, but now additionally residualize out other covariates
+    - For example, for detection of AD we residualize out age and sex
+- Results still similar but with overall poorer performance for detection of male
+
+```{r out.width='33%', fig.show='hold', fig.align='default'}
+knitr::include_graphics(c("adni_auc_AD_keep.png", "adni_auc_m_keep.png"))
+```
+
+---
+
+## CovBat Controlling for Covariates ##
+After ComBat step we have
+$$\xi_{ijk} = \mu_{ik} + \rho_{ik} \epsilon_{ijk}$$
+Instead of assuming $\epsilon_{ijk} \sim N(0, \tau_{k}^2)$, let's assume $\epsilon_{ijk} \sim N(0, \tau_{ik})$ where $log(\tau_{ik}^2) = z_ij' \theta_k + x_ij' \eta_k$ where $x_i$ are the vector of covariates and $z_i$ are the vector of indicators for site. Our goal is to regress the score variances on the covariates and site then residualize with respect to the covariates before adjusting the variances for site. After estimation, we remove the covariate effect on the variances then find $\mu_{ik}$ and $\rho_{ik}$ that bring the residual variance to the pooled residual variance. Once we multiply back the covariate effect on the variance, the adjusted scores are
+$$\xi_{ijk}^{CovBat} = \left(\frac{\xi_{ijk}}{e^{x_{ij}' \hat{\eta}_k}}  - \hat{\mu}_{ik}\right)\frac{e^{x_{ij}' \hat{\eta}_k}}{\hat{\rho}_{ik} }$$
+The main difference between this model and the original CovBat model is that the $\hat{\rho}_{ik}$ are estimated using the variances residualized on covariates.
+
+---
+
+## Simulation Modification
+- Before, covariate effect on covariance was just the Site 2 effect on covariance
+- We test two alternative covariate effects
+    1. Linear combination of all three site-specific matrices
+    2. First 20 PCs from data generated without confounding
+
+---
+
+## All Sites: Base
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+load("../../animats_add.Rdata")
+plot_mat(-5 * (allmat[,,1] + allmat[,,2] + allmat[,,3]))
+```
+
+
+---
+
+## All Sites: No Covariate
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+load("../../allmat_auc_ctrl.Rdata")
+plot_mat(df_in$cov[[2]][[1]])
+```
+
+---
+
+## All Sites: With Covariate
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(df_in$cov[[2]][[2]])
+```
+
+---
+
+## All Sites Effect
+```{r out.width='50%', fig.show='hold', fig.align='default'}
+knitr::include_graphics(c("allmat_auc_site_ctrl.png", "allmat_auc_dx_ctrl.png"))
+```
+
+---
+
+## Add PCs: Base
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+load("../../beta_mat.Rdata")
+plot_mat(25 * apply(beta_mat[,,1:20], c(1,2), mean))
+```
+
+
+---
+
+## Add PCs: No Covariate
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+load("../../allmat_auc_ctrl2.Rdata")
+plot_mat(df_in$cov[[2]][[1]])
+```
+
+---
+
+## Add PCs: With Covariate
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(df_in$cov[[2]][[2]])
+```
+
+---
+
+## PC Effect
+```{r out.width='50%', fig.show='hold', fig.align='default'}
+knitr::include_graphics(c("allmat_auc_site_ctrl2.png", "allmat_auc_dx_ctrl2.png"))
+```
+
+---
+
+## Simulation Results
+- Controlling for covariate effect exactly identical to site effects increases performance on site detection (site effects partially kept)
+- Instead using a similar matrix (first 20 PCs) shows that our CovBat modification can reduce site detection performance while also improving covariate detection
+- Promising results showing our modification produces substantially better results under confounding between site and covariate effects on the covariance of observations
+    - Need to further investigate how this situation may arise in real data
+
+---
+
+## References
+```{r, results="asis"}
+NoCite(bib, c("harvey_estimating_1976", "aitkin_modelling_1987", "spady_dual_2018", "spady_simultaneous_2018", "zhao_covariate_2018"))
+PrintBibliography(bib, .opts = list(style = "html"))
+```
