@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Covariance Harmonization
 PennSIVE Presentation (8/6/2019) [Slides](Covariance Harmonization/Covariance_Harmonization_PennSIVE_Presentation.html)  
 DBEI Summer Chalk Talk (8/28/2019) [Slides](Covariance Harmonization/Covariance_Harmonization_Chalk_Talk.html)  
+BSTA751 Presentation (12/5/2019) [Slides](Covariance Harmonization/Slides - Removal of Scanner Effects in Covariance.pdf)
 
 ### Write-Ups
 Summer Rotation 2019 Literature Review [PDF](Covariance Harmonization/Covariance_Harmonization_Review.pdf)  
