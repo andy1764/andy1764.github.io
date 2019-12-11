@@ -28,7 +28,8 @@ Functional Connectivity CovBat [PDF](Covariance Harmonization/FC-CovBat.pdf)
 10/23: Manuscript Simulation Investigation [Slides](Covariance Harmonization/10-23-Manuscript-Simulations.html)  
 10/30: FC CovBat Initial Tests [Slides](Covariance Harmonization/10-30-FC-CovBat-Updates-and-Manuscript-Simulations.html)  
 11/12: CovBat Controlling for Variance Parameters [Slides](Covariance Harmonization/11-12/11-12-CovBat-Controlling-for-Covariates.html)  
-11/19: CovBat using Training Set and Controlling for Variance [Slides](Covariance Harmonization/11-19/11-19-CovBat-Improvements.html)
+11/19: CovBat using Training Set and Controlling for Variance [Slides](Covariance Harmonization/11-19/11-19-CovBat-Improvements.html)  
+12/11: ABCD Dataset CovBat Initial Results [Slides](Covariance Harmonization/12-11/12-11-ABCD-Preliminary-Results.html)  
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)

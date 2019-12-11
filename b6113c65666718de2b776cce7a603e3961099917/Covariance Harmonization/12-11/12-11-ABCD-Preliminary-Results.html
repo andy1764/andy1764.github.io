@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ABCD Dataset: CovBat Results</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# ABCD Dataset: CovBat Results
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+## CovBat Controlling for Covariates
+After ComBat step we have
+`$$\xi_{ijk} = \mu_{ik} + \rho_{ik} \epsilon_{ijk}$$`
+Instead of assuming `\(\epsilon_{ijk} \sim N(0, \tau_{k}^2)\)`, let's assume `\(\epsilon_{ijk} \sim N(0, \tau_{ik})\)` where `\(log(\tau_{ik}^2) = z_ij' \theta_k + x_ij' \eta_k\)` where `\(x_i\)` are the vector of covariates and `\(z_i\)` are the vector of indicators for site. Our goal is to regress the score variances on the covariates and site then residualize with respect to the covariates before adjusting the variances for site. After estimation, we remove the covariate effect on the variances then find `\(\mu_{ik}\)` and `\(\rho_{ik}\)` that bring the residual variance to the pooled residual variance. Once we multiply back the covariate effect on the variance, the adjusted scores are
+`$$\xi_{ijk}^{CovBat} = \left(\frac{\xi_{ijk}}{e^{x_{ij}' \hat{\eta}_k}}  - \hat{\mu}_{ik}\right)\frac{e^{x_{ij}' \hat{\eta}_k}}{\hat{\rho}_{ik} }$$`
+The main difference between this model and the original CovBat model is that the `\(\hat{\rho}_{ik}\)` are estimated using the variances residualized on covariates.
+
+---
+
+## ABCD Dataset
+- 8198 subjects over 29 scanners with ID (17 Siemens, 9 GE, 3 Philips)
+    - Scanners without serial number excluded from analyses (11400 subjects originally)
+- For numerical reasons, subset to scanners with `\(\le 200\)` subjects
+- Subset considered is 1599 subjects over 13 scanners (7 Siemens, 5 GE, 1 Philips)
+- Demographics from the three largest sites are displayed below
+
+
+
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; A &lt;/th&gt; &lt;th&gt; B &lt;/th&gt; &lt;th&gt; C &lt;/th&gt; &lt;th&gt; p &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; n &lt;/td&gt; &lt;td&gt; 197 &lt;/td&gt; &lt;td&gt; 199 &lt;/td&gt; &lt;td&gt; 196 &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; sex = M (%) &lt;/td&gt; &lt;td&gt; 103 (52.3) &lt;/td&gt; &lt;td&gt; 98 (49.2) &lt;/td&gt; &lt;td&gt; 100 (51.0) &lt;/td&gt; &lt;td&gt; 0.831 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; age (mean (SD)) &lt;/td&gt; &lt;td&gt; 27.60 (12.74) &lt;/td&gt; &lt;td&gt; 25.71 (13.13) &lt;/td&gt; &lt;td&gt; 36.92 (7.97) &lt;/td&gt; &lt;td&gt; &amp;lt;0.001 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; ehi_y_ss_scoreb (%) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt; 0.385 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt;    1 &lt;/td&gt; &lt;td&gt; 156 (79.2) &lt;/td&gt; &lt;td&gt; 170 (85.4) &lt;/td&gt; &lt;td&gt; 158 (80.6) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt;    2 &lt;/td&gt; &lt;td&gt; 17 (8.6) &lt;/td&gt; &lt;td&gt; 8 (4.0) &lt;/td&gt; &lt;td&gt; 14 (7.1) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt;    3 &lt;/td&gt; &lt;td&gt; 24 (12.2) &lt;/td&gt; &lt;td&gt; 21 (10.6) &lt;/td&gt; &lt;td&gt; 24 (12.2) &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+## Harmonization of Correlations
+
+&lt;img src="abcd_corr.png" width="95%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Harmonization of Covariance
+
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Unharmonized &lt;/th&gt; &lt;th&gt; ComBat &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; A,B &lt;/td&gt; &lt;td align="right"&gt; 72.93 &lt;/td&gt; &lt;td align="right"&gt; 72.93 &lt;/td&gt; &lt;td align="right"&gt; 50.94 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; A,C &lt;/td&gt; &lt;td align="right"&gt; 74.72 &lt;/td&gt; &lt;td align="right"&gt; 74.72 &lt;/td&gt; &lt;td align="right"&gt; 64.28 &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; B,C &lt;/td&gt; &lt;td align="right"&gt; 62.25 &lt;/td&gt; &lt;td align="right"&gt; 62.25 &lt;/td&gt; &lt;td align="right"&gt; 61.69 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+## Scanner MVPA
+&lt;img src="abcd_auc_score_ctrl.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Sex MVPA
+&lt;img src="abcd_auc_m_ctrl.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Handedness MVPA
+&lt;img src="abcd_auc_hand_ctrl.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Summary
+- Scanner effects on covariance less severe than ADNI dataset
+    - Yet scanner even more easily detected before and after harmonization
+- Lesser improvements across the board in MVPA experiments
+- Less improvement when controlling for covariates
+- Need to investigate numerical properties of variance effect estimation
+    - Boils down to a problem with likelihood maximization
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
