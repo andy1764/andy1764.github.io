@@ -1,0 +1,292 @@
+---
+title: "FC CovBat using Log Transform"
+author:
+  - Andrew Chen
+  - Advised by Haochang Shou and Taki Shinohara
+fontsize: 16pt
+always_allow_html: yes
+output:
+  xaringan::moon_reader:
+    css: ["xaringan-themer.css"]
+    nature:
+      slideNumberFormat: "%current%"
+  beamer_presentation:
+    theme: "Szeged"
+    colortheme: "dolphin"
+header_includes: 
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(reshape2)
+library(ggplot2)
+library(xaringanthemer)
+library(xtable)
+library(lessR)
+library(tableone)
+library(plotly)
+library(png)
+library(grid)
+library(psych)
+
+theme_set(theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
+options(digits = 4)
+
+load("../../BLSA CARDIA Example/sm_fc_covout.Rdata")
+load("../../BLSA CARDIA Example/sm_fc_norms.Rdata")
+source("../../covbat.R", chdir = TRUE)
+```
+
+# Introducing CovBat for Functional Connectivity
+- Similar idea as regular CovBat but instead on matrix observations
+- Use PVD (Crainiceanu et al. 2011) to reduce dimension of matrices to $A \times A$ before performing PCA
+
+$$\log\Sigma_{ij} = \mathbf{P} \mathbf{V}_{ij} \mathbf{P}^T + \mathbf{E}_{ij}$$
+
+- Vectorize subject-specific matrices then perform PCA to obtain $\boldsymbol{\phi}_k$, which are just the eigenvectors arranged as $A \times A$ symmetric matrices
+- Left and right multiply by population-level matrix $P$ to obtain
+
+$$\log\Sigma_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \mathbf{P} \boldsymbol{\phi}_k \mathbf{P}^T + \mathbf{P} \boldsymbol{\eta}_i \mathbf{P}^T + \mathbf{E}_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \mathbf{\Phi}_k + \mathbf{e}_{ij}$$
+
+- Apply ComBat including covariates to the $\Lambda_{ijk}$, harmonizing across sites indexed by $i$
+- Recover CovBat-adjusted FC matrices by applying population-level framing, then taking the matrix exponential
+
+---
+
+# BLSA/Cardia Dataset
+- 742 subjects across two sites and 5 scanners (4 different scanners in CARDIA)
+- Initial tests using just BLSA and CARDIA_1, 25 subjects included from each
+
+```{r, include=FALSE}
+demotab <- CreateTableOne(vars = c("age_at_scan", "sex"), data = all_demo, strata = "site")
+tabout <- print(demotab)
+```
+
+```{r demo, results="asis"}
+print(xtable(tabout[,-7]), comment = FALSE, type = "html")
+```
+
+---
+
+# Implementation Considerations
+- How to guarantee positive semi-definite inputs
+    - Currently using *nearPD* function, uses algorithm developed by Higham (2002)
+- Inclusion/exclusion of PVD errors (\mathbf{E}_{ij} in the model)
+
+---
+
+# BLSA Subject 1 Covariance
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$dat.input[,,1])
+```
+
+---
+
+# BLSA Subject 1 Correlation
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(cov2cor(fc_covout$dat.input[,,1]))
+```
+
+---
+
+# BLSA Subject 1 Log Covariance
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$dat.log.input[,,1])
+```
+
+---
+
+# BLSA Subject 1 V Matrix
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$V[[1]])
+```
+
+---
+
+# BLSA Subject 1 w/o Error
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$dat.no.err[,,1])
+```
+
+---
+
+# BLSA Subject 1 CovBat w/o Error
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$dat.covbat.no.err[,,1])
+```
+
+---
+
+# BLSA Subject 1 CovBat w/o Error
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(cov2cor(fc_covout$dat.covbat.no.err[,,1]))
+```
+
+---
+
+# BLSA Subject 1 CovBat w/ Error
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$dat.covbat[,,1])
+```
+
+---
+
+# BLSA Subject 1 CovBat w/ Error
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(cov2cor(fc_covout$dat.covbat[,,1]))
+```
+
+---
+
+# CARDIA Subject 1 Covariance
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$dat.input[,,26])
+```
+
+---
+
+# CARDIA Subject 1 Correlation
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(cov2cor(fc_covout$dat.input[,,26]))
+```
+
+---
+
+# CARDIA Subject 1 Log Covariance
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$dat.log.input[,,26])
+```
+
+---
+
+# CARDIA Subject 1 V Matrix
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$V[[26]])
+```
+
+---
+
+# CARDIA Subject 1 w/o Error
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$dat.no.err[,,26])
+```
+
+---
+
+# CARDIA Subject 1 CovBat w/o Error
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$dat.covbat.no.err[,,26])
+```
+
+---
+
+# CARDIA Subject 1 CovBat w/o Error
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(cov2cor(fc_covout$dat.covbat.no.err[,,26]))
+```
+
+---
+
+# CARDIA Subject 1 CovBat w/ Error
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(fc_covout$dat.covbat[,,26])
+```
+
+---
+
+# CARDIA Subject 1 CovBat w/ Error
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(cov2cor(fc_covout$dat.covbat[,,26]))
+```
+
+---
+
+# BLSA Subject 1 Before
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(cov2cor(fc_covout$dat.input[,,1]))
+```
+
+---
+
+# CARDIA Subject 1 Before
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(cov2cor(fc_covout$dat.input[,,26]))
+```
+
+---
+
+# BLSA Subject 1 After
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(cov2cor(fc_covout$dat.covbat[,,1]))
+```
+
+---
+
+# CARDIA Subject 1 After
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(cov2cor(fc_covout$dat.covbat[,,26]))
+```
+
+---
+
+# Still Unexpected Frobenius Norm Results
+- For now, evaluate based on mean of all Frobenius norms between those in site A and those in site B
+- Goes up for covariance and down for correlation
+
+Covariance
+```{r, results="asis"}
+print(xtable(site_1_2_cov), comment = FALSE, type = "html")
+```
+
+Correlation
+```{r, results="asis"}
+print(xtable(site_1_2_cor), comment = FALSE, type = "html")
+```
+
+---
+
+# PC Score Correction
+```{r}
+bat <- as.numeric(all_demo$site)
+
+var_in <- rbind(A = apply(fc_covout$x.pc$x[bat==1,], 2, var)[1:5],
+                B = apply(fc_covout$x.pc$x[bat==2,], 2, var)[1:5])
+var_out <- rbind(A = apply(fc_covout$com.scores$dat.combat[,bat==1], 1, var)[1:5],
+                 B = apply(fc_covout$com.scores$dat.combat[,bat==2], 1, var)[1:5])
+
+mean_in <- rbind(A = apply(fc_covout$x.pc$x[bat==1,], 2, mean)[1:5],
+                 B = apply(fc_covout$x.pc$x[bat==2,], 2, mean)[1:5])
+mean_out <- rbind(A = apply(fc_covout$com.scores$dat.combat[,bat==1], 1, mean)[1:5],
+                  B = apply(fc_covout$com.scores$dat.combat[,bat==2], 1, mean)[1:5])
+```
+
+Score Variance Before
+
+```{r, results="asis"}
+print(xtable(var_in), comment = FALSE, type = "html")
+```
+
+Score Variance After
+
+```{r, results="asis"}
+print(xtable(var_out), comment = FALSE, type = "html")
+```
+
+---
+
+# PC Score Correction
+
+Score Mean Before
+
+```{r, results="asis"}
+print(xtable(mean_in), comment = FALSE, type = "html")
+```
+
+Score Mean After
+
+```{r, results="asis"}
+print(xtable(mean_out), comment = FALSE, type = "html")
+```
