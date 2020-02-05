@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Toward a Covariance Regression Model</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Toward a Covariance Regression Model
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+# ABCD Two-Sample Covariance Tests
+
+- Permutation tests previously suggested that considerable differences in covariance exist between Prisma and Prisma fit scanners
+- Cai and Ma (2013) suggest another way to perform this two-sample test using a test statistic based on the maximum difference between entries of two covariance matrices
+- For Prisma vs Prisma fit, this test statistic is 43.7204 compared against threshold of 18.1545, so we reject the null
+- For Philips Ingenia vs Achieva dStream, this test statistic is 13.8507 compared against threshold of 18.1545, so we fail to reject the null
+
+---
+
+# Existing Covariance Regressions
+- Hoff and Niu (2012) propose the following model for estimating a rank `\(q\)` covariance effect
+`$$\Sigma_i = \Psi + \sum_{k=1}^q B_k \boldsymbol{x}_i \boldsymbol{x}_i^T B_k^T$$`
+    - `\(B_k\)` are `\(r \times p\)` where `\(r\)` is the dimension of the outcome and `\(p\)` is the dimension of the covariates
+    - Likely infeasible for estimating higher rank covariance effects
+- Zou et al. (2017) base their covariance regression model on modeling covariance as a sum similarity/dissimilarity matrices (e.g. subject 1 and 2 are similar if share the same gender, dissimilar otherwise)
+    - Additive model, but need to carefully define the similarity matrices
+    
+---
+
+# Existing Covariance Regressions
+- Zhao et al. (2018) find simulatenously find directions of variation that are maximally explained by the covariates and the degree to which those covariates are related to the variance in those directions
+    - Allows for flexbility in the form of covariance effects
+    - Feasible for higher rank effects
+
+---
+
+# Proposed Covariance Regression
+- We suggest a covariance regression model that is concerningly simple and only involves PCA and a heteroscedasticity model on the PC score variances
+- Let `\(\boldsymbol{y}_1, \boldsymbol{y}_2, \ldots, \boldsymbol{y}_n\)` be i.i.d. `\(r \times 1\)` draws from a random vector `\(\boldsymbol{y}\)` with means `\(\boldsymbol{\mu}_i\)` and covariances `\(\Sigma_i\)` and `\(\boldsymbol{x}_1, \boldsymbol{x}_2, \ldots, \boldsymbol{x}_n\)` be `\(p \times 1\)` covariate vectors
+- Assume without loss of generality that `\(\boldsymbol{\mu}_i = \boldsymbol{0}\)` for all `\(i\)` and then perform PCA
+`$$\Sigma_i = \sum_{k=1}^Q \lambda_{ik} \boldsymbol{\phi}_k \boldsymbol{\phi}_k^T$$` 
+- Then model the variance of PCs
+`$$\log(\lambda_{ik}) = \boldsymbol{x}_i^T \gamma_k$$`
+- So the covariance matrices are then modeled as
+`$$\Sigma_i = \sum_{k=1}^q \exp(\boldsymbol{x}_i^T \gamma_k) \boldsymbol{\phi}_k \boldsymbol{\phi}_k^T + E_i$$`
+for a rank `\(q\)` covariance effect.
+
+---
+
+# Advantages/Disadvantages
+- Very simple estimation, relies on nothing more than PCA and GLM estimation procedures
+- Easy to obtain prediction for subjects or sets of covariates
+- Confidence intervals and hypothesis can be easily derived from heteroscedasticity models (may need some multiple comparisons correction, still investigating)
+- However, covariance effects limited in form to some linear combination of eigenvector outer products
+
+---
+
+# Initial Simulation Results
+- Same situation as CovBat paper
+`$$\boldsymbol{y}_{ij} = \boldsymbol{\alpha} + x_{ij} \boldsymbol{\beta} + \boldsymbol{\gamma}_i + \boldsymbol{\delta}_i^T \boldsymbol{e}_{ij}$$`
+where `\(e_{ij} \sim \text{N}(\boldsymbol{0}, \Sigma + \Omega_i + x_{ij}\Psi)\)`
+- We chose `\(\Psi\)` to be similar to `\(\Omega_2\)`, which looks like a pig
+
+---
+
+# Intercept (Somewhat Positive Duck)
+
+&lt;img src="1-29-Toward-a-Covariance-Regression-Model_files/figure-html/unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Scanner 2 (Negative Cat)
+
+&lt;img src="1-29-Toward-a-Covariance-Regression-Model_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Scanner 3 (Positive Pig)
+&lt;img src="1-29-Toward-a-Covariance-Regression-Model_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Intercept + Covariate
+&lt;img src="1-29-Toward-a-Covariance-Regression-Model_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Covariate (Negative Pig)
+&lt;img src="1-29-Toward-a-Covariance-Regression-Model_files/figure-html/unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# References
+&lt;a name=bib-cai_two-sample_2013&gt;&lt;/a&gt;[Cai, T, W. Liu, and Y.
+Xia](#cite-cai_two-sample_2013) (2013). "Two-Sample Covariance Matrix
+Testing and Support Recovery in High-Dimensional and Sparse Settings".
+In: _Journal of the American Statistical Association_ 108.501, pp.
+265-277. ISSN: 0162-1459. DOI:
+[10.1080/01621459.2012.758041](https://doi.org/10.1080%2F01621459.2012.758041).
+
+&lt;a name=bib-hoff_covariance_2012&gt;&lt;/a&gt;[Hoff, P. D. and X.
+Niu](#cite-hoff_covariance_2012) (2012). "A COVARIANCE REGRESSION
+MODEL". In: _Statistica Sinica_ 22.2, pp. 729-753. ISSN: 1017-0405.
+
+&lt;a name=bib-zhao_covariate_2018&gt;&lt;/a&gt;[Zhao, Y, B. Wang, S. Mostofsky, et
+al.](#cite-zhao_covariate_2018) (2018). "Covariate Assisted Principal
+Regression for Covariance Matrix Outcomes". In: _bioRxiv_, p. 425033.
+
+&lt;a name=bib-zou_covariance_2017&gt;&lt;/a&gt;[Zou, T, W. Lan, H. Wang, et
+al.](#cite-zou_covariance_2017) (2017). "Covariance Regression
+Analysis". In: _Journal of the American Statistical Association_
+112.517, pp. 266-281. ISSN: 0162-1459. DOI:
+[10.1080/01621459.2015.1131699](https://doi.org/10.1080%2F01621459.2015.1131699).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

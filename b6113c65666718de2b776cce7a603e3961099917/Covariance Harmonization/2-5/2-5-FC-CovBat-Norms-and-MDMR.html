@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>FC CovBat: Norms, Means, and MDMR</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# FC CovBat: Norms, Means, and MDMR
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+# Introducing CovBat for Functional Connectivity
+- Similar idea as regular CovBat but instead on `\(p \times p\)` matrix observations
+- Let's skip the PVD idea and just vectorize then apply PCA
+- Vectorize subject-specific matrices then perform PCA to obtain `\(\boldsymbol{\phi}_k\)`, which are just the eigenvectors arranged as `\(p \times p\)` symmetric matrices `\(\boldsymbol{\phi}_k\)`
+
+`$$\log\Sigma_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \boldsymbol{\phi}_k + \mathbf{E}_{ij}$$`
+
+- Apply ComBat including covariates to the `\(\Lambda_{ijk}\)`, harmonizing across sites indexed by `\(i\)`
+- Recover CovBat-adjusted FC matrices by taking the matrix exponential
+
+---
+
+# Cardia 1/4 Dataset
+- 196 subjects across two sites
+
+
+
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; CARDIA_1 &lt;/th&gt; &lt;th&gt; CARDIA_4 &lt;/th&gt; &lt;th&gt; p &lt;/th&gt; &lt;th&gt; test &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; n &lt;/td&gt; &lt;td&gt;    57 &lt;/td&gt; &lt;td&gt;   139 &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; age_at_scan (mean (SD)) &lt;/td&gt; &lt;td&gt; 50.12 (3.42) &lt;/td&gt; &lt;td&gt; 50.12 (3.64) &lt;/td&gt; &lt;td&gt;  0.989 &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; sex = M (%) &lt;/td&gt; &lt;td&gt;    22 (38.6)  &lt;/td&gt; &lt;td&gt;    55 (39.6)  &lt;/td&gt; &lt;td&gt;  1.000 &lt;/td&gt; &lt;td&gt;  &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# Metric Considerations
+- For this method, we map symmetric positive semi-definite matrices into the space of symmetric matrices via the matrix logarithm
+    - PC-based harmonization works better in the space of symmetric matrices since neither increasing nor decreasing the PC scores generates new matrices outside the space
+- However, evaluating this harmonization method requires careful consideration of which distance metrics to use
+- We compare common metrics by drawing from two different multivariate normal distributions with different covariance matrices then finding the mean (simple case, `\(n = 2\)`)
+    - Frobenius: `\(\lVert A - B \rVert_F\)`
+    - Log-Euclidean: `\(\lVert \log(A) - \log(B) \rVert_F\)`
+    - Root-Euclidean: `\(\lVert A - B \rVert_F\)`
+    - Cholesky: `\(\lVert \text{chol}(A) - \text{chol}(B) \rVert_F\)`
+
+---
+
+# Original Sample 1
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Original Sample 2
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-3-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Euclidean Mean
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-4-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Cholesky Mean
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Root-Euclidean Mean
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Log-Euclidean Mean
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-7-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Original Sample 1 Correlation
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-8-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Original Sample 2 Correlation
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-9-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Euclidean Mean
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-10-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Cholesky Mean
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-11-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Root-Euclidean Mean
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-12-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Log-Euclidean Mean
+&lt;img src="2-5-FC-CovBat-Norms-and-MDMR_files/figure-html/unnamed-chunk-13-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Evaluating Harmonization Results
+- We first evaluate based on mean of all Frobenius norms between those in site A (CARDIA 1) and those in site B (CARDIA 4)
+- Previous investigation showed that harmonization does not show substantial benefits in Frobenius distance
+
+&lt;center&gt;
+Covariance
+&lt;/center&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Raw &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1 &lt;/td&gt; &lt;td align="right"&gt; 666061111.36 &lt;/td&gt; &lt;td align="right"&gt; 1246769334.97 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+&lt;center&gt;
+Correlation
+&lt;/center&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Raw &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1 &lt;/td&gt; &lt;td align="right"&gt; 11359.41 &lt;/td&gt; &lt;td align="right"&gt; 12153.74 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# Log-Euclidean and Graph Results
+- Since our method works on the log-covariance, we actually expect to see better results in the log-Euclidean distance `\(d(A, B) = \lVert \log(A) - \log(B) \rVert_F\)`, which we somewhat see
+
+&lt;center&gt;
+Log-Covariance
+&lt;/center&gt;
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Raw &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1 &lt;/td&gt; &lt;td align="right"&gt; 8493.92 &lt;/td&gt; &lt;td align="right"&gt; 8464.91 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+- Alternatively, we can look at distances between derived graphs which may be less sensitive to noise
+    - For now, we define edges between vertices with correlation `\(\geq 0.5\)`
+    - Then we can compare the graph Laplacian matrices using any metric
+
+---
+
+# Graph Results
+- For now, we just try the Euclidean distance for graphs
+
+&lt;table border=1&gt;
+&lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Raw &lt;/th&gt; &lt;th&gt; CovBat &lt;/th&gt;  &lt;/tr&gt;
+  &lt;tr&gt; &lt;td align="right"&gt; 1 &lt;/td&gt; &lt;td align="right"&gt; 435.28 &lt;/td&gt; &lt;td align="right"&gt; 428.92 &lt;/td&gt; &lt;/tr&gt;
+   &lt;/table&gt;
+
+---
+
+# MDMR Results
+
+- After choosing a metric, we can use multivariate distance matrix regression (MDMR) to test the hypothesis that the regressor variables (site) have no relationship to variance in the distance among subjects (Zapala and Schork, 2012)
+    - Due to the relatively small sample ( `\(n = 196\)` ), we find the null distribution using 10000 permutations
+- For the Frobenius distance matrix, results are not promising
+    - Pre-CovBat `\(p =\)` 0
+    - Post-CovBat `\(p =\)` 0
+
+- For log-Euclidean though, very promising
+    - Pre-CovBat `\(p =\)` 0
+    - Post-CovBat `\(p =\)` 1
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

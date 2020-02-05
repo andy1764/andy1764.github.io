@@ -1,0 +1,231 @@
+---
+title: "FC CovBat: Norms, Means, and MDMR"
+author:
+  - Andrew Chen
+  - Advised by Haochang Shou and Taki Shinohara
+fontsize: 16pt
+always_allow_html: yes
+output:
+  xaringan::moon_reader:
+    css: ["xaringan-themer.css"]
+    nature:
+      slideNumberFormat: "%current%"
+  beamer_presentation:
+    theme: "Szeged"
+    colortheme: "dolphin"
+header_includes: 
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(reshape2)
+library(ggplot2)
+library(xaringanthemer)
+library(xtable)
+library(lessR)
+library(tableone)
+library(plotly)
+library(png)
+library(grid)
+library(psych)
+
+theme_set(theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
+options(digits = 4)
+
+load("../../ABCD Example/pris_vs_fit_perm.Rdata")
+load("../../BLSA CARDIA Example/cardia_1_4_covout_noPVD.Rdata")
+load("../../BLSA CARDIA Example/cardia_fc_norms.Rdata")
+source("../../covbat.R", chdir = TRUE)
+```
+
+# Introducing CovBat for Functional Connectivity
+- Similar idea as regular CovBat but instead on $p \times p$ matrix observations
+- Let's skip the PVD idea and just vectorize then apply PCA
+- Vectorize subject-specific matrices then perform PCA to obtain $\boldsymbol{\phi}_k$, which are just the eigenvectors arranged as $p \times p$ symmetric matrices $\boldsymbol{\phi}_k$
+
+$$\log\Sigma_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \boldsymbol{\phi}_k + \mathbf{E}_{ij}$$
+
+- Apply ComBat including covariates to the $\Lambda_{ijk}$, harmonizing across sites indexed by $i$
+- Recover CovBat-adjusted FC matrices by taking the matrix exponential
+
+---
+
+# Cardia 1/4 Dataset
+- 196 subjects across two sites
+
+```{r, include=FALSE}
+demotab <- CreateTableOne(vars = c("age_at_scan", "sex"), data = all_demo, strata = "site")
+tabout <- print(demotab)
+```
+
+```{r demo, results="asis"}
+print(xtable(tabout[,-7]), comment = FALSE, type = "html")
+```
+
+---
+
+# Metric Considerations
+- For this method, we map symmetric positive semi-definite matrices into the space of symmetric matrices via the matrix logarithm
+    - PC-based harmonization works better in the space of symmetric matrices since neither increasing nor decreasing the PC scores generates new matrices outside the space
+- However, evaluating this harmonization method requires careful consideration of which distance metrics to use
+- We compare common metrics by drawing from two different multivariate normal distributions with different covariance matrices then finding the mean (simple case, $n = 2$)
+    - Frobenius: $\lVert A - B \rVert_F$
+    - Log-Euclidean: $\lVert \log(A) - \log(B) \rVert_F$
+    - Root-Euclidean: $\lVert A - B \rVert_F$
+    - Cholesky: $\lVert \text{chol}(A) - \text{chol}(B) \rVert_F$
+
+---
+
+# Original Sample 1
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+load("../../BLSA CARDIA Example/cov_mean_tests.Rdata")
+plot_mat(samples[,,1])
+```
+
+---
+
+# Original Sample 2
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(samples[,,2])
+```
+
+---
+
+# Euclidean Mean
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(mE)
+```
+
+---
+
+# Cholesky Mean
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(mC)
+```
+
+---
+
+# Root-Euclidean Mean
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(mRE)
+```
+
+---
+
+# Log-Euclidean Mean
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(mL)
+```
+
+---
+
+# Original Sample 1 Correlation
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+load("../../BLSA CARDIA Example/cor_mean_tests.Rdata")
+plot_mat(samples[,,1])
+```
+
+---
+
+# Original Sample 2 Correlation
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(samples[,,2])
+```
+
+---
+
+# Euclidean Mean
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(mE)
+```
+
+---
+
+# Cholesky Mean
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(mC)
+```
+
+---
+
+# Root-Euclidean Mean
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(mRE)
+```
+
+---
+
+# Log-Euclidean Mean
+```{r fig.width=10, fig.height=10, fig.show='hold', fig.align='center', out.width = "70%"}
+plot_mat(mL)
+```
+
+---
+
+# Evaluating Harmonization Results
+- We first evaluate based on mean of all Frobenius norms between those in site A (CARDIA 1) and those in site B (CARDIA 4)
+- Previous investigation showed that harmonization does not show substantial benefits in Frobenius distance
+
+<center>
+Covariance
+</center>
+```{r, results="asis"}
+print(xtable(site_1_2_cov), comment = FALSE, type = "html")
+```
+
+<center>
+Correlation
+</center>
+```{r, results="asis"}
+print(xtable(site_1_2_cor), comment = FALSE, type = "html")
+```
+
+---
+
+# Log-Euclidean and Graph Results
+- Since our method works on the log-covariance, we actually expect to see better results in the log-Euclidean distance $d(A, B) = \lVert \log(A) - \log(B) \rVert_F$, which we somewhat see
+
+<center>
+Log-Covariance
+</center>
+```{r, results="asis"}
+load("../../BLSA CARDIA Example/cardia_fc_log_norms.Rdata")
+print(xtable(site_1_2_cov), comment = FALSE, type = "html")
+```
+
+- Alternatively, we can look at distances between derived graphs which may be less sensitive to noise
+    - For now, we define edges between vertices with correlation $\geq 0.5$
+    - Then we can compare the graph Laplacian matrices using any metric
+
+---
+
+# Graph Results
+- For now, we just try the Euclidean distance for graphs
+
+```{r, results="asis"}
+load("../../BLSA CARDIA Example/cardia_graph_norms.Rdata")
+print(xtable(site_1_2_graph), comment = FALSE, type = "html")
+```
+
+---
+
+# MDMR Results
+```{r}
+load("../../BLSA CARDIA Example/euclidean_mdmr.Rdata")
+```
+- After choosing a metric, we can use multivariate distance matrix regression (MDMR) to test the hypothesis that the regressor variables (site) have no relationship to variance in the distance among subjects (Zapala and Schork, 2012)
+    - Due to the relatively small sample ( $n = 196$ ), we find the null distribution using 10000 permutations
+- For the Frobenius distance matrix, results are not promising
+    - Pre-CovBat $p =$ `r mdmr_pre$pv[2,1]`
+    - Post-CovBat $p =$ `r mdmr_post$pv[2,1]`
+```{r}
+load("../../BLSA CARDIA Example/log_euclidean_mdmr.Rdata")
+```
+- For log-Euclidean though, very promising
+    - Pre-CovBat $p =$ `r mdmr_pre$pv[2,1]`
+    - Post-CovBat $p =$ `r mdmr_post$pv[2,1]`
+
+
