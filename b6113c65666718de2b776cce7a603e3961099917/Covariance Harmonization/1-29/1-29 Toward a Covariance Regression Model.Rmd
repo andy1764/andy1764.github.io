@@ -48,7 +48,7 @@ myBib <- ReadBib("bibliography.bib", check = FALSE)
 source("../../covbat.R", chdir = TRUE)
 ```
 
-# ABCD Two-Sample Covariance Tests
+# ABCD Covariance Tests
 ```{r}
 load("../../ABCD Example/two-sample_covtests.Rdata")
 ```
