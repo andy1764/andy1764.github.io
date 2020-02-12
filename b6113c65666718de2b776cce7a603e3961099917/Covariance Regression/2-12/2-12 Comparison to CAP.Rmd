@@ -1,0 +1,220 @@
+---
+title: "Covariance Regressions: PC vs CAP"
+author:
+  - Andrew Chen
+  - Advised by Haochang Shou and Taki Shinohara
+fontsize: 16pt
+always_allow_html: yes
+output:
+  xaringan::moon_reader:
+    css: ["xaringan-themer.css"]
+    nature:
+      slideNumberFormat: "%current%"
+  beamer_presentation:
+    theme: "Szeged"
+    colortheme: "dolphin"
+header_includes: 
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(reshape2)
+library(ggplot2)
+library(xaringanthemer)
+library(xtable)
+library(lessR)
+library(tableone)
+library(plotly)
+library(png)
+library(grid)
+library(psych)
+library()
+
+theme_set(theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
+options(digits = 4)
+
+library(RefManageR)
+BibOptions(check.entries = FALSE,
+           bib.style = "authoryear",
+           cite.style = "alphabetic",
+           style = "markdown",
+           dashed = FALSE)
+myBib <- ReadBib("bibliography.bib", check = FALSE)
+
+source("../../lmcov.R", chdir = TRUE)
+```
+
+## ABCD Covariance Tests
+```{r}
+load("../../ABCD Example/two-sample_covtests.Rdata")
+```
+- Permutation tests previously suggested that considerable differences in covariance exist between Prisma and Prisma fit scanners
+- Cai and Ma (2013) suggest another way to perform this two-sample test using a test statistic based on the maximum difference between entries of two covariance matrices
+- For Prisma vs Prisma fit, this test statistic is `r covtest_siemens$statistic` compared against threshold of `r covtest_siemens$threshold`, so we reject the null
+- For Philips Ingenia vs Achieva dStream, this test statistic is `r covtest_philips$statistic` compared against threshold of `r covtest_philips$threshold`, so we fail to reject the null
+
+---
+
+## Proposed Covariance Regression
+- We suggest a covariance regression model that is concerningly simple and only involves PCA and a heteroscedasticity model on the PC score variances
+- Let $\boldsymbol{y}_1, \boldsymbol{y}_2, \ldots, \boldsymbol{y}_n$ be i.i.d. $r \times 1$ draws from a random vector $\boldsymbol{y}$ with means $\boldsymbol{\mu}_i$ and covariances $\Sigma_i$ and $\boldsymbol{x}_1, \boldsymbol{x}_2, \ldots, \boldsymbol{x}_n$ be $p \times 1$ covariate vectors
+- Assume without loss of generality that $\boldsymbol{\mu}_i = \boldsymbol{0}$ for all $i$ and then perform PCA
+$$\Sigma_i = \sum_{k=1}^Q \lambda_{ik} \boldsymbol{\phi}_k \boldsymbol{\phi}_k^T$$ 
+- Then assume a log-linear model on the variance of PCs
+$$\log(\lambda_{ik}) = \boldsymbol{x}_i^T \gamma_k$$
+- So the covariance matrices are then expressed as
+$$\Sigma_i = \sum_{k=1}^q \exp(\boldsymbol{x}_i^T \gamma_k) \boldsymbol{\phi}_k \boldsymbol{\phi}_k^T + E_i$$
+for a rank $q$ covariance effect.
+
+---
+
+## Advantages/Disadvantages
+- Very simple estimation, relies on nothing more than PCA and GLM estimation procedures
+- Easy to obtain prediction for subjects or sets of covariates
+- Confidence intervals and hypothesis testing can be easily derived from heteroscedasticity models
+- However, covariance effects limited in form to some linear combination of eigenvector outer products
+
+---
+
+## Covariate-Assisted Principal (CAP) Regression
+- Zhao et al. (2019) propose a similar model for sample covariance outcomes ( $\mathbf{S}_i$ ), $i=1,\ldots,n$
+- Block coordinate descent is used to minimize the negative log-likelihood function over $\boldsymbol{\gamma}$ and $\boldsymbol{\eta}$ 
+$$\frac{1}{2}\sum_{i=1}^n(\boldsymbol{x}_i^T\boldsymbol{\gamma})\cdot T_i+\frac{1}{2}\sum_{i=1}^n\boldsymbol{\eta}^T\mathbf{S}_i\boldsymbol{\eta}\cdot\exp(-\boldsymbol{x}_i^T\boldsymbol{\gamma})$$
+- Asymptotic properties derived for known direction $\boldsymbol{\eta}$
+- Without known direction, asmyptotic properties achieved under the common principal components condition (CPC)
+$$\Sigma_i = \sum_{k=1}^Q \lambda_{ik} \boldsymbol{\phi}_k \boldsymbol{\phi}_k^T$$
+    - Consistency and asmyptotic normality of coefficient estimators established for each common principal component
+
+---
+
+## CAP Advantanges/Disadvantages
+- For same number of components, should identify directions more related to covariates
+- In comparison with regression on CPC eigenvalues, greater power to detect covariate effect
+- Works well for covariance matrix outcomes (each subject has one covariance matrix)
+- Does not work for vector-valued outcomes (groups of subjects have covariance matrices) since $\mathbf{S}_i$ must be calculated
+
+---
+
+## Simulation Design
+- In order for proposed model to be comparable to CAP, need to simulate multiple observations per subject
+- Let $i$ index subjects $i=1,\ldots,n$ and $j$ index their observations $j=1,\ldots,m$ then we simulate
+$$\boldsymbol{y}_{ij} = \text{N}(\boldsymbol{0}, \sum_{k=1}^q \exp(\boldsymbol{x}_i^T \gamma_k) \boldsymbol{\phi}_k \boldsymbol{\phi}_k^T)$$
+- We have a 3-dimensional outcome the 3 PCs being the standard basis
+    - CAP model does not fit when number of PCs is less than dimension of outcome
+- For $\boldsymbol{x}_i$ we sample from a Bernoulli distribution with probability 0.5
+- For situation relating covariate to single PC, we have intercept terms for the 3 PCs as $(5,3,0)$ and coefficents $(0,0,2)$
+- For situation relating covariate to all PCs, we have intercept terms for the 3 PCs as $(5,3,1)$ and coefficents $(1,1,1)$
+- We have $n=100$ and $m=1000$ for these initial simulations
+
+---
+
+## Covariate Related to Single PC
+```{r}
+load("../../lmcov_cap_3rd_pc.Rdata")
+```
+- Covariate is associated with third PC $(0,0,1)$
+- PCA recovers significant association
+
+```{r}
+summary(lmcov_res$var.fit.all[[1]])$coefficients[3,]
+summary(lmcov_res$var.fit.all[[2]])$coefficients[3,]
+summary(lmcov_res$var.fit.all[[3]])$coefficients[3,]
+```
+
+- CAP recovers association in first direction, (`r cap_res$gamma[,1]`) with $p = 0$
+
+---
+
+## Covariate Related to All PCs
+```{r}
+load("../../lmcov_cap_all_3_pcs.Rdata")
+```
+- Covariate is associated with all PCs, $(1,0,0)$, $(0,1,0)$, and $(0,0,1)$
+- PCA recovers significant associations
+
+```{r}
+summary(lmcov_res$var.fit.all[[1]])$coefficients[3,]
+summary(lmcov_res$var.fit.all[[2]])$coefficients[3,]
+summary(lmcov_res$var.fit.all[[3]])$coefficients[3,]
+```
+
+---
+
+## Covariate Related to All PCs
+- CAP finds association in first three directions
+
+```{r}
+cap_res$gamma[,1]
+cap_inf[2,c(1,5,8)]
+cap_res$gamma[,2]
+cap_inf[2,c(2,6,9)]
+cap_res$gamma[,1]
+cap_inf[2,c(3,7,10)]
+```
+
+---
+
+## Initial ABCD Test: Proposed
+```{r}
+load("../../ABCD Example/abcd_lmcov_cap_mf.Rdata")
+```
+- Since CAP needs group-level covariance estimates, we start by applying CAP on subjects grouped by sex
+- Our proposed method works on subject-level outcome and covariates instead
+- We apply both methods to the cortical thickness data
+- For proposed method, we regress PCs that explain 80% of the variation and find three significant PCs after Bonferroni correction
+
+```{r, out.width="300px", out.height="300px"}
+plot(mf_p, ylim = c(0,0.02), xlab = "PC", ylab = "p-value"); abline(h = 0.05/length(mf_p), lty = 3)
+```
+
+---
+
+## Initial ABCD Test: CAP
+- CAP identifies three orthogonal directions, all highly significant
+```{r}
+cap_inf[2,c(1,5,8)]
+cap_inf[2,c(2,6,9)]
+cap_inf[2,c(3,7,10)]
+```
+- Inner product with significant PC directions shows they are not very similar
+```{r}
+c("1,PC1" = crossprod(cap_res$gamma[,1], lmcov_res$y.pc$rotation[,1]),
+  "1,PC2" = crossprod(cap_res$gamma[,1], lmcov_res$y.pc$rotation[,2]),
+  "1,PC3" = crossprod(cap_res$gamma[,1], lmcov_res$y.pc$rotation[,3]),
+  "2,PC2" = crossprod(cap_res$gamma[,2], lmcov_res$y.pc$rotation[,2]),
+  "2,PC3" = crossprod(cap_res$gamma[,2], lmcov_res$y.pc$rotation[,3]),
+  "3,PC3" = crossprod(cap_res$gamma[,3], lmcov_res$y.pc$rotation[,3]))
+```
+
+---
+
+## Initial ABCD Test
+- Proposed and CAP both identify multiple directions associated with sex
+- CAP does not seem to be notably more parsimonious
+- Computationally, CAP is very intensive for finding orthogonal directions
+    - Less so for non-orthogonal directions
+- Representing covariance matrix in CAP basis is possible, but may be computationally infeasible
+    - For proposed method, can easily obtain covariance point estimate
+
+---
+
+## Discussion
+- Proposed method does not immediately identify directions associated with covariates unless they drive a large portion of the variation in the outcome
+- CAP does not apply to vector-valued observations and does not easily determine a basis
+- For identifying the direction most driven by covariate, CAP is a good choice
+- For testing whether or not covariance is affected by covariates, proposed method may be more feasible
+    - Does covariance differ by site controlling for known covariates?
+    - Controlling for scanner effects on covariance, does age affect covariance of brain measures?
+
+---
+
+## References
+```{r ref, results="asis"}
+NoCite(myBib, c("cai_two-sample_2013",
+                "zhao_covariate_2018"))
+PrintBibliography(myBib)
+```
