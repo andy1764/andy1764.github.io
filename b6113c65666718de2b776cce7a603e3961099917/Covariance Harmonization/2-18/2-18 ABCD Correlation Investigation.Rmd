@@ -44,7 +44,7 @@ knitr::kable(scanners, "html", col.names=c("Subjects"))
 ## Correlation Permutation Tests
 - Initial tests of our harmonization method ([CovBat](https://www.biorxiv.org/content/10.1101/858415v2)) suggested that differences in covariance existed across scanners
     - Particularly notable between Prisma and Prisma Fit scanners
-- Designed two permutation tests to assess this difference
+- Designed two permutation tests to assess if this difference is likely due to chance
 
 ---
 ## Permuting over Scanner Label
@@ -61,7 +61,7 @@ plot(pris_fit_perm, 1)
 - To avoid effects due to number of subjects within each scanner, we shuffle scanner label and scanner ID
     - Compute correlation matrices within each scanner ID
     - Then report average pairwise distance between correlation matrices of different scanner labels
-- For Prisma vs Prisma Fit:
+- For Prisma vs. Prisma Fit:
     
 ```{r, fig.retina=3, fig.align="center", out.width="50%"}
 plot(pris_fit_id_perm, 5, "Average Frobenius Distance")
@@ -69,10 +69,13 @@ plot(pris_fit_id_perm, 5, "Average Frobenius Distance")
 
 ---
 ## Philips Scanners
-- Permutation test repeated for Achieva dStream vs Ingenia
+- Prisma vs. Prisma Fit test shows that, even accounting for sample size from each scanner, the correlation differences between Prisma and Prisma fit scanners are unlikely to be due to chance
+- We investigated if this is the case for different models of Philips scanners
+- Permutation test repeated for Achieva dStream vs. Ingenia:
 ```{r, fig.retina=3, fig.align="center", out.width="50%"}
 plot(philips_id_perm, 5, "Average Frobenius Distance")
 ```
+- For Philips scanners, the differences are not significant
 
 ---
 ## Philips vs Siemens Scanners
@@ -81,6 +84,8 @@ plot(philips_id_perm, 5, "Average Frobenius Distance")
 ```{r, fig.retina=3, fig.align="center", out.width="50%"}
 plot(phil_siem_id_perm, 7, "Average Frobenius Distance")
 ```
+
+- Which shows that Philips and Siemens scanners differ significantly in correlation
 
 ---
 ## Further Investigation

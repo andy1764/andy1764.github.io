@@ -63,7 +63,7 @@ class: center, middle, inverse, title-slide
 ## Correlation Permutation Tests
 - Initial tests of our harmonization method ([CovBat](https://www.biorxiv.org/content/10.1101/858415v2)) suggested that differences in covariance existed across scanners
     - Particularly notable between Prisma and Prisma Fit scanners
-- Designed two permutation tests to assess this difference
+- Designed two permutation tests to assess if this difference is likely due to chance
 
 ---
 ## Permuting over Scanner Label
@@ -78,20 +78,25 @@ class: center, middle, inverse, title-slide
 - To avoid effects due to number of subjects within each scanner, we shuffle scanner label and scanner ID
     - Compute correlation matrices within each scanner ID
     - Then report average pairwise distance between correlation matrices of different scanner labels
-- For Prisma vs Prisma Fit:
+- For Prisma vs. Prisma Fit:
     
 &lt;img src="2-18-ABCD-Correlation-Investigation_files/figure-html/unnamed-chunk-3-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
 ## Philips Scanners
-- Permutation test repeated for Achieva dStream vs Ingenia
+- Prisma vs. Prisma Fit test shows that, even accounting for sample size from each scanner, the correlation differences between Prisma and Prisma fit scanners are unlikely to be due to chance
+- We investigated if this is the case for different models of Philips scanners
+- Permutation test repeated for Achieva dStream vs. Ingenia:
 &lt;img src="2-18-ABCD-Correlation-Investigation_files/figure-html/unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+- For Philips scanners, the differences are not significant
 
 ---
 ## Philips vs Siemens Scanners
 - And again for Achieva dStream vs Prisma
 
 &lt;img src="2-18-ABCD-Correlation-Investigation_files/figure-html/unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+- Which shows that Philips and Siemens scanners differ significantly in correlation
 
 ---
 ## Further Investigation
