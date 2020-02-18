@@ -35,6 +35,7 @@ Functional Connectivity CovBat [PDF](Covariance Harmonization/FC-CovBat.pdf)
 1/29: Toward a Covariance Regression Model [Slides](Covariance Harmonization/1-29/1-29-Toward-a-Covariance-Regression-Model.html)  
 2/5: FC CovBat Distance and MDMR [Slides](Covariance Harmonization/2-5/2-5-FC-CovBat-Norms-and-MDMR.html)  
 2/12: Proposed Covariance Regression vs. CAP [Slides](Covariance Regression/2-12/2-12-Comparison-to-CAP.html)  
+2/18: ABCD Investigation Summary [Slides](Covariance Harmonization/2-18/2-18-ABCD-Correlation-Investigation.html)  
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)

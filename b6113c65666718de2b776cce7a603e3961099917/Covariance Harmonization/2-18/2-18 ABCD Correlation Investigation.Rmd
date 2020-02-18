@@ -1,0 +1,97 @@
+---
+title: "ABCD Scanner Differences in Correlation"
+author:
+  - Andrew Chen
+  - Advised by Haochang Shou and Taki Shinohara
+fontsize: 16pt
+always_allow_html: yes
+output:
+  xaringan::moon_reader:
+    css: ["xaringan-themer.css"]
+    nature:
+      slideNumberFormat: "%current%"
+  beamer_presentation:
+    theme: "Szeged"
+    colortheme: "dolphin"
+header_includes: 
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+options(digits = 4)
+
+load("../../ABCD Example/abcd_perm_tests.Rdata")
+source("../../ABCD Example/cor_perm.R")
+```
+
+## ABCD Dataset Description
+- Cortical thickness values computed using 3T scans for 8198 subjects, provided by Adam Pines
+- Multi-scanner acquisition suggests need for harmonization
+
+```{r, results="asis"}
+scanners <- c("GE Discovery MR750" = 1745,
+              "GE SIGNA Creator" = 2,
+              "Philips Achieva dStream" = 527,
+              "Philips Ingenia" = 275,
+              "Siemens Prisma" = 2594,
+              "Siemens Prisma Fit" = 3055)
+knitr::kable(scanners, "html", col.names=c("Subjects"))
+```
+
+---
+## Correlation Permutation Tests
+- Initial tests of our harmonization method ([CovBat](https://www.biorxiv.org/content/10.1101/858415v2)) suggested that differences in covariance existed across scanners
+    - Particularly notable between Prisma and Prisma Fit scanners
+- Designed two permutation tests to assess this difference
+
+---
+## Permuting over Scanner Label
+- Shuffle scanner label then compute distance between Prisma correlation matrix and Prisma Fit correlation matrix
+- Permutations shown in histogram, blue line represents distance in original data
+- For Prisma vs Prisma Fit:
+
+```{r, fig.retina=3, fig.align="center", out.width="50%"}
+plot(pris_fit_perm, 1)
+```
+
+---
+## Permuting over Label and ID
+- To avoid effects due to number of subjects within each scanner, we shuffle scanner label and scanner ID
+    - Compute correlation matrices within each scanner ID
+    - Then report average pairwise distance between correlation matrices of different scanner labels
+- For Prisma vs Prisma Fit:
+    
+```{r, fig.retina=3, fig.align="center", out.width="50%"}
+plot(pris_fit_id_perm, 5, "Average Frobenius Distance")
+```
+
+---
+## Philips Scanners
+- Permutation test repeated for Achieva dStream vs Ingenia
+```{r, fig.retina=3, fig.align="center", out.width="50%"}
+plot(philips_id_perm, 5, "Average Frobenius Distance")
+```
+
+---
+## Philips vs Siemens Scanners
+- And again for Achieva dStream vs Prisma
+
+```{r, fig.retina=3, fig.align="center", out.width="50%"}
+plot(phil_siem_id_perm, 7, "Average Frobenius Distance")
+```
+
+---
+## Further Investigation
+- With these preliminary results, we want to look into potential variables driving these differences in correlation
+- Our suspicion is that field inhomogeneity is somehow related
+- Mark Elliot suggested looking into the following subject-level variables that we have obtained from Adam
+    - Body weight
+    - Head size (approximated using volume of brain mask)
+- However we are missing potentially important scanner variables such as
+    - Head coil used in Prisma and Prisma fit scanners
+    - Transmit reference voltage
+- Any assistance would be greatly appreciated!
+    
+    
