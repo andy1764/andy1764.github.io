@@ -9,7 +9,6 @@ output:
       beforeInit: "macros.js"
       countIncrementalSlides: false
       slideNumberFormat: "%current%"
-
 header_includes:
   - \usepackage{amsmath}
   - \usepackage{bm}
