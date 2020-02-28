@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>PennSIVE Template in Xaringan</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <link rel="stylesheet" href="PennSIVE-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# PennSIVE Template in Xaringan
+### Andrew Chen
+
+---
+
+
+
+
+# This is a Title
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;No sources here  
+&lt;sup&gt;2&lt;/sup&gt;But just in case you had two  
+[https://www.catster.com/cats-101/orange-tabby-cat-facts](https://www.catster.com/cats-101/orange-tabby-cat-facts)
+]
+.pull-left[
+This is some body
+- The body can contain *lots* of things&lt;sup&gt;1&lt;/sup&gt;
+    - Such as
+![](PennSIVE-Slides-using-Xaringan_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+]
+--
+.pull-right[
+- And even a second column, **wow**!&lt;sup&gt;2&lt;/sup&gt;
+
+.center[![:scale 75%](tabby.jpg)]
+]
+--
+![:abs 25%, 10%, 50%](tabby.jpg)
+![:abs 25%, 40%, 60%](tabby.jpg)
+
+![:abs 25%, 70%, 70%](tabby.jpg)
+
+---
+class: divider, center, middle
+&lt;!-- Make sure to include all of the above classes to get this format --&gt;
+
+# Welcome to a New Section
+### Featuring more placeholder text
+
+---
+
+## This is a Smaller Title
+And here's an equation
+`\begin{align*}
+e^{i\pi} &amp;= \cos\pi+i\sin\pi \\
+&amp;=-1
+\end{align*}`
+--
+And a fun table
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Slide Type &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; My Review &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PowerPoint &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3/10: Does images well, but equations are the worst &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Other HTML Slides &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 5/10: At least they're not PowerPoint &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Xaringan &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10/10: Support for TWO columns and equations and backgrounds
+                  see &lt;a href=https://yihui.org/en/2017/08/why-xaringan-remark-js/&gt;this link by Yihui&lt;/a&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

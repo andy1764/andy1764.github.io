@@ -1,0 +1,102 @@
+---
+title: "PennSIVE Template in Xaringan"
+author:
+  - Andrew Chen
+output:
+  xaringan::moon_reader:
+    css: ["PennSIVE-theme.css"]
+    nature:
+      beforeInit: "macros.js"
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
+
+header_includes:
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# # How to make the base theme for PennSIVE-theme.css
+# library(xaringanthemer)
+# base_color = "#001F5B"
+# white_color = "#FFFFFF"
+# black_color = "#000000"
+# mono_accent(
+#   base_color = base_color,
+#   header_font_google = google_font("Source Sans Pro", "600"),
+#   text_font_google   = google_font("Source Sans Pro", "400", "400i"),
+#   code_font_google   = google_font("IBM Plex Mono"),
+#   title_slide_text_color = white_color,
+#   title_slide_background_color = base_color,
+#   title_slide_background_image = "cwp-pennSIVE_Logo_FINAL_main_W-O_tagline_horizontal-04.png",
+#   title_slide_background_position = "50% 12.5%",
+#   title_slide_background_size = "50%",
+#   background_image = "cwp-pennSIVE_Logo_icon.png",
+#   background_size = "7.5%",
+#   background_position = "95% 5%",
+#   table_row_even_background_color = white_color,
+#   header_h1_font_size = "40px",
+#   header_h2_font_size = "32px", 
+#   header_h3_font_size = "20px",
+# )
+```
+
+# This is a Title
+.footnote[
+<sup>1</sup>No sources here  
+<sup>2</sup>But just in case you had two  
+[https://www.catster.com/cats-101/orange-tabby-cat-facts](https://www.catster.com/cats-101/orange-tabby-cat-facts)
+]
+.pull-left[
+This is some body
+- The body can contain *lots* of things<sup>1</sup>
+    - Such as
+```{r}
+plot(1:100, 1:100)
+```
+]
+--
+.pull-right[
+- And even a second column, **wow**!<sup>2</sup>
+
+.center[![:scale 75%](tabby.jpg)]
+]
+--
+![:abs 25%, 10%, 50%](tabby.jpg)
+![:abs 25%, 40%, 60%](tabby.jpg)
+
+![:abs 25%, 70%, 70%](tabby.jpg)
+
+---
+class: divider, center, middle
+<!-- Make sure to include all of the above classes to get this format -->
+
+# Welcome to a New Section
+### Featuring more placeholder text
+
+---
+
+## This is a Smaller Title
+And here's an equation
+\begin{align*}
+e^{i\pi} &= \cos\pi+i\sin\pi \\
+&=-1
+\end{align*}
+--
+And a fun table
+```{r why_xaringan}
+knitr::kable(data.frame(
+  "Slide Type" = c("PowerPoint", "Other HTML Slides", "Xaringan"), 
+  "My Review" = c("3/10: Does images well, but equations are the worst",
+                  "5/10: At least they're not PowerPoint",
+                  "10/10: Support for TWO columns and equations and backgrounds
+                  see <a href=https://yihui.org/en/2017/08/why-xaringan-remark-js/>this link by Yihui</a>"),
+  check.names = F),
+  "html", escape = F)
+```
+
+```{r, eval=FALSE}
+pagedown::chrome_print("PennSIVE-Slides-using-Xaringan.html") # print as pdf
+```
