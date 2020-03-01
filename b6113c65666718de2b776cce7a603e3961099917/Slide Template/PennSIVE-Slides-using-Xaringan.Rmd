@@ -50,7 +50,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ]
 .pull-left[
 This is some body
-- The body can contain *lots* of things<sup>1</sup>
+- The body can contain *lots*<sup>1</sup>
     - Such as
 ```{r}
 plot(1:100, 1:100)
@@ -58,7 +58,7 @@ plot(1:100, 1:100)
 ]
 --
 .pull-right[
-- And even a second column, **wow**!<sup>2</sup>
+- Even a second column, **wow**!<sup>2</sup>
 
 .center[![:scale 75%](tabby.jpg)]
 ]
@@ -90,11 +90,17 @@ knitr::kable(data.frame(
   "Slide Type" = c("PowerPoint", "Other HTML Slides", "Xaringan"), 
   "My Review" = c("3/10: Does images well, but equations are the worst",
                   "5/10: At least they're not PowerPoint",
-                  "10/10: Support for TWO columns and equations and backgrounds
+                  "10/10: Support for TWO columns and equations and backgrounds and previews that update as you type,
                   see <a href=https://yihui.org/en/2017/08/why-xaringan-remark-js/>this link by Yihui</a>"),
   check.names = F),
   "html", escape = F)
 ```
+
+---
+class: middle
+
+From Yihui's [blog post](https://yihui.org/en/2019/02/ultimate-inf-mr/) on the recent update:
+![inf_mr](https://user-images.githubusercontent.com/163582/53144527-35f7a500-3562-11e9-862e-892d3fd7036d.gif)
 
 ```{r, eval=FALSE}
 pagedown::chrome_print("PennSIVE-Slides-using-Xaringan.html") # print as pdf
