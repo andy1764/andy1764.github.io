@@ -52,7 +52,7 @@ knitr::opts_chunk$set(echo = FALSE)
 This is some body
 - The body can contain *lots*<sup>1</sup>
     - Such as
-```{r}
+```{r lame_plot}
 plot(1:100, 1:100)
 ```
 ]
