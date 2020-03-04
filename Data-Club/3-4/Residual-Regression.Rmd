@@ -54,12 +54,8 @@ library(mvtnorm)
 .footnote[
 <sup>1</sup> [Lindquist et al., 2019](https://onlinelibrary.wiley.com/doi/full/10.1002/hbm.24528)
 ]
----
-class: img-caption
-![](hbm24528-fig-0001-m.jpg)
-.footnote[
-[Lindquist et al., 2019](https://onlinelibrary.wiley.com/doi/full/10.1002/hbm.24528)
-]
+
+
 ---
 class: img-caption
 ![](hbm24528-fig-0003-mr.jpg)
