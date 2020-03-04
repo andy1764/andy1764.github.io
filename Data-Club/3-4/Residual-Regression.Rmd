@@ -118,7 +118,7 @@ class: just-img
 fig <- plot_ly(frdata, x = ~ind, y = ~res, type = "scatter",
                mode = "markers")
 fig <- fig %>% add_markers()
-fig <- fig %>% layout(xaxis = list(title = 'Covariates'),
+fig <- fig %>% layout(xaxis = list(title = 'Covariate'),
                       yaxis = list(title = 'Residuals'),
                       showlegend = FALSE)
 fig
