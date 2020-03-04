@@ -46,6 +46,7 @@ DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190
 DBEI Chalk Talk (4/23/2019) [Slides](Spring Rotation 2019/ADNI_CIA_presentation_abridged.html)
 
 # Other Projects
-PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template/PennSIVE-Slides-using-Xaringan.html)  [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template)
+PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template/PennSIVE-Slides-using-Xaringan.html)  [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template)  
 
 ### Data Club Meetings
+3-4: Why Residual Regression is Bad [Slides](../Data-Club/3-4/Residual-Regression.html)
