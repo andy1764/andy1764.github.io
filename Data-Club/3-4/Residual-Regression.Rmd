@@ -92,7 +92,7 @@ Answer: We get very poor estimates, even with larger samples
 ---
 class: just-img
 ```{r freckleton_data}
-N <- 200 # number of subjects
+N <- 200
 
 x_mean <- rep(0, 2) # mean of covariates
 corl <- 0.5
@@ -102,23 +102,23 @@ x <- rmvnorm(N, x_mean, x_cov)
 beta <- rep(0.7, 2) # x[,1] is confounder, x[,2] is covariate of interest
 y <- x%*% beta + rnorm(1, 0, 1)
 frdata <- data.frame(confound = x[,1], ind = x[,2], outcome = y)
-frdata$res <- residuals(lm(outcome ~ confound, data))
+frdata$res <- residuals(lm(outcome ~ confound, frdata))
 ```
 
-```{r freckleton_plot, out.width = '100%', out.height = 600}
+```{r freckleton_plot, out.width = '100%', out.height = '100%'}
 fig <- plot_ly(frdata, x = ~ind, y = ~confound, z = ~outcome, type = "scatter3d",
                mode = "markers")
 fig <- fig %>% add_markers()
 fig <- fig %>% layout(scene = list(xaxis = list(title = 'Covariate'),
                                    yaxis = list(title = 'Confounder'),
                                    zaxis = list(title = 'Outcome'),
-                      camera= list(eye= list(x = 1.25, y = -1.25, z = 1.25))),
+                      camera= list(eye= list(x = 1.5, y = -1.5, z = 1.5))),
                       showlegend = FALSE)
 fig
 ```
 ---
 class: just-img
-```{r freckleton_plot2, out.width = '100%', out.height = 600}
+```{r freckleton_plot2, out.width = '100%', out.height = '100%'}
 fig <- plot_ly(frdata, x = ~ind, y = ~res, type = "scatter",
                mode = "markers")
 fig <- fig %>% add_markers()
