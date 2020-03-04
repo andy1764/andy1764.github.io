@@ -95,7 +95,7 @@ class: just-img
 N <- 200
 
 x_mean <- rep(0, 2) # mean of covariates
-corl <- 0.5
+corl <- 0.8
 x_cov <- matrix(c(1, corl, corl, 1), 2, 2) # correlated covariates
 x <- rmvnorm(N, x_mean, x_cov)
 
