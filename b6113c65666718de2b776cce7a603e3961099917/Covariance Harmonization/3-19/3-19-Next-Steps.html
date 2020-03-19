@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Updates and Possible Directions</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <script src="3-19-Next-Steps_files/kePrint-0.0.1/kePrint.js"></script>
+    <link rel="stylesheet" href="PennSIVE-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Updates and Possible Directions
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+## Outline of Projects
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Boik, 2002](https://www.jstor.org/stable/4140565)  
+&lt;sup&gt;2&lt;/sup&gt;[Yu et al., 2018](https://doi.org/10.1002/hbm.24241)
+]
+- Correcting Covariance Batch Effects: CovBat
+    - Retailored to fit the format of Nature Methods Brief Communications
+    - R code: aiming for submission to CRAN
+    - Python code completed and available on GitHub
+--
+- PCA-based covariance regression for vector outcomes
+    - Model itself is not new, both estimation and asymptotics are established&lt;sup&gt;1&lt;/sup&gt;
+    - Novel application to covariance harmonization to preserve covariate effects in variance/covariance
+    - Dearth of applications to neuroimaging
+--
+- Functional connectivity harmonization
+    - Common principal components approach
+    - PCA on log-transformed approach
+    - How to evaluate methods and compare to existing approach?&lt;sup&gt;2&lt;/sup&gt;
+---
+
+## PCA-Based Covariance Regression
+For our model, we assume that the covariance matrices are positive definite and impose structure on the error covariances such that
+`$$\boldsymbol{\Sigma}_i=\sum_{k=1}^q \lambda_{ik} \boldsymbol{\phi}_k \boldsymbol{\phi}_k^T$$`
+where `\(\boldsymbol{\phi}_k\)` is are the eigenvectors of the response matrix `\(\boldsymbol{Y}\)` and `\(\lambda_{ik}\)` are the corresponding eigenvalues. We furthermore assume a log-linear relationship between `\(r\leq q\)` eigenvalues and predictors such that
+`$$\log(\lambda_{ik}) = \boldsymbol{x}_i^T \boldsymbol{\gamma}_k, \hspace{5mm}\text{for}\hspace{2.5mm}k=1,2,\ldots,r$$`
+which implies that
+`$$\boldsymbol{\Sigma}_i=\sum_{k=1}^r \exp({\boldsymbol{x}_i^T \gamma_k})\boldsymbol{\phi}_k \boldsymbol{\phi}_k^T+\boldsymbol{F}_i$$`
+---
+
+## Asymptotic Properties
+By examining the distribution of the PC scores, we have that
+`$$\sqrt{n}(\hat{\boldsymbol{\gamma}}_k-\boldsymbol{\gamma}_k)\overset{D}\to N(0, 2(X^TX)^{-1})$$`
+based on earlier derivations.&lt;sup&gt;1&lt;/sup&gt;
+
+The point estimates for the PC score effects are thus consistent and asymptotically normal and can be readily used for hypothesis testing and prediction.
+
+.footnote[&lt;sup&gt;1&lt;/sup&gt;[Harvey, 1976](https://www.jstor.org/stable/1913974)]
+---
+
+## Covariance Regression in ABCD
+&lt;style type="text/css"&gt;
+.small { font-size: 70% }
+&lt;/style&gt;
+
+
+- Cortical thickness values computed using 3T scans for 11400 subjects
+    - Excluded subjects without sex or scanner ID, *n* = 8196 included
+- Demographics stratified by scanner model shown below
+
+.small[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; GE Discovery MR750 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; GE Signa Creator &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Philips Achieva dStream &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Philips Ingenia &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Siemens Prisma &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Siemens Prisma Fit &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Number of Subjects &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1745 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 527 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 275 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2594 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3053 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age (Mean (SD)) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 133.1 (14.2) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 123.5 (12.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 134.0 (13.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 141.4 (11.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 143.5 (9.5) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 135.0 (14.1) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 923 (52.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 ( 50.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 292 (55.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 130 (47.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1435 (55.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1668 (54.6) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Handedness score rating &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Right-handed &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1397 (80.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 (100.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 431 (81.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 205 (74.5) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2042 (78.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2379 (77.9) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Left-handed &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 114 ( 6.5) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 (  0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 23 ( 4.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 25 ( 9.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 182 ( 7.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 208 ( 6.8) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Mixed &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 234 (13.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 (  0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 73 (13.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 45 (16.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 370 (14.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 466 (15.3) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Covariance Regression in ABCD
+- Permutation tests showed significant difference in correlation across scanner manufacturers and models
+- We regress all 68 PC score variance on age, sex, handedness, and scanner manufacturer
+- Likelihood ratio test comparing against model without scanner manufacturer yields 64 PC scores with variance significantly associated with manufacturer after Bonferroni correction
+
+&lt;img src="3-19-Next-Steps_files/figure-html/lr_plot-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+---
+
+## Effect of Siemens
+- Taking the difference between predicted correlation of male, right-handed, 15 month old subject acquired on Philips vs. acquired on Siemens (Siemens minus Philips)
+&lt;img src="3-19-Next-Steps_files/figure-html/siemens_plot-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+---
+
+## Effect of Sex
+
+- Sex is significant at the Bonferroni-adjusted threshold of 0.00074 for 4 PCs
+- Difference between predicted correlation for female vs. male subject
+&lt;img src="3-19-Next-Steps_files/figure-html/sex_plot-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+---
+
+## Effect of Age
+
+- Age is significant at the Bonferroni-adjusted threshold for 8 PCs
+- Difference between predicted correlation for same subject acquired on Philips for ages 3 and 52 months
+&lt;img src="3-19-Next-Steps_files/figure-html/age_plot-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+---
+
+## Effect of Handedness
+
+- Handedness is significant at the Bonferroni-adjusted threshold for 2 PCs
+- Difference between predicted correlation for same subject acquired on Philips for left vs. right handedness
+&lt;img src="3-19-Next-Steps_files/figure-html/hand_plot-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Covariance Regression Directions
+- The theory is already well-established for the current method, even for correlation matrix outcomes&lt;sup&gt;1&lt;/sup&gt;
+- Application to covariance harmonization to control for covariate effects in variance/covariance adjustment is novel (and already implemented)
+- Potential extension to preprocessing?
+    - Often is the case that global signal regression is followed by calculation of correlation matrix then subsequent analysis&lt;sup&gt;2&lt;/sup&gt;
+    - Can we regress out confounders from both mean and covariance, while controlling for outcome of interest?
+    - In the simplest case, we can assume independent observations across subjects and perform PCA
+        - But could be infeasible for voxel-level analysis
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Boik, 2013](https://doi.org/10.1016/j.jmva.2012.11.017)  
+&lt;sup&gt;2&lt;/sup&gt;[Murphy and Fox, 2017](https://doi.org/10.1016/j.neuroimage.2016.11.052)
+]
+---
+
+## FC Harmonization using CPCs
+We assume that there exist common principal components (CPCs) across the functional connectivity matrices such that
+`$$\Sigma_{ij} = \Phi \Lambda_{ij}\Phi^T$$`
+where `\(\Lambda_{ij}\)` are `\(p\times p\)` diagonal matrices with entries `\(\lambda_{ijk}\)`
+
+We then directly apply the ComBat model to `\(q\)` CPC eigenvalues such that
+`$$\lambda_{ijk} = x_{ij}^T \beta_k + \gamma_{ik} + \delta_{ik} e_{ijk}$$`
+for `\(k=1,2,\ldots,q\)` where `\(q \leq p\)`.
+---
+
+## Estimation of CPCs
+- For now, `\(q\)` is fixed at some value, but there could be a data-driven way (e.g. percentage of norm captured by CPC approximation)
+- Estimation of CPCs can proceed via any method, major ones include the MLE estimation&lt;sup&gt;1&lt;/sup&gt;, stepwise CPC&lt;sup&gt;2&lt;/sup&gt;, or potentially CAP&lt;sup&gt;3&lt;/sup&gt;
+- However, no guarantees that any of these CPC methods fit the data well
+    - Currently running into same issues as with PVD-based approach
+    - Correction works on relatively small part of the FC matrices (in percentage of norm) even with large number of CPCs
+- Could adjust the CPC estimates, then harmonize error matrices separately
+    - Perhaps through log-transformation approach
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Flury, 1986](https://projecteuclid.org/euclid.aos/1176349930)  
+&lt;sup&gt;2&lt;/sup&gt;[Trendafilov, 2010](https://doi.org/10.1016/j.csda.2010.03.010)  
+&lt;sup&gt;3&lt;/sup&gt;[Zhao et al., 2019](https://doi.org/10.1093/biostatistics/kxz057)
+]
+---
+
+## Log-Transformation Approach
+- Apply log transformation then vectorize subject-specific matrices then perform PCA to obtain `\(\boldsymbol{\Phi}_k\)`, which are just the eigenvectors arranged as `\(p \times p\)` symmetric matrices
+`$$\log\Sigma_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \boldsymbol{\Phi}_k + \mathbf{E}_{ij}$$`
+- Apply ComBat including covariates to the `\(\Lambda_{ijk}\)`, harmonizing across sites indexed by `\(i\)`
+- Recover CovBat-adjusted FC matrices by taking the matrix exponential
+---
+
+## FC Harmonization Evaluation
+- So far, we have mainly focused on Frobenius or log-Euclidean norms
+    - Log-transformation approach works well on the latter
+    - CPC approach does not sufficiently modify the FC matrices so performs poorly on these metrics
+- ComBat on vectorized FC matrices&lt;sup&gt;1&lt;/sup&gt; has performed well on the following:
+    - Elements of FC matrices no longer different in mean across sites
+    - PCs of upper-triangular elements less associated with site
+    - Default mode network FC and age more strongly associated
+- Need to understand better what kinds of analyses are performed
+
+.footnote[&lt;sup&gt;1&lt;/sup&gt;[Yu et al., 2018](https://doi.org/10.1002/hbm.24241)]
+---
+
+## FC Harmonization Directions
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Flury, 1987](https://doi.org/10.1093/biomet/74.1.59)  
+&lt;sup&gt;2&lt;/sup&gt;[Kim et al., 2018](https://doi.org/10.1093/bioinformatics/btx765)  
+&lt;sup&gt;3&lt;/sup&gt;[Crainiceanu et al., 2014](https://dx.doi.org/10.1198%2Fjasa.2011.ap10089)
+]
+
+- CPC approach may benefit from allowing for different eigenvectors in each site
+- Partial CPC&lt;sup&gt;1&lt;/sup&gt; provides a potential framework, can be adapted via 
+`$$\Sigma_{ij} = \sum_{k=1}^q \lambda_{ijk}\phi_{k}\phi_{k}^T + \sum_{l=q+1}^p \lambda_{ijl}\phi_{il}\phi_{il}^T$$`
+where we assume there are `\(q\)` components common across all subjects and `\(p-q\)` components that are site-specific and all are orthogonal
+    - The `\(\lambda_{ijk}\)` are not necessarily decreasing in `\(k\)`
+--
+- Or could work with CPCs within site `\(\Sigma_{ij} = \sum_{k=1}^p \lambda_{ijk}\phi_{ik}\phi_{ik}^T\)`
+    - Then find CPC directions shared across sites via available methods such as MetaPCA&lt;sup&gt;2&lt;/sup&gt; or PVD&lt;sup&gt;3&lt;/sup&gt;
+---
+
+## FC Harmonization Directions
+- How do we deal with the error terms?
+    - Log-transformation then ComBat can preserve positive definiteness
+    - Could do PCA within individuals and scale eigenvalues to ensure norm differences not dominated by error `\((\lVert\Sigma\rVert_F = \sum_{k=1}^q \lambda_{k})\)`
+- Currently writing up an R package that can handle various decompositions and error matrix handling
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

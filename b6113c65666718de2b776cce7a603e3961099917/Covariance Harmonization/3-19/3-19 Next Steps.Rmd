@@ -1,0 +1,229 @@
+---
+title: "Updates and Possible Directions"
+author:
+  - Andrew Chen
+  - Advised by Haochang Shou and Taki Shinohara
+output:
+  xaringan::moon_reader:
+    css: ["PennSIVE-theme.css"]
+    nature:
+      beforeInit: "macros.js"
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
+header_includes:
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(kableExtra)
+```
+
+## Outline of Projects
+.footnote[
+<sup>1</sup>[Boik, 2002](https://www.jstor.org/stable/4140565)  
+<sup>2</sup>[Yu et al., 2018](https://doi.org/10.1002/hbm.24241)
+]
+- Correcting Covariance Batch Effects: CovBat
+    - Retailored to fit the format of Nature Methods Brief Communications
+    - R code: aiming for submission to CRAN
+    - Python code completed and available on GitHub
+--
+- PCA-based covariance regression for vector outcomes
+    - Model itself is not new, both estimation and asymptotics are established<sup>1</sup>
+    - Novel application to covariance harmonization to preserve covariate effects in variance/covariance
+    - Dearth of applications to neuroimaging
+--
+- Functional connectivity harmonization
+    - Common principal components approach
+    - PCA on log-transformed approach
+    - How to evaluate methods and compare to existing approach?<sup>2</sup>
+---
+
+## PCA-Based Covariance Regression
+For our model, we assume that the covariance matrices are positive definite and impose structure on the error covariances such that
+$$\boldsymbol{\Sigma}_i=\sum_{k=1}^q \lambda_{ik} \boldsymbol{\phi}_k \boldsymbol{\phi}_k^T$$
+where $\boldsymbol{\phi}_k$ is are the eigenvectors of the response matrix $\boldsymbol{Y}$ and $\lambda_{ik}$ are the corresponding eigenvalues. We furthermore assume a log-linear relationship between $r\leq q$ eigenvalues and predictors such that
+$$\log(\lambda_{ik}) = \boldsymbol{x}_i^T \boldsymbol{\gamma}_k, \hspace{5mm}\text{for}\hspace{2.5mm}k=1,2,\ldots,r$$
+which implies that
+$$\boldsymbol{\Sigma}_i=\sum_{k=1}^r \exp({\boldsymbol{x}_i^T \gamma_k})\boldsymbol{\phi}_k \boldsymbol{\phi}_k^T+\boldsymbol{F}_i$$
+---
+
+## Asymptotic Properties
+By examining the distribution of the PC scores, we have that
+$$\sqrt{n}(\hat{\boldsymbol{\gamma}}_k-\boldsymbol{\gamma}_k)\overset{D}\to N(0, 2(X^TX)^{-1})$$
+based on earlier derivations.<sup>1</sup>
+
+The point estimates for the PC score effects are thus consistent and asymptotically normal and can be readily used for hypothesis testing and prediction.
+
+.footnote[<sup>1</sup>[Harvey, 1976](https://www.jstor.org/stable/1913974)]
+---
+
+## Covariance Regression in ABCD
+```{css small}
+.small { font-size: 70% }
+```
+
+```{r load_abcd}
+load("../../ABCD Example/abcd_demo_tests.Rdata")
+load("abcd_lmcov_out.Rdata")
+```
+- Cortical thickness values computed using 3T scans for 11400 subjects
+    - Excluded subjects without sex or scanner ID, *n* = 8196 included
+- Demographics stratified by scanner model shown below
+
+.small[
+```{r, results="asis"}
+#colnames(tab1_print) <- c("Achieva dStream)
+add_indent(knitr::kable(tab1_print, "html"), 5:7)
+```
+]
+---
+
+## Covariance Regression in ABCD
+- Permutation tests showed significant difference in correlation across scanner manufacturers and models
+- We regress all `r lmcov_res$npc` PC score variance on age, sex, handedness, and scanner manufacturer
+- Likelihood ratio test comparing against model without scanner manufacturer yields `r sum(lr_manufac_p <= 0.05/length(lr_manufac_p))` PC scores with variance significantly associated with manufacturer after Bonferroni correction
+
+```{r lr_plot, fig.align='center', fig.asp=0.4, fig.retina=2, out.width='100%'}
+plot(1:length(lr_manufac_p), lr_manufac_p, xlab = "PC", ylab = "p-value",
+     ylim = c(0, 0.05/length(lr_manufac_p) + 0.001))
+abline(h = 0.05/length(lr_manufac_p), col = "blue")
+```
+---
+
+## Effect of Siemens
+- Taking the difference between predicted correlation of male, right-handed, 15 month old subject acquired on Philips vs. acquired on Siemens (Siemens minus Philips)
+```{r siemens_plot, fig.align='center', fig.width=5.5, fig.height=5, fig.retina=2, out.width='70%'}
+plot_mat(cov2cor(predict.lmcov(c(1,15,0,0,1,0), lmcov_res))
+         - cov2cor(predict.lmcov(c(1,15,0,0,0,1), lmcov_res)))
+```
+---
+
+## Effect of Sex
+```{r sex}
+sex_p <- sapply(1:lmcov_res$npc, function(i) 
+  summary(lmcov_res$var.fit.all[[i]])$coefficients[3,4])
+```
+- Sex is significant at the Bonferroni-adjusted threshold of 0.00074 for `r sum(sex_p <= 0.05/length(lr_manufac_p))` PCs
+- Difference between predicted correlation for female vs. male subject
+```{r sex_plot, fig.align='center', fig.width=5.5, fig.height=5, fig.retina=2, out.width='70%'}
+plot_mat(cov2cor(predict.lmcov(c(1,52,0,0,1,0), lmcov_res))
+         - cov2cor(predict.lmcov(c(0,3,0,0,1,0), lmcov_res)))
+```
+---
+
+## Effect of Age
+```{r age}
+age_p <- sapply(1:lmcov_res$npc, function(i) 
+  summary(lmcov_res$var.fit.all[[i]])$coefficients[4,4])
+
+```
+- Age is significant at the Bonferroni-adjusted threshold for `r sum(age_p <= 0.05/length(lr_manufac_p))` PCs
+- Difference between predicted correlation for same subject acquired on Philips for ages 3 and 52 months
+```{r age_plot, fig.align='center', fig.width=5.5, fig.height=5, fig.retina=2, out.width='70%'}
+plot_mat(cov2cor(predict.lmcov(c(1,52,0,0,1,0), lmcov_res))
+         - cov2cor(predict.lmcov(c(1,3,0,0,1,0), lmcov_res)))
+```
+---
+
+## Effect of Handedness
+```{r hand}
+hand_p <- sapply(1:lmcov_res$npc, function(i) 
+  summary(lmcov_res$var.fit.all[[i]])$coefficients[5,4])
+
+```
+- Handedness is significant at the Bonferroni-adjusted threshold for `r sum(hand_p <= 0.05/length(lr_manufac_p))` PCs
+- Difference between predicted correlation for same subject acquired on Philips for left vs. right handedness
+```{r hand_plot, fig.align='center', fig.width=5.5, fig.height=5, fig.retina=2, out.width='70%'}
+plot_mat(cov2cor(predict.lmcov(c(1,15,0,0,1,0), lmcov_res))
+         - cov2cor(predict.lmcov(c(1,15,1,0,1,0), lmcov_res)))
+```
+
+---
+
+## Covariance Regression Directions
+- The theory is already well-established for the current method, even for correlation matrix outcomes<sup>1</sup>
+- Application to covariance harmonization to control for covariate effects in variance/covariance adjustment is novel (and already implemented)
+- Potential extension to preprocessing?
+    - Often is the case that global signal regression is followed by calculation of correlation matrix then subsequent analysis<sup>2</sup>
+    - Can we regress out confounders from both mean and covariance, while controlling for outcome of interest?
+    - In the simplest case, we can assume independent observations across subjects and perform PCA
+        - But could be infeasible for voxel-level analysis
+
+.footnote[
+<sup>1</sup>[Boik, 2013](https://doi.org/10.1016/j.jmva.2012.11.017)  
+<sup>2</sup>[Murphy and Fox, 2017](https://doi.org/10.1016/j.neuroimage.2016.11.052)
+]
+---
+
+## FC Harmonization using CPCs
+We assume that there exist common principal components (CPCs) across the functional connectivity matrices such that
+$$\Sigma_{ij} = \Phi \Lambda_{ij}\Phi^T$$
+where $\Lambda_{ij}$ are $p\times p$ diagonal matrices with entries $\lambda_{ijk}$
+
+We then directly apply the ComBat model to $q$ CPC eigenvalues such that
+$$\lambda_{ijk} = x_{ij}^T \beta_k + \gamma_{ik} + \delta_{ik} e_{ijk}$$
+for $k=1,2,\ldots,q$ where $q \leq p$.
+---
+
+## Estimation of CPCs
+- For now, $q$ is fixed at some value, but there could be a data-driven way (e.g. percentage of norm captured by CPC approximation)
+- Estimation of CPCs can proceed via any method, major ones include the MLE estimation<sup>1</sup>, stepwise CPC<sup>2</sup>, or potentially CAP<sup>3</sup>
+- However, no guarantees that any of these CPC methods fit the data well
+    - Currently running into same issues as with PVD-based approach
+    - Correction works on relatively small part of the FC matrices (in percentage of norm) even with large number of CPCs
+- Could adjust the CPC estimates, then harmonize error matrices separately
+    - Perhaps through log-transformation approach
+
+.footnote[
+<sup>1</sup>[Flury, 1986](https://projecteuclid.org/euclid.aos/1176349930)  
+<sup>2</sup>[Trendafilov, 2010](https://doi.org/10.1016/j.csda.2010.03.010)  
+<sup>3</sup>[Zhao et al., 2019](https://doi.org/10.1093/biostatistics/kxz057)
+]
+---
+
+## Log-Transformation Approach
+- Apply log transformation then vectorize subject-specific matrices then perform PCA to obtain $\boldsymbol{\Phi}_k$, which are just the eigenvectors arranged as $p \times p$ symmetric matrices
+$$\log\Sigma_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \boldsymbol{\Phi}_k + \mathbf{E}_{ij}$$
+- Apply ComBat including covariates to the $\Lambda_{ijk}$, harmonizing across sites indexed by $i$
+- Recover CovBat-adjusted FC matrices by taking the matrix exponential
+---
+
+## FC Harmonization Evaluation
+- So far, we have mainly focused on Frobenius or log-Euclidean norms
+    - Log-transformation approach works well on the latter
+    - CPC approach does not sufficiently modify the FC matrices so performs poorly on these metrics
+- ComBat on vectorized FC matrices<sup>1</sup> has performed well on the following:
+    - Elements of FC matrices no longer different in mean across sites
+    - PCs of upper-triangular elements less associated with site
+    - Default mode network FC and age more strongly associated
+- Need to understand better what kinds of analyses are performed
+
+.footnote[<sup>1</sup>[Yu et al., 2018](https://doi.org/10.1002/hbm.24241)]
+---
+
+## FC Harmonization Directions
+.footnote[
+<sup>1</sup>[Flury, 1987](https://doi.org/10.1093/biomet/74.1.59)  
+<sup>2</sup>[Kim et al., 2018](https://doi.org/10.1093/bioinformatics/btx765)  
+<sup>3</sup>[Crainiceanu et al., 2014](https://dx.doi.org/10.1198%2Fjasa.2011.ap10089)
+]
+
+- CPC approach may benefit from allowing for different eigenvectors in each site
+- Partial CPC<sup>1</sup> provides a potential framework, can be adapted via 
+$$\Sigma_{ij} = \sum_{k=1}^q \lambda_{ijk}\phi_{k}\phi_{k}^T + \sum_{l=q+1}^p \lambda_{ijl}\phi_{il}\phi_{il}^T$$
+where we assume there are $q$ components common across all subjects and $p-q$ components that are site-specific and all are orthogonal
+    - The $\lambda_{ijk}$ are not necessarily decreasing in $k$
+--
+- Or could work with CPCs within site $\Sigma_{ij} = \sum_{k=1}^p \lambda_{ijk}\phi_{ik}\phi_{ik}^T$
+    - Then find CPC directions shared across sites via available methods such as MetaPCA<sup>2</sup> or PVD<sup>3</sup>
+---
+
+## FC Harmonization Directions
+- How do we deal with the error terms?
+    - Log-transformation then ComBat can preserve positive definiteness
+    - Could do PCA within individuals and scale eigenvalues to ensure norm differences not dominated by error $(\lVert\Sigma\rVert_F = \sum_{k=1}^q \lambda_{k})$
+- Currently writing up an R package that can handle various decompositions and error matrix handling

@@ -153,3 +153,7 @@ class: img-caption
 - When dealing with modular pipelines, do one of the following
     - Regress out all confounders simultaneously
     - For each new step, regress the confounders on all confounders from previous steps
+    
+```{r, eval=FALSE}
+pagedown::chrome_print("Residual-Regression.html") # print as pdf
+```
