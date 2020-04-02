@@ -1,0 +1,978 @@
+---
+title: "Comparison of Multiple FC Harmonization Methods"
+author:
+  - Andrew Chen
+  - Advised by Haochang Shou and Taki Shinohara
+output:
+  xaringan::moon_reader:
+    css: ["PennSIVE-theme.css"]
+    nature:
+      beforeInit: "macros.js"
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
+header_includes:
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(ggplot2)
+library(patchwork)
+library(reshape2)
+library(dplyr)
+library(tableone)
+library(FCharmony)
+
+plot_mat <- function(cov, lims = c(-max(abs(cov_melt$value)), max(abs(cov_melt$value)))) {
+  dimnames(cov) <- list(NULL, NULL)
+  cov_melt <- melt(cov)
+  ggplot(data = cov_melt, aes(x=Var1, y=Var2, fill=value)) + 
+    geom_tile() + 
+    scale_fill_gradientn(
+      colours = c("red", "white", "blue"), 
+      limits = lims) +
+    labs(fill = "") + 
+    theme_classic() +
+    theme(axis.line = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank())
+}
+```
+
+```{css}
+.medium{font-size: 85%}
+.small{font-size: 65%}
+```
+
+### Overview of FC Harmonization Methods
+.footnote[
+<sup>1</sup>[Yu et al., 2018](https://doi.org/10.1002/hbm.24241)  
+<sup>2</sup>[Zhao et al., 2019](https://doi.org/10.1093/biostatistics/kxz057)]
+- Harmonization of off-diagonal elements
+    - ComBat applied directly<sup>1</sup>
+--
+- Log-transformation approaches
+    - Apply PCA to off-diagonal elements then use ComBat on the scores
+    - ComBat applied to the elements directly
+--
+- Harmonization of common principal component (CPC) eigenvalues
+    - Apply ComBat to eigenvalues or log of eigenvalues
+    - Assume log-linear relationship with covariates and regress out
+    - Estimate CPCs using covariate-assisted principal (CAP) components<sup>2</sup>
+---
+
+### General Methodological Considerations
+- Positive semi-definite constraints
+    - Direct manipulation of FC matrices do not guarantee
+    - Modification of log-transformed FC does
+    - CPC-based methods can guarantee
+--
+- Correlation or covariance
+    - Most downstream analyses rely on correlation
+    - Can start with covariance or correlation input
+    - No methods can guarantee correlation output
+--
+- Common structure among FC matrices
+    - Empirical results show that majority of structure is not shared (CPC and PVD both confirm)
+    - How to handle the error terms?
+---
+
+## Evaluation Criteria
+- Norm-based approaches
+    - Can evaluate pairwise distances between groups using any metric
+    - MDMR can test by comparing within-group and between-group distances
+--
+- Network measures
+    - Network connectivity: sum of all edges
+    - Global efficiency: average of shortest path lengths
+    - Local efficiency of a node: global efficiency of all connected nodes
+        For a subgraph, we simply take the sum of all included local efficiencies
+--
+- Covariance regression models (WIP)
+    - Could look at mass univariate testing of off-diagonal elements
+    - Can also test for effects of site and covariates by assuming models on CPCs, CAPs, or other shared structures
+---
+
+## FC Harmonization using CPCs
+Let $\Sigma_{ij}$ be the covariance matrices within site $i$ for subject $j$. We assume that there exist common principal components (CPCs) across the functional connectivity matrices such that
+$$\Sigma_{ij} = \Phi \Lambda_{ij}\Phi^T + E_{ij}$$
+where $\Lambda_{ij}$ are $p\times p$ diagonal matrices with entries $\lambda_{ijk}$ and $E_{ij}$ are the error terms.
+
+We then directly apply the ComBat model to $q$ CPC eigenvalues such that
+$$\lambda_{ijk} = x_{ij}^T \beta_k + \gamma_{ik} + \delta_{ik} e_{ijk}$$
+for $k=1,2,\ldots,q$ where $q \leq p$.
+---
+
+## Estimation of CPCs
+- For now, $q$ is fixed at some value, but there could be a data-driven way (e.g. percentage of norm captured by CPC approximation)
+- Estimation of CPCs is achieved through stepwise CPC<sup>1</sup>
+- Currently testing four different approaches for handling the error terms
+    - Do nothing
+    - Log-CovBat
+    - FC ComBat
+    - Remove entirely
+
+.footnote[
+<sup>1</sup>[Trendafilov, 2010](https://doi.org/10.1016/j.csda.2010.03.010)  
+]
+---
+
+## Log-CovBat
+- Apply log transformation then vectorize subject-specific matrices then perform PCA to obtain $\boldsymbol{\Phi}_k$, which are just the eigenvectors arranged as $p \times p$ symmetric matrices
+$$\log\Sigma_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \boldsymbol{\Phi}_k + \mathbf{E}_{ij}$$
+- Apply ComBat including covariates to the $\Lambda_{ijk}$, harmonizing across sites indexed by $i$
+- Recover CovBat-adjusted FC matrices by taking the matrix exponential
+- Guarantees positive definiteness
+---
+
+## All Methods Considered
+- Bolded methods guarantee positive definiteness
+    - For others, we find the nearest PD matrix
+- Tried all methods using covariance and correlation as inputs
+
+
+- FC ComBat: ComBat on off-diagonal elements
+- **Log-ComBat**: Log then ComBat on off-diagonal elements
+- **Log-CovBat**: Log then ComBat on PC scores
+- CPC eigenvalues harmonized using log-ComBat with errors
+    - **Not handled**
+    - **Log-CovBat**
+    - **Removed entirely**
+- CPC eigenvalues harmonized using ComBat with errors
+    - FC ComBat
+    - Removed entirely
+---
+
+## BLSA/CARDIA Data Example
+- Preliminary results on subset of full data
+- 50 subjects each from the four larger sites (CARDIA2 has only 4 subjects)
+- Only harmonizing default mode network (58 ROIs)
+    - Network measures calculated on half of network (29 ROIs)
+
+```{r, include=FALSE}
+demo <- BLSA_CARDIA_demo
+demo$site <- droplevels(demo$site)
+demotab <- CreateTableOne(vars = c("age_at_scan", "sex"), data = demo, strata = "site")
+tabout <- print(demotab)[,-6]
+rownames(tabout) <- c("Number of subjects", "Age (shifted)", "Male (%)")
+```
+.medium[
+```{r demo, results="asis"}
+knitr::kable(tabout, "html")
+```
+]
+---
+
+## Examples: Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- BLSA_CARDIA
+s <- 1
+subj <- with(demo,
+             c(which(site == levels(site)[1])[s],
+               which(site == levels(site)[2])[s],
+               which(site == levels(site)[3])[s],
+               which(site == levels(site)[4])[s]))
+
+plot_mat(fc[,,subj[1]]) + labs(title = "BLSA") + 
+  plot_mat(fc[,,subj[2]]) + labs(title = "CARDIA1") +
+  plot_mat(fc[,,subj[3]]) + labs(title = "CARDIA3") +
+  plot_mat(fc[,,subj[4]]) + labs(title = "CARDIA4")
+```
+
+---
+## Examples: Correlation
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## FC ComBat Covariance
+```{r}
+load("../../BLSA CARDIA Example/all_cov_dats.Rdata")
+load("../../BLSA CARDIA Example/all_cov_harmony_out.Rdata")
+```
+
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- yu_out$dat.out
+plot_mat(fc[,,subj[1]]) + labs(title = "BLSA") + 
+  plot_mat(fc[,,subj[2]]) + labs(title = "CARDIA1") +
+  plot_mat(fc[,,subj[3]]) + labs(title = "CARDIA3") +
+  plot_mat(fc[,,subj[4]]) + labs(title = "CARDIA4")
+```
+
+---
+
+## FC ComBat Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## FC ComBat Covariance
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(yu_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(yu_log, "html", digits = 2)
+```
+]
+---
+
+## FC ComBat Covariance
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(yu_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(yu_yu$net.results.site, "html", digits = 2)
+```
+]
+
+---
+
+## Log-ComBat Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- log_c_out$dat.out
+plot_mat(fc[,,subj[1]]) + labs(title = "BLSA") + 
+  plot_mat(fc[,,subj[2]]) + labs(title = "CARDIA1") +
+  plot_mat(fc[,,subj[3]]) + labs(title = "CARDIA3") +
+  plot_mat(fc[,,subj[4]]) + labs(title = "CARDIA4")
+```
+
+---
+
+## Log-ComBat Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-ComBat Covariance
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_c_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_c_log, "html", digits = 2)
+```
+]
+---
+
+## Log-ComBat Covariance
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_c_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_c_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+## Log-CovBat Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- log_out$dat.out
+plot_mat(fc[,,subj[1]]) + labs(title = "BLSA") + 
+  plot_mat(fc[,,subj[2]]) + labs(title = "CARDIA1") +
+  plot_mat(fc[,,subj[3]]) + labs(title = "CARDIA3") +
+  plot_mat(fc[,,subj[4]]) + labs(title = "CARDIA4")
+```
+
+---
+
+## Log-CovBat Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-CovBat Covariance
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_log, "html", digits = 2)
+```
+]
+---
+
+## Log-CovBat Covariance
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+## Log-CPC + None Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_out$dat.out
+plot_mat(fc[,,subj[1]]) + labs(title = "BLSA") + 
+  plot_mat(fc[,,subj[2]]) + labs(title = "CARDIA1") +
+  plot_mat(fc[,,subj[3]]) + labs(title = "CARDIA3") +
+  plot_mat(fc[,,subj[4]]) + labs(title = "CARDIA4")
+```
+
+---
+
+## Log-CPC + None Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-CPC + None Covariance
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_log, "html", digits = 2)
+```
+]
+---
+
+## Log-CPC + None Covariance
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+## Log-CPC + Log-CovBat Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_l_out$dat.out
+plot_mat(fc[,,subj[1]]) + labs(title = "BLSA") + 
+  plot_mat(fc[,,subj[2]]) + labs(title = "CARDIA1") +
+  plot_mat(fc[,,subj[3]]) + labs(title = "CARDIA3") +
+  plot_mat(fc[,,subj[4]]) + labs(title = "CARDIA4")
+```
+
+---
+
+## Log-CPC + Log-CovBat Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-CPC + Log-CovBat Covariance
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_l_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_l_log, "html", digits = 2)
+```
+]
+---
+
+## Log-CPC + Log-CovBat Covariance
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_l_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_l_yu$net.results.site, "html", digits = 2)
+```
+]
+
+---
+
+## Log-CPC + Remove Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_r_out$dat.out
+plot_mat(fc[,,subj[1]]) + labs(title = "BLSA") + 
+  plot_mat(fc[,,subj[2]]) + labs(title = "CARDIA1") +
+  plot_mat(fc[,,subj[3]]) + labs(title = "CARDIA3") +
+  plot_mat(fc[,,subj[4]]) + labs(title = "CARDIA4")
+```
+
+---
+
+## Log-CPC + Remove Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-CPC + Remove Covariance
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_log, "html", digits = 2)
+```
+]
+---
+
+## Log-CPC + Remove Covariance
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+## CPC + ComBat Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_c_out$dat.out
+plot_mat(fc[,,subj[1]]) + labs(title = "BLSA") + 
+  plot_mat(fc[,,subj[2]]) + labs(title = "CARDIA1") +
+  plot_mat(fc[,,subj[3]]) + labs(title = "CARDIA3") +
+  plot_mat(fc[,,subj[4]]) + labs(title = "CARDIA4")
+```
+
+---
+
+## CPC + ComBat Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## CPC + ComBat Covariance
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_c_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_c_log, "html", digits = 2)
+```
+]
+---
+
+## CPC + ComBat Covariance
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_c_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_c_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+## CPC + Remove Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_r_c_out$dat.out
+plot_mat(fc[,,subj[1]]) + labs(title = "BLSA") + 
+  plot_mat(fc[,,subj[2]]) + labs(title = "CARDIA1") +
+  plot_mat(fc[,,subj[3]]) + labs(title = "CARDIA3") +
+  plot_mat(fc[,,subj[4]]) + labs(title = "CARDIA4")
+```
+
+---
+
+## CPC + Remove Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## CPC + Remove Covariance
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_c_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_c_log, "html", digits = 2)
+```
+]
+---
+
+## CPC + Remove Covariance
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_c_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_c_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+### FC ComBat Correlation (Yu et al. method)
+```{r}
+load("../../BLSA CARDIA Example/all_corr_dats.Rdata")
+load("../../BLSA CARDIA Example/all_corr_harmony_out.Rdata")
+```
+
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- yu_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## FC ComBat Correlation
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(yu_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(yu_log, "html", digits = 2)
+```
+]
+---
+
+## FC ComBat Correlation
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(yu_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(yu_yu$net.results.site, "html", digits = 2)
+```
+]
+
+---
+
+## Log-ComBat Correlation
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- log_c_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-ComBat Correlation
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_c_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_c_log, "html", digits = 2)
+```
+]
+---
+
+## Log-ComBat Correlation
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_c_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_c_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+## Log-CovBat Correlation
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- log_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-CovBat Correlation
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_log, "html", digits = 2)
+```
+]
+---
+
+## Log-CovBat Correlation
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(log_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+## Log-CPC + None Correlation
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-CPC + None Correlation
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_log, "html", digits = 2)
+```
+]
+---
+
+## Log-CPC + None Correlation
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+## Log-CPC + Log-CovBat Correlation
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_l_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-CPC + Log-CovBat Correlation
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_l_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_l_log, "html", digits = 2)
+```
+]
+---
+
+## Log-CPC + Log-CovBat Correlation
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_l_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_l_yu$net.results.site, "html", digits = 2)
+```
+]
+
+---
+
+## Log-CPC + Remove Correlation
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_r_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-CPC + Remove Correlation
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_log, "html", digits = 2)
+```
+]
+---
+
+## Log-CPC + Remove Correlation
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+## CPC + ComBat Correlation
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_c_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## CPC + ComBat Correlation
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_c_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_c_log, "html", digits = 2)
+```
+]
+---
+
+## CPC + ComBat Correlation
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_c_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_c_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+## CPC + Remove Correlation
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_r_c_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## CPC + Remove Correlation
+.small[
+.center[Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_c_eu, "html", digits = 2)
+```
+
+.center[Log-Euclidean]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_c_log, "html", digits = 2)
+```
+]
+---
+
+## CPC + Remove Correlation
+.small[
+.center[Associations with Age]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_c_yu$net.results, "html", digits = 2)
+```
+
+.center[Associations with Site (Kruskal-Wallis)]
+```{r, results='asis'}
+options(knitr.kable.NA = '')
+knitr::kable(cpc_r_c_yu$net.results.site, "html", digits = 2)
+```
+]
+---
+
+## Summary
+- Log-transformation methods tend to perform better on log-Euclidean metric
+- For CPC methods, generally poor results without error harmonization
+    - Surprisingly good performance from simply removing the error entirely
+- Network measures improved most by methods taking correlation inputs
+    - Suggests large influence of variance terms
+    - Possible evidence that next steps should work on correlation only
+--
+
+
+- Thanks for sitting through this very long slide set!
+
+```{r, eval=FALSE}
+pagedown::chrome_print() # print as pdf
+```
+

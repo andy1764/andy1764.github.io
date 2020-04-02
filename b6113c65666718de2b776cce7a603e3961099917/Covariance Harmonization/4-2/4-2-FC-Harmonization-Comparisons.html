@@ -1,0 +1,4246 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Comparison of Multiple FC Harmonization Methods</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="PennSIVE-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Comparison of Multiple FC Harmonization Methods
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 65%}
+&lt;/style&gt;
+
+### Overview of FC Harmonization Methods
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Yu et al., 2018](https://doi.org/10.1002/hbm.24241)  
+&lt;sup&gt;2&lt;/sup&gt;[Zhao et al., 2019](https://doi.org/10.1093/biostatistics/kxz057)]
+- Harmonization of off-diagonal elements
+    - ComBat applied directly&lt;sup&gt;1&lt;/sup&gt;
+--
+- Log-transformation approaches
+    - Apply PCA to off-diagonal elements then use ComBat on the scores
+    - ComBat applied to the elements directly
+--
+- Harmonization of common principal component (CPC) eigenvalues
+    - Apply ComBat to eigenvalues or log of eigenvalues
+    - Assume log-linear relationship with covariates and regress out
+    - Estimate CPCs using covariate-assisted principal (CAP) components&lt;sup&gt;2&lt;/sup&gt;
+---
+
+### General Methodological Considerations
+- Positive semi-definite constraints
+    - Direct manipulation of FC matrices do not guarantee
+    - Modification of log-transformed FC does
+    - CPC-based methods can guarantee
+--
+- Correlation or covariance
+    - Most downstream analyses rely on correlation
+    - Can start with covariance or correlation input
+    - No methods can guarantee correlation output
+--
+- Common structure among FC matrices
+    - Empirical results show that majority of structure is not shared (CPC and PVD both confirm)
+    - How to handle the error terms?
+---
+
+## Evaluation Criteria
+- Norm-based approaches
+    - Can evaluate pairwise distances between groups using any metric
+    - MDMR can test by comparing within-group and between-group distances
+--
+- Network measures
+    - Network connectivity: sum of all edges
+    - Global efficiency: average of shortest path lengths
+    - Local efficiency of a node: global efficiency of all connected nodes
+        For a subgraph, we simply take the sum of all included local efficiencies
+--
+- Covariance regression models (WIP)
+    - Could look at mass univariate testing of off-diagonal elements
+    - Can also test for effects of site and covariates by assuming models on CPCs, CAPs, or other shared structures
+---
+
+## FC Harmonization using CPCs
+Let `\(\Sigma_{ij}\)` be the covariance matrices within site `\(i\)` for subject `\(j\)`. We assume that there exist common principal components (CPCs) across the functional connectivity matrices such that
+`$$\Sigma_{ij} = \Phi \Lambda_{ij}\Phi^T + E_{ij}$$`
+where `\(\Lambda_{ij}\)` are `\(p\times p\)` diagonal matrices with entries `\(\lambda_{ijk}\)` and `\(E_{ij}\)` are the error terms.
+
+We then directly apply the ComBat model to `\(q\)` CPC eigenvalues such that
+`$$\lambda_{ijk} = x_{ij}^T \beta_k + \gamma_{ik} + \delta_{ik} e_{ijk}$$`
+for `\(k=1,2,\ldots,q\)` where `\(q \leq p\)`.
+---
+
+## Estimation of CPCs
+- For now, `\(q\)` is fixed at some value, but there could be a data-driven way (e.g. percentage of norm captured by CPC approximation)
+- Estimation of CPCs is achieved through stepwise CPC&lt;sup&gt;1&lt;/sup&gt;
+- Currently testing four different approaches for handling the error terms
+    - Do nothing
+    - Log-CovBat
+    - FC ComBat
+    - Remove entirely
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Trendafilov, 2010](https://doi.org/10.1016/j.csda.2010.03.010)  
+]
+---
+
+## Log-CovBat
+- Apply log transformation then vectorize subject-specific matrices then perform PCA to obtain `\(\boldsymbol{\Phi}_k\)`, which are just the eigenvectors arranged as `\(p \times p\)` symmetric matrices
+`$$\log\Sigma_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \boldsymbol{\Phi}_k + \mathbf{E}_{ij}$$`
+- Apply ComBat including covariates to the `\(\Lambda_{ijk}\)`, harmonizing across sites indexed by `\(i\)`
+- Recover CovBat-adjusted FC matrices by taking the matrix exponential
+- Guarantees positive definiteness
+---
+
+## All Methods Considered
+- Bolded methods guarantee positive definiteness
+    - For others, we find the nearest PD matrix
+- Tried all methods using covariance and correlation as inputs
+
+
+- FC ComBat: ComBat on off-diagonal elements
+- **Log-ComBat**: Log then ComBat on off-diagonal elements
+- **Log-CovBat**: Log then ComBat on PC scores
+- CPC eigenvalues harmonized using log-ComBat with errors
+    - **Not handled**
+    - **Log-CovBat**
+    - **Removed entirely**
+- CPC eigenvalues harmonized using ComBat with errors
+    - FC ComBat
+    - Removed entirely
+---
+
+## BLSA/CARDIA Data Example
+- Preliminary results on subset of full data
+- 50 subjects each from the four larger sites (CARDIA2 has only 4 subjects)
+- Only harmonizing default mode network (58 ROIs)
+    - Network measures calculated on half of network (29 ROIs)
+
+
+.medium[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA_4 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Number of subjects &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age (shifted) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 15.60 (11.45) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.04 (3.44) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.02 (3.66) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.82 (4.02) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 (100.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18 (36.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 22 (44.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 14 (28.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Examples: Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+## Examples: Correlation
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## FC ComBat Covariance
+
+
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## FC ComBat Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## FC ComBat Covariance
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7535.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8030.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.60 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7315.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8083.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 85.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7251.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8150.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13.60 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6163.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7323.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6033.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7337.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 84.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5625.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7163.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.86 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 84.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28.38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 29.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 44.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 41.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.34 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 42.84 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 41.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 44.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 44.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## FC ComBat Covariance
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.84 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.08 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.06 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.62 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+
+## Log-ComBat Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Log-ComBat Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-13-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Log-ComBat Covariance
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7535.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 212451.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 42.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97.78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.35 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7315.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 254205.98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 41.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 95.84 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7251.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 220085.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 41.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97.17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6163.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 94106.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 40.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 98.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6033.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 57128.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 40.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 99.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5625.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100191.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81.93 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83.93 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83.98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.96 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82.81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.96 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-ComBat Covariance
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.89 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.29 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CovBat Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-18-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Log-CovBat Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-19-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Log-CovBat Covariance
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7535.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11355.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 108.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7315.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11004.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 96.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7251.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10784.24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6163.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6538.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 108.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6033.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6214.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 110.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5625.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5096.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.62 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.60 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CovBat Covariance
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.90 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CPC + None Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-24-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Log-CPC + None Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-25-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Log-CPC + None Covariance
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7535.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7206.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 99.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7315.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7089.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7251.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6966.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.96 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6163.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6220.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6033.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6062.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5625.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5795.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.99 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.96 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 64.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65.78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CPC + None Covariance
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.89 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.06 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CPC + Log-CovBat Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-30-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Log-CPC + Log-CovBat Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-31-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Log-CPC + Log-CovBat Covariance
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7535.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8352.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7315.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8473.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 90.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7251.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8235.98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 87.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6163.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4919.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.84 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 86.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6033.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4610.97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.62 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5625.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4589.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13.81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 88.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65.93 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.74 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65.95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CPC + Log-CovBat Covariance
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.54 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.62 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.62 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+
+## Log-CPC + Remove Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-36-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Log-CPC + Remove Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-37-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Log-CPC + Remove Covariance
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7535.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1899.34 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.27 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7315.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2213.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 90.97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7251.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2082.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 85.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6163.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2154.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 87.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6033.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2004.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.85 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5625.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2301.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.69 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 89.78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.24 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.25 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CPC + Remove Covariance
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.65 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.31 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## CPC + ComBat Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-42-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## CPC + ComBat Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-43-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## CPC + ComBat Covariance
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7535.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7547.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 94.17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7315.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7608.69 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 98.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7251.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7588.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 99.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6163.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7059.85 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 95.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6033.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7019.65 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 96.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5625.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6952.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 95.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 69.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## CPC + ComBat Covariance
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.68 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.69 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## CPC + Remove Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-48-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## CPC + Remove Covariance
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-49-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## CPC + Remove Covariance
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7535.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2247.98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.74 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 89.98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.17 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7315.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2333.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 93.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7251.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2280.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 90.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6163.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2185.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 88.95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6033.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2132.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 86.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5625.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2205.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.60 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 87.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.74 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.24 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.69 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## CPC + Remove Covariance
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.53 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.25 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.47 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+### FC ComBat Correlation (Yu et al. method)
+
+
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-55-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## FC ComBat Correlation
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.84 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.84 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.25 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65.75 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.85 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.34 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## FC ComBat Correlation
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.69 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.69 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.41 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+
+## Log-ComBat Correlation
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-60-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Log-ComBat Correlation
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.43 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.68 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 84.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 86.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.25 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-ComBat Correlation
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.83 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CovBat Correlation
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-65-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Log-CovBat Correlation
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 60.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28.18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 109.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58.35 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58.43 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.99 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 109.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.99 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 110.93 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.65 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.75 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.74 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CovBat Correlation
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.89 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.95 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CPC + None Correlation
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-70-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Log-CPC + None Correlation
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.68 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.96 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.34 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.74 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.85 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.95 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CPC + None Correlation
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.65 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.69 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.69 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CPC + Log-CovBat Correlation
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-75-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Log-CPC + Log-CovBat Correlation
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 45.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 89.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 44.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 92.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 44.65 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.62 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 91.98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 86.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 86.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 86.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.60 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.35 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.85 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CPC + Log-CovBat Correlation
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+
+## Log-CPC + Remove Correlation
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-80-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Log-CPC + Remove Correlation
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.93 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.88 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 80.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.36 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.92 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.60 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Log-CPC + Remove Correlation
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.26 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## CPC + ComBat Correlation
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-85-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## CPC + ComBat Correlation
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 92.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 93.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.98 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 93.75 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 90.84 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 91.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 92.18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.60 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.99 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.93 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.69 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.93 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.75 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13.70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## CPC + ComBat Correlation
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.40 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.52 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## CPC + Remove Correlation
+&lt;img src="4-2-FC-Harmonization-Comparisons_files/figure-html/unnamed-chunk-90-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## CPC + Remove Correlation
+.small[
+.center[Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.84 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.62 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 102.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 81.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.60 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 100.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 79.78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.62 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82.36 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Log-Euclidean]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Orig &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Corr &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.Lapl &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw.MDMR &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Out.MDMR &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.88 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.89 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.68 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.36 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## CPC + Remove Correlation
+.small[
+.center[Associations with Age]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.59 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[Associations with Site (Kruskal-Wallis)]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Out &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.83 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Summary
+- Log-transformation methods tend to perform better on log-Euclidean metric
+- For CPC methods, generally poor results without error harmonization
+    - Surprisingly good performance from simply removing the error entirely
+- Network measures improved most by methods taking correlation inputs
+    - Suggests large influence of variance terms
+    - Possible evidence that next steps should work on correlation only
+--
+
+
+- Thanks for sitting through this very long slide set!
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

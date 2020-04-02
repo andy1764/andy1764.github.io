@@ -39,6 +39,7 @@ Functional Connectivity CovBat [PDF](Covariance Harmonization/FC-CovBat.pdf)
 2/19: CovBat vs Wachinger [Slides](Covariance Harmonization/2-19/2-19-CovBat-vs-Wachinger.html)  
 2/28: ABCD Investigation Summary [Slides](Covariance Harmonization/2-28/2-28-ABCD-Correlation-Investigation.html)  
 3/19: General Updates and Potential Directions [Slides](Covariance Harmonization/3-19/3-19-Next-Steps.html)  
+4/2: FC Harmonization Methods Comparison [Slides](Covariance Harmonization/4-2/4-2-FC-Harmonization-Comparisons.html)
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
