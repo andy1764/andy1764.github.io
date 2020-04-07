@@ -127,7 +127,7 @@ system.time({
 
 ```
 ## elapsed 
-##   9.829
+##   7.825
 ```
 
 ```r
@@ -140,7 +140,7 @@ system.time({
 
 ```
 ## elapsed 
-##   2.032
+##   2.127
 ```
 ---
 
@@ -158,7 +158,7 @@ system.time({
 
 ```
 ## elapsed 
-##   0.011
+##   0.013
 ```
 
 ```r
@@ -171,7 +171,7 @@ system.time({
 
 ```
 ## elapsed 
-##   0.059
+##   0.058
 ```
 ---
 
@@ -198,7 +198,7 @@ system.time({
 
 ```
 ## elapsed 
-##   3.573
+##   3.617
 ```
 ---
 
@@ -216,7 +216,7 @@ system.time({
 
 ```
 ## elapsed 
-##   0.468
+##   0.497
 ```
 ---
 
@@ -234,7 +234,7 @@ system.time({svd(A)})[3]
 
 ```
 ## elapsed 
-##    3.58
+##   3.755
 ```
 
 ```r
@@ -244,12 +244,12 @@ system.time({svd(A)})[3]
 
 ```
 ## elapsed 
-##   3.627
+##   3.411
 ```
 ---
 
-## gpuR: Multivariate distance matrix regression
-- Similar to regression, but using distance matrix to compute sum of squared distances&lt;sup&gt;1&lt;/sup&gt;
+## gpuR: MDMR
+- Multivariate distance matrix regression (MDMR) is similar to least squares regression, but using distance matrix to compute sum of squared distances&lt;sup&gt;1&lt;/sup&gt;
 - Calculation of pairwise distance between subjects is one of the most expensive steps
 
 ```r
@@ -265,12 +265,12 @@ system.time({
 
 ```
 ## elapsed 
-##   4.346
+##   3.629
 ```
 .footnote[&lt;sup&gt;1&lt;/sup&gt;[Zapala and Schork, 2012](https://doi.org/10.3389/fgene.2012.00190)]
 ---
 
-## gpuR: Multivariate distance matrix regression
+## gpuR: MDMR
 
 ```r
 # using gpuR
@@ -284,7 +284,7 @@ system.time({
 
 ```
 ## elapsed 
-##   2.188
+##   1.919
 ```
 ---
 
@@ -339,7 +339,7 @@ system.time({log(a)})[3]
 
 ```
 ## elapsed 
-##   2.527
+##   2.337
 ```
 
 ```r
@@ -348,7 +348,7 @@ system.time({log_ocl(a)})[3]
 
 ```
 ## elapsed 
-##   1.721
+##   1.725
 ```
 ---
 

@@ -46,7 +46,7 @@ library(MDMR)
 
 
 .center[
-<video controls loop autoplay muted>
+<video loop autoplay muted>
     <source src="https://thumbs.gfycat.com/FelineHopefulCassowary-mobile.mp4" type="video/mp4" />
 </video>
 ]
@@ -54,7 +54,7 @@ library(MDMR)
 
 ## Ray-tracing example
 .center[
-<video controls loop autoplay muted>
+<video loop autoplay muted>
     <source src="https://thumbs.gfycat.com/ImaginativeSlimyAlleycat-mobile.mp4" type="video/mp4" />
 </video>
 ]
@@ -224,8 +224,8 @@ system.time({svd(A)})[3]
 ```
 ---
 
-## gpuR: Multivariate distance matrix regression
-- Similar to regression, but using distance matrix to compute sum of squared distances<sup>1</sup>
+## gpuR: MDMR
+- Multivariate distance matrix regression (MDMR) is similar to least squares regression, but using distance matrix to compute sum of squared distances<sup>1</sup>
 - Calculation of pairwise distance between subjects is one of the most expensive steps
 ```{r, warning=FALSE}
 # using base R
@@ -240,7 +240,7 @@ system.time({
 .footnote[<sup>1</sup>[Zapala and Schork, 2012](https://doi.org/10.3389/fgene.2012.00190)]
 ---
 
-## gpuR: Multivariate distance matrix regression
+## gpuR: MDMR
 ```{r, warning=FALSE}
 # using gpuR
 system.time({
