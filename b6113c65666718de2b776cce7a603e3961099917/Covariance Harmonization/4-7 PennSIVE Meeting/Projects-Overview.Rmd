@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
   dev = "svg", # vector graphics device
   dev.args=list(bg="transparent") # transparent plot backgrounds
 )
-options(digits = 2)
+options(digits = 3)
 
 library(kableExtra)
 library(reshape2)
@@ -36,6 +36,7 @@ source("../../ABCD Example/cor_perm.R")
 
 ## Outline of Projects
 - Correcting Covariance Batch Effects: CovBat
+
 - Harmonization of functional connectivity matrices (WIP)
 - Covariance regression using principal components analysis (WIP)
 ---
@@ -143,7 +144,7 @@ knitr::kable(tabout[,1:4], "html")
 ```
 ---
 
-## Multivariate Distance Matrix Regression
+### Multivariate Distance Matrix Regression
 - MDMR<sup>1,2</sup> is a technique for relating an arbitrary number of dependent variables to independent variables
     - Only relies on a distance matrix calculated using any metric
 - Effective in high-dimensional settings, including FC
@@ -289,7 +290,9 @@ add_indent(knitr::kable(tab1_print, "html"), 5:7)
 ---
 ## Prisma vs. Prisma Fit
 - Found large difference in correlation structure between Prisma and Prisma fit scanners (true value in blue, *p* = 0.005)
-- Fitting a mixed model to account for nesting by scanner ID, no significant difference between subjects acquired on either scanner in age (*p* = `r demo_p[1]`) or sex (*p* = `r demo_p[2]`)
+- Fitting a mixed model to account for nesting by scanner ID:
+    - No significant difference in age (*p* = `r demo_p[1]`)
+    - Or sex (*p* = `r demo_p[2]`)
 ```{r, fig.retina=3, fig.align="center", out.width="60%", fig.width=4, fig.height=4}
 plot(all_perm$pris, 1, "Average Frobenius Distance")
 ```
@@ -361,18 +364,19 @@ abline(h = 0.05/length(lr_manufac_p), col = "blue")
 ---
 
 ## Covariance Regression Directions
-- The theory is already well-established for this model, even for correlation matrix outcomes<sup>1</sup>
-- We have also applied the method to covariance harmonization to control for covariate effects in variance/covariance adjustment
-- Potential extension to preprocessing
-    - Often is the case that motion<sup>2</sup> or global signal<sup>3</sup> is regressed out of ROI-level time series then residuals used to calculated correlation matrix
-    - Potential loss of information: an example being if motion is correlated with your outcomes of interest
-    - Can we directly regress out confounders from correlation or covariance matrix while controlling for outcome of interest?
-
 .footnote[
 <sup>1</sup>[Boik, 2013](https://doi.org/10.1016/j.jmva.2012.11.017)  
 <sup>2</sup>[Satterthwaite et al., 2013](https://doi.org/10.1016/j.neuroimage.2012.08.052)  
 <sup>3</sup>[Murphy and Fox, 2017](https://doi.org/10.1016/j.neuroimage.2016.11.052)
 ]
+
+- The theory is already well-established for this model, even for correlation matrix outcomes<sup>1</sup>
+- We have also applied the method to covariance harmonization to control for covariate effects in variance/covariance adjustment
+--
+- Potential extension to preprocessing
+    - Often is the case that motion<sup>2</sup> or global signal<sup>3</sup> is regressed out of ROI-level time series then residuals used to calculated correlation matrix
+    - Potential loss of information: an example being if motion is correlated with your outcomes of interest
+    - Can we directly regress out confounders from correlation or covariance matrix while controlling for outcome of interest?
 ---
 
 ## Summary

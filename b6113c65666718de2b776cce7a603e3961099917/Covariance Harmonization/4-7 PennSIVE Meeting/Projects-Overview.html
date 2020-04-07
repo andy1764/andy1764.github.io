@@ -30,6 +30,7 @@ class: center, middle, inverse, title-slide
 
 ## Outline of Projects
 - Correcting Covariance Batch Effects: CovBat
+
 - Harmonization of functional connectivity matrices (WIP)
 - Covariance regression using principal components analysis (WIP)
 ---
@@ -159,7 +160,7 @@ Ideally, this removes scanner effect from features shared between subjects, whic
 &lt;/table&gt;
 ---
 
-## Multivariate Distance Matrix Regression
+### Multivariate Distance Matrix Regression
 - MDMR&lt;sup&gt;1,2&lt;/sup&gt; is a technique for relating an arbitrary number of dependent variables to independent variables
     - Only relies on a distance matrix calculated using any metric
 - Effective in high-dimensional settings, including FC
@@ -633,8 +634,10 @@ class: divider, center, middle
 ---
 ## Prisma vs. Prisma Fit
 - Found large difference in correlation structure between Prisma and Prisma fit scanners (true value in blue, *p* = 0.005)
-- Fitting a mixed model to account for nesting by scanner ID, no significant difference between subjects acquired on either scanner in age (*p* = 0.16) or sex (*p* = 1)
-&lt;img src="Projects-Overview_files/figure-html/unnamed-chunk-32-1.svg" width="60%" style="display: block; margin: auto;" /&gt;
+- Fitting a mixed model to account for nesting by scanner ID:
+    - No significant difference in age (*p* = 0.159)
+    - Or sex (*p* = 0.998)
+&lt;img src="Projects-Overview_files/figure-html/unnamed-chunk-13-1.svg" width="60%" style="display: block; margin: auto;" /&gt;
 ---
 ## All Comparisons Table
 &lt;style type="text/css"&gt;
@@ -691,7 +694,7 @@ class: divider, center, middle
    &lt;td style="text-align:center;"&gt; 0.005 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; &lt;span style="     color: #990000 !important;"&gt;0.002&lt;/span&gt; &lt;/td&gt;
    &lt;td style="text-align:center;"&gt; &lt;span style="     color: #990000 !important;"&gt;0.001&lt;/span&gt; &lt;/td&gt;
-   &lt;td style="text-align:center;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.005 &lt;/td&gt;
    &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
@@ -721,18 +724,19 @@ which implies that
 ---
 
 ## Covariance Regression Directions
-- The theory is already well-established for this model, even for correlation matrix outcomes&lt;sup&gt;1&lt;/sup&gt;
-- We have also applied the method to covariance harmonization to control for covariate effects in variance/covariance adjustment
-- Potential extension to preprocessing
-    - Often is the case that motion&lt;sup&gt;2&lt;/sup&gt; or global signal&lt;sup&gt;3&lt;/sup&gt; is regressed out of ROI-level time series then residuals used to calculated correlation matrix
-    - Potential loss of information: an example being if motion is correlated with your outcomes of interest
-    - Can we directly regress out confounders from correlation or covariance matrix while controlling for outcome of interest?
-
 .footnote[
 &lt;sup&gt;1&lt;/sup&gt;[Boik, 2013](https://doi.org/10.1016/j.jmva.2012.11.017)  
 &lt;sup&gt;2&lt;/sup&gt;[Satterthwaite et al., 2013](https://doi.org/10.1016/j.neuroimage.2012.08.052)  
 &lt;sup&gt;3&lt;/sup&gt;[Murphy and Fox, 2017](https://doi.org/10.1016/j.neuroimage.2016.11.052)
 ]
+
+- The theory is already well-established for this model, even for correlation matrix outcomes&lt;sup&gt;1&lt;/sup&gt;
+- We have also applied the method to covariance harmonization to control for covariate effects in variance/covariance adjustment
+--
+- Potential extension to preprocessing
+    - Often is the case that motion&lt;sup&gt;2&lt;/sup&gt; or global signal&lt;sup&gt;3&lt;/sup&gt; is regressed out of ROI-level time series then residuals used to calculated correlation matrix
+    - Potential loss of information: an example being if motion is correlated with your outcomes of interest
+    - Can we directly regress out confounders from correlation or covariance matrix while controlling for outcome of interest?
 ---
 
 ## Summary
