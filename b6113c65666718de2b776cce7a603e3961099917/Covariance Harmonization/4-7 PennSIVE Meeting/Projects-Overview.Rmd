@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
   dev = "svg", # vector graphics device
   dev.args=list(bg="transparent") # transparent plot backgrounds
 )
+options(digits = 2)
 
 library(kableExtra)
 library(reshape2)
