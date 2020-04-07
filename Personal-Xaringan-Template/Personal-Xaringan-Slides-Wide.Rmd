@@ -1,11 +1,12 @@
 ---
-title: "PennSIVE Template in Xaringan <html><div style='float:center'></div><hr color='#70c0b1' size=2em width=750em></html>"
+title: "PennSIVE Template in Xaringan: Wide <html><div style='float:center'></div><hr color='#70c0b1' size=2em width=900em></html>"
 author:
   - Andrew Chen
 output:
   xaringan::moon_reader:
-    css: ["AC_theme.css", "AC_theme_add.css"]
+    css: ["AC_theme_wide.css", "AC_theme_add.css"]
     nature:
+      ratio: "16:9"
       highlightStyle: tomorrow-night-bright
       beforeInit: "macros.js"
       countIncrementalSlides: false
@@ -40,12 +41,15 @@ base_color = "#70c0b1" # from https://github.com/chriskempson/tomorrow-theme
 white_color = "#FFFFFF"
 black_color = "#16161d"
 mono_dark(
+  padding = "1em 5em 1em 5em",
   base_color = base_color,
   white_color = white_color,
   black_color = black_color,
   header_font_google = google_font("Source Sans Pro", "600"),
   text_font_google   = google_font("Source Sans Pro", "400", "400i"),
   code_font_google   = google_font("IBM Plex Mono"),
+  code_inline_color = white_color,
+  code_inline_background_color = "#000000",
   title_slide_text_color = white_color,
   title_slide_background_color = black_color,
   inverse_text_color = white_color,
@@ -56,7 +60,7 @@ mono_dark(
   header_h1_font_size = "44px",
   header_h2_font_size = "36px",
   header_h3_font_size = "28px",
-  outfile = "AC_theme.css"
+  outfile = "AC_theme_wide.css"
 )
 ```
 
@@ -69,7 +73,8 @@ This is some body by `xaringan`
 - The body can contain *lots*<sup>1</sup>
     - Such as
 
-```{r, echo=FALSE}
+
+```{r, echo=FALSE, out.width='75%', fig.align='center'}
 ggplot(data.frame(x=1:100, y=1:100)) + 
   geom_point(aes(x=x, y=y), color=base_color)
 ```

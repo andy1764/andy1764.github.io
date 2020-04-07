@@ -15,7 +15,12 @@ header_includes:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.retina = 2, # higher quality plots
+  dev = "svg", # vector graphics device
+  dev.args=list(bg="transparent") # transparent plot backgrounds
+)
 
 # # How to make the base theme for PennSIVE-theme.css
 # library(xaringanthemer)

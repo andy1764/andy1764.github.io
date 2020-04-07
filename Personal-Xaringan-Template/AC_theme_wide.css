@@ -15,30 +15,29 @@
  *    - xaringan wiki: https://github.com/yihui/xaringan/wiki
  *    - remarkjs wiki: https://github.com/gnab/remark/wiki
  *
- *  Edits to the base xaringan-themer code were done by Andrew Chen
- *  Contact via email: andrewac@pennmedicine.upenn.edu
  * ------------------------------------------------------- */
-@import url(https://fonts.googleapis.com/css?family=Montserrat);
-@import url(https://fonts.googleapis.com/css?family=Lato);
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,400i);
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:600);
 @import url(https://fonts.googleapis.com/css?family=IBM+Plex+Mono);
 
+
 body {
-  font-family: Lato, Verdana, sans-serif;
+  font-family: Source Sans Pro, 'Palatino Linotype', 'Book Antiqua', Palatino, 'Microsoft YaHei', 'Songti SC', serif;
   font-weight: 400;
-  color: #272822;
+  color: #FFFFFF;
 }
 h1, h2, h3 {
-  font-family: Montserrat, Verdana, sans-serif;
-  font-weight: 600;
-  color: #011F5B;
+  font-family: Source Sans Pro;
+  font-weight: normal;
+  color: #70c0b1;
 }
 .remark-slide-content {
-  background-color: #FFFFFF;
+  background-color: #16161d;
   font-size: 22px;
-  background-image: url(cwp-pennSIVE_Logo_icon.png);
-  background-size: 7.5%;
-  background-position: 95% 5%;
-  padding: 1em 4em 1em 4em;
+  
+  
+  
+  padding: 1em 5em 1em 5em;
 }
 .remark-slide-content h1 {
     font-size: 44px;
@@ -57,76 +56,49 @@ h1, h2, h3 {
 }
 .remark-inline-code {
   font-size: 1em;
-  color: #011F5B;
-}
-
-strong{color:#011F5B;}
-a, a > code {
-  color: #011F5B;
-  text-decoration: none;
+  color: #FFFFFF;
+  background-color: #000000;
+  padding: 2px;
 }
 .remark-slide-number {
-  color: #001F5B;
+  color: #70c0b1;
   opacity: 1;
-  margin-bottom: 0;
-  margin-right: 0;
-  font-size: 16px;
+  font-size: 0.9em;
+}
+strong{color:#70c0b1;}
+a, a > code {
+  color: #70c0b1;
+  text-decoration: none;
 }
 .footnote {
-  opacity: 1;
+  
   position: absolute;
-  bottom: 0.5em;
-  padding-right: 60px;
-  font-size: 16px;
+  bottom: 3em;
+  padding-right: 4em;
+  font-size: 0.9em;
 }
 .remark-code-line-highlighted {
   background-color: rgba(255,255,0,0.5);
 }
-.divider {
-  background-color: #011F5B;
-  color: #FFFFFF;
-  background-image: url(cwp-pennSIVE_Logo_FINAL_main_W-O_tagline_vertical-03-icon-only.png);
-  background-size: 25%;
-  background-position: 50% 15%;
-}
-.divider h1 {
-  color: #FFFFFF;
-}
-.divider h2, .divider h3 {
-  color: #82bbdc; 
-  font-weight: normal;
-  line-height: 1.5em;
-}
-.divider .remark-slide-number {
-  display: none;
-}
 .inverse {
-  background-color: #011F5B;
+  background-color: #4E867B;
   color: #FFFFFF;
+  
 }
 .inverse h1, .inverse h2, .inverse h3 {
   color: #FFFFFF;
 }
-.title-slide h1 {
+.title-slide, .title-slide h1, .title-slide h2, .title-slide h3 {
   color: #FFFFFF;
 }
-.title-slide h2, .title-slide h3 {
-  color: #82bbdc; 
-  font-weight: 400;
-  font-size: 28px;
-}
 .title-slide {
-  background-color: #011F5B;
-  background-image: url(cwp-pennSIVE_Logo_FINAL_main_W-O_tagline_horizontal-04.png);
-  background-size: 50%;
-  background-position: 50% 12.5%;
+  background-color: #16161d;
+  
+  
+  
 }
 .title-slide .remark-slide-number {
   display: none;
-}
-/* fixes MathJax font size */
-.mjx-chtml{
-  font-size: 1em !important;
 }
 /* Two-column layout */
 .left-column {
@@ -135,10 +107,10 @@ a, a > code {
   float: left;
 }
 .left-column h2, .left-column h3 {
-  color: #011F5B;
+  color: #70c0b199;
 }
 .left-column h2:last-of-type, .left-column h3:last-child {
-  color: #011F5B;
+  color: #70c0b1;
 }
 .right-column {
   width: 75%;
@@ -160,7 +132,7 @@ img, video, iframe {
   max-width: 100%;
 }
 blockquote {
-  border-left: solid 5px #011F5B;
+  border-left: solid 5px #70c0b180;
   padding-left: 1em;
 }
 .remark-slide table {
@@ -170,25 +142,25 @@ blockquote {
 }
 .remark-slide table thead th { border-bottom: 1px solid #ddd; }
 th, td { padding: 5px; }
-.remark-slide thead, .remark-slide tfoot, .remark-slide tr:nth-child(even) { background: #FFFFFF }
+.remark-slide thead, .remark-slide tfoot, .remark-slide tr:nth-child(even) { background: #16161d }
 table.dataTable tbody {
-  background-color: #FFFFFF;
-  color: #272822;
+  background-color: #16161d;
+  color: #FFFFFF;
 }
 table.dataTable.display tbody tr.odd {
-  background-color: #FFFFFF;
+  background-color: #16161d;
 }
 table.dataTable.display tbody tr.even {
-  background-color: #FFFFFF;
+  background-color: #16161d;
 }
 table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   background-color: rgba(255, 255, 255, 0.5);
 }
 .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
-  color: #272822;
+  color: #FFFFFF;
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button {
-  color: #272822 !important;
+  color: #FFFFFF !important;
 }
 
 @page { margin: 0; }

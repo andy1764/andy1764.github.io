@@ -18,13 +18,14 @@ h1, h2, h3 {
 }
 .remark-code, .remark-inline-code {
   font-family: IBM Plex Mono, 'Lucida Console', Monaco, monospace;
+  border-radius: 3px;
 }
 .remark-code {
   font-size: 0.8em;
-  border-radius: 3px;
 }
-.MathJax {
-font-size: 1.4em;
+/* fixes MathJax font size */
+.mjx-chtml{
+  font-size: 1em !important;
 }
 
 .remark-slide-number {
