@@ -115,6 +115,21 @@ library(gpuR) # uses OpenCL, works on Mac
 listContexts()
 setContext(3) # select GPU to use
 ```
+---
+
+## gpuR: gpuMatrix vs vclMatrix
+- `gpuMatrix` stores the object in RAM but performs calculations on the GPU
+- `vclMatrix` stores in video RAM (VRAM)
+    - Avoids performance loss from moving between CPU and GPU
+    - Can run out of VRAM
+- Note that both default to single-precision, specify `type = "double"`
+
+```{r}
+A <- gpuMatrix(diag(10), type = "double")
+class(A) #d indicates double
+B <- vclMatrix(diag(10), type = "double")
+class(B)
+```
 
 ---
 
@@ -130,7 +145,7 @@ system.time({
 
 # using gpuR
 system.time({
-  A <- gpuMatrix(runif(p^2), p, p)
+  A <- vclMatrix(runif(p^2), p, p, type = "double")
   solve(A)
 })[3]
 ```
@@ -148,7 +163,7 @@ system.time({
 
 # using gpuR
 system.time({
-  A <- gpuMatrix(runif(p^2), p, p)
+  A <- vclMatrix(runif(p^2), p, p, type = "double")
   solve(A)
 })[3]
 ```
@@ -163,7 +178,7 @@ inv <- sapply(c(seq(50, 450, 50), seq(500, 2500, 500)), function(p) c(
     solve(A)
   })[3],
   system.time({
-    A <- gpuMatrix(runif(p^2), p, p)
+    A <- vclMatrix(runif(p^2), p, p, type = "double")
     solve(A)
   })[3]
 ))
@@ -201,9 +216,9 @@ system.time({
 ```{r}
 # using gpuR
 system.time({
-  X <- gpuMatrix(runif(n*p), n, p)
-  beta <- gpuMatrix(rnorm(p), p, 1)
-  y <- X %*% beta + gpuMatrix(rnorm(n), n, 1)
+  X <- vclMatrix(runif(n*p), n, p, type = "double")
+  beta <- vclMatrix(rnorm(p), p, 1, type = "double")
+  y <- X %*% beta + vclMatrix(rnorm(n), n, 1, type = "double")
   solve(t(X) %*% X) %*% t(X) %*% y
 })[3]
 ```
@@ -212,14 +227,16 @@ system.time({
 ## gpuR: SVD
 ```{r}
 # using base R
-p = 10000
+p = 1500
 system.time({
   A <- matrix(runif(p^2), p, p)
+  svd(A)
   })[3]
 
 # using gpuR
 system.time({
-  A <- gpuMatrix(runif(p^2), p, p)
+  A <- vclMatrix(runif(p^2), p, p, type = "double")
+  svd(A)
   })[3]
 ```
 ---
@@ -244,8 +261,8 @@ system.time({
 ```{r, warning=FALSE}
 # using gpuR
 system.time({
-  X <- gpuMatrix(rnorm(n*q), n, q)
-  Y <- gpuMatrix(runif(n*p), n, p)
+  X <- vclMatrix(rnorm(n*q), n, q, type = "double")
+  Y <- vclMatrix(runif(n*p), n, p, type = "double")
   D <- dist(Y)
   mdmr(as.matrix(X), as.matrix(D))
 })[3]
@@ -318,11 +335,10 @@ CL_MEM_OBJECT_ALLOCATION_FAILURE
 ```
 ---
 
-## Conclusions
+## Summary
 - GPU is definitely useful for more than just gaming
 - Substantial speedups in simple matrix operations
-    - Limited advantage in complex tasks (e.g. SVD)
-    - Unable to handle larger objects
+    - Unable to handle larger objects (but for most part, no trouble storing on GPU)
 - Easy to import OpenCL kernels
 --
 

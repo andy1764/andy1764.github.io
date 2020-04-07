@@ -110,6 +110,37 @@ listContexts()
 ```r
 setContext(3) # select GPU to use
 ```
+---
+
+## gpuR: gpuMatrix vs vclMatrix
+- `gpuMatrix` stores the object in RAM but performs calculations on the GPU
+- `vclMatrix` stores in video RAM (VRAM)
+    - Avoids performance loss from moving between CPU and GPU
+    - Can run out of VRAM
+- Note that both default to single-precision, specify `type = "double"`
+
+
+```r
+A &lt;- gpuMatrix(diag(10), type = "double")
+class(A) #d indicates double
+```
+
+```
+## [1] "dgpuMatrix"
+## attr(,"package")
+## [1] "gpuR"
+```
+
+```r
+B &lt;- vclMatrix(diag(10), type = "double")
+class(B)
+```
+
+```
+## [1] "dvclMatrix"
+## attr(,"package")
+## [1] "gpuR"
+```
 
 ---
 
@@ -127,20 +158,20 @@ system.time({
 
 ```
 ## elapsed 
-##   8.145
+##   7.616
 ```
 
 ```r
 # using gpuR
 system.time({
-  A &lt;- gpuMatrix(runif(p^2), p, p)
+  A &lt;- vclMatrix(runif(p^2), p, p, type = "double")
   solve(A)
 })[3]
 ```
 
 ```
 ## elapsed 
-##       2
+##   1.262
 ```
 ---
 
@@ -164,21 +195,21 @@ system.time({
 ```r
 # using gpuR
 system.time({
-  A &lt;- gpuMatrix(runif(p^2), p, p)
+  A &lt;- vclMatrix(runif(p^2), p, p, type = "double")
   solve(A)
 })[3]
 ```
 
 ```
 ## elapsed 
-##   0.063
+##   0.133
 ```
 ---
 
 ## gpuR: Matrix inversion comparison
 
 
-&lt;img src="Special-Topic-Presentation_files/figure-html/unnamed-chunk-5-1.svg" width="504" /&gt;
+&lt;img src="Special-Topic-Presentation_files/figure-html/unnamed-chunk-6-1.svg" width="504" /&gt;
 ---
 
 ## gpuR: Linear models
@@ -198,7 +229,7 @@ system.time({
 
 ```
 ## elapsed 
-##   3.766
+##   3.569
 ```
 ---
 
@@ -207,16 +238,16 @@ system.time({
 ```r
 # using gpuR
 system.time({
-  X &lt;- gpuMatrix(runif(n*p), n, p)
-  beta &lt;- gpuMatrix(rnorm(p), p, 1)
-  y &lt;- X %*% beta + gpuMatrix(rnorm(n), n, 1)
+  X &lt;- vclMatrix(runif(n*p), n, p, type = "double")
+  beta &lt;- vclMatrix(rnorm(p), p, 1, type = "double")
+  y &lt;- X %*% beta + vclMatrix(rnorm(n), n, 1, type = "double")
   solve(t(X) %*% X) %*% t(X) %*% y
 })[3]
 ```
 
 ```
 ## elapsed 
-##   0.515
+##   0.239
 ```
 ---
 
@@ -224,27 +255,29 @@ system.time({
 
 ```r
 # using base R
-p = 10000
+p = 1500
 system.time({
   A &lt;- matrix(runif(p^2), p, p)
+  svd(A)
   })[3]
 ```
 
 ```
 ## elapsed 
-##   3.426
+##  10.405
 ```
 
 ```r
 # using gpuR
 system.time({
-  A &lt;- gpuMatrix(runif(p^2), p, p)
+  A &lt;- vclMatrix(runif(p^2), p, p, type = "double")
+  svd(A)
   })[3]
 ```
 
 ```
 ## elapsed 
-##   3.631
+##   6.185
 ```
 ---
 
@@ -265,7 +298,7 @@ system.time({
 
 ```
 ## elapsed 
-##   3.018
+##   3.327
 ```
 .footnote[&lt;sup&gt;1&lt;/sup&gt;[Zapala and Schork, 2012](https://doi.org/10.3389/fgene.2012.00190)]
 ---
@@ -275,8 +308,8 @@ system.time({
 ```r
 # using gpuR
 system.time({
-  X &lt;- gpuMatrix(rnorm(n*q), n, q)
-  Y &lt;- gpuMatrix(runif(n*p), n, p)
+  X &lt;- vclMatrix(rnorm(n*q), n, q, type = "double")
+  Y &lt;- vclMatrix(runif(n*p), n, p, type = "double")
   D &lt;- dist(Y)
   mdmr(as.matrix(X), as.matrix(D))
 })[3]
@@ -284,7 +317,7 @@ system.time({
 
 ```
 ## elapsed 
-##   1.764
+##   1.118
 ```
 ---
 
@@ -339,7 +372,7 @@ system.time({log(a)})[3]
 
 ```
 ## elapsed 
-##    2.74
+##   2.232
 ```
 
 ```r
@@ -348,7 +381,7 @@ system.time({log_ocl(a)})[3]
 
 ```
 ## elapsed 
-##   0.824
+##   1.689
 ```
 ---
 
@@ -369,11 +402,10 @@ CL_MEM_OBJECT_ALLOCATION_FAILURE
 ```
 ---
 
-## Conclusions
+## Summary
 - GPU is definitely useful for more than just gaming
 - Substantial speedups in simple matrix operations
-    - Limited advantage in complex tasks (e.g. SVD)
-    - Unable to handle larger objects
+    - Unable to handle larger objects (but for most part, no trouble storing on GPU)
 - Easy to import OpenCL kernels
 --
 
