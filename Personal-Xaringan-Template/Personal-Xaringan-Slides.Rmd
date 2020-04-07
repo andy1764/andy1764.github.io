@@ -1,0 +1,123 @@
+---
+title: "PennSIVE Template in Xaringan"
+author:
+  - Andrew Chen
+output:
+  xaringan::moon_reader:
+    css: ["AC_theme.css", "AC_theme_add.css"]
+    nature:
+      highlightStyle: tomorrow-night-bright
+      beforeInit: "macros.js"
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
+header_includes:
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.retina = 2, # higher quality plots
+  dev = "svg", # vector graphics device
+  dev.args=list(bg="transparent") # transparent plot backgrounds
+)
+
+library(ggplot2)
+# Dark Theme
+theme_set(theme_minimal())
+theme_update(
+  panel.background = element_rect(fill = "transparent", colour = NA),
+  plot.background = element_rect(fill = "transparent", colour = NA),
+  legend.background = element_rect(fill = "transparent", colour = NA),
+  legend.key = element_rect(fill = "transparent", colour = NA),
+  text = element_text(colour = "white"),
+  axis.text = element_text(colour = "white"))
+
+# How to make the base theme for AC_theme.css
+library(xaringanthemer)
+base_color = "#70c0b1" # from https://github.com/chriskempson/tomorrow-theme
+white_color = "#FFFFFF"
+black_color = "#16161d"
+mono_dark(
+  base_color = base_color,
+  white_color = white_color,
+  black_color = black_color,
+  header_font_google = google_font("Source Sans Pro", "600"),
+  text_font_google   = google_font("Source Sans Pro", "400", "400i"),
+  code_font_google   = google_font("IBM Plex Mono"),
+  title_slide_text_color = white_color,
+  title_slide_background_color = black_color,
+  inverse_text_color = white_color,
+  inverse_header_color = white_color,
+  inverse_background_color = darken_color(base_color, 0.3),
+  table_row_even_background_color = black_color,
+  text_font_size = "22px",
+  header_h1_font_size = "44px",
+  header_h2_font_size = "36px",
+  header_h3_font_size = "28px",
+  outfile = "AC_theme.css"
+)
+```
+
+# This is a Title
+.footnote[
+<sup>1</sup>No sources here
+]
+.pull-left[
+This is some body by `xaringan`
+- The body can contain *lots*<sup>1</sup>
+    - Such as
+
+```{r, echo=FALSE}
+ggplot(data.frame(x=1:100, y=1:100)) + 
+  geom_point(aes(x=x, y=y), color=base_color)
+```
+]
+--
+.pull-right[
+- Even a second column, **wow**!<sup>2</sup>
+```{r, eval=FALSE}
+library(whatever)
+whatever::meh()
+```
+]
+---
+class: inverse, center, middle
+<!-- Make sure to include all of the above classes to get this format -->
+
+# Welcome to a New Section
+### Featuring more placeholder text
+
+---
+
+## This is a Smaller Title
+And here's an equation
+\begin{align*}
+e^{i\pi} &= \cos\pi+i\sin\pi \\
+&=-1
+\end{align*}
+--
+And a fun table
+.small[
+```{r why_xaringanm, echo=FALSE}
+knitr::kable(data.frame(
+  "Slide Type" = c("PowerPoint", "Other HTML Slides", "Xaringan"), 
+  "My Review" = c("3/10: Does images well, but equations are the worst",
+                  "5/10: At least they're not PowerPoint",
+                  "10/10: Support for TWO columns and equations and backgrounds and previews that update as you type,
+                  see <a href=https://yihui.org/en/2017/08/why-xaringan-remark-js/>this link by Yihui</a>"),
+  check.names = F),
+  "html", escape = F)
+```
+]
+
+---
+class: middle
+
+From Yihui's [blog post](https://yihui.org/en/2019/02/ultimate-inf-mr/) on the recent update:
+![inf_mr](https://user-images.githubusercontent.com/163582/53144527-35f7a500-3562-11e9-862e-892d3fd7036d.gif)
+
+```{r, eval=FALSE, echo=FALSE}
+pagedown::chrome_print("Personal-Xaringan-Slides.html") # print as pdf
+```

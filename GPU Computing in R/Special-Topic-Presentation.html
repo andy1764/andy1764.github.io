@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>How to use your GPU for things other than gaming</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <link rel="stylesheet" href="AC_theme.css" type="text/css" />
+    <link rel="stylesheet" href="AC_theme_add.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# How to use your GPU for things other than gaming
+### Andrew Chen
+
+---
+
+
+
+
+## Why do we have GPUs
+- Graphical processing units (GPUs) were named by Sony for the PlayStation console
+- Intended for huge number of simple parallel operations
+    - e.g. increasing the brightness of every pixel on a screen
+--
+    - or most tasks involving rendering, lighting, etc.
+
+
+.center[
+&lt;video autoplay muted&gt;
+    &lt;source src="https://thumbs.gfycat.com/FelineHopefulCassowary-mobile.mp4" type="video/mp4" /&gt;
+&lt;/video&gt;
+]
+---
+
+## Ray-tracing example
+.center[
+&lt;video autoplay muted&gt;
+    &lt;source src="https://thumbs.gfycat.com/ImaginativeSlimyAlleycat-mobile.mp4" type="video/mp4" /&gt;
+&lt;/video&gt;
+]
+---
+
+## But there are other uses
+- General-purpose computing on GPUs
+    - Enables CPU computations on GPUs
+    - Popularized recently by frameworks such as OpenCL and Nvidia CUDA
+- Useful for calculations in
+    - Matrix/vector operations
+    - Fast fourier transforms
+    - Neural networks
+    - Image segmentation/processing&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Smistad et al., 2015](https://www.sciencedirect.com/science/article/pii/S1361841514001819)
+]
+---
+
+## CPUs vs GPUs
+- Nvidia GeForce RTX 2080 Ti has 4,352 GPU cores at a clock speed of 1,350MHz
+    - A high-end CPU, say the Intel Core i7-9700K, has 8 cores at a clock speed of 3,600MHz
+--
+- GPUs good at applying same operation to many data units[&lt;sup&gt;1&lt;/sup&gt;](https://graphics.stanford.edu/~mhouston/public_talks/R520-mhouston.pdf)
+    - Optimized for parallel processing
+--
+- CPUs better for executing a smaller number of complex tasks
+    - Optimized for serial processing
+---
+
+## Considerations for GPU computing
+- OpenCL vs Nvidia CUDA
+    - CUDA written only for Nvidia GPUs
+    - Mac support for CUDA ended[&lt;sup&gt;1&lt;/sup&gt;](https://gizmodo.com/apple-and-nvidia-are-over-1840015246)
+--
+- Single-precision vs double-precision
+    - Loss of performance for double-precision computing
+--
+- Object storage
+    - GPUs are generally less capable of storing large objects to memory
+    - Moving object from CPU to GPU and back is slow
+--
+- Computer hardware
+    - Low-end GPU may not see performance gains over high-end CPU
+    - Available software depends on your system specifications
+---
+
+## gpuR: GPU matrix computations in R
+- `gpuR` provides tools to perform basic matrix operations using the GPU
+- Simply need to specify which device to use
+
+
+
+```r
+library(gpuR) # uses OpenCL, works on Mac
+listContexts()
+```
+
+```
+##   context                                 platform platform_index
+## 1       1 Apple: OpenCL 1.2 (Oct  2 2019 00:43:05)              0
+## 2       2 Apple: OpenCL 1.2 (Oct  2 2019 00:43:05)              0
+## 3       3 Apple: OpenCL 1.2 (Oct  2 2019 00:43:05)              0
+##                                     device device_index device_type
+## 1 Intel(R) Core(TM) i9-9880H CPU @ 2.30GHz            0         cpu
+## 2                Intel(R) UHD Graphics 630            0         gpu
+## 3      AMD Radeon Pro 5500M Compute Engine            0         gpu
+```
+
+```r
+setContext(3) # select GPU to use
+```
+
+---
+
+## gpuR: Matrix inversion
+
+```r
+# using base R
+p = 2000
+
+system.time({
+  A &lt;- matrix(runif(p^2), p, p)
+  solve(A)
+})[3]
+```
+
+```
+## elapsed 
+##   9.829
+```
+
+```r
+# using gpuR
+system.time({
+  A &lt;- gpuMatrix(runif(p^2), p, p)
+  solve(A)
+})[3]
+```
+
+```
+## elapsed 
+##   2.032
+```
+---
+
+## gpuR: Small matrix inversion
+
+```r
+# using base R
+p = 200
+
+system.time({
+  A &lt;- matrix(runif(p^2), p, p)
+  solve(A)
+})[3]
+```
+
+```
+## elapsed 
+##   0.011
+```
+
+```r
+# using gpuR
+system.time({
+  A &lt;- gpuMatrix(runif(p^2), p, p)
+  solve(A)
+})[3]
+```
+
+```
+## elapsed 
+##   0.059
+```
+---
+
+## gpuR: Matrix inversion comparison
+
+
+&lt;img src="Special-Topic-Presentation_files/figure-html/unnamed-chunk-5-1.svg" width="504" /&gt;
+---
+
+## gpuR: Linear models
+
+```r
+# using base R
+n = 2000
+p = 1000
+
+system.time({
+  X &lt;- matrix(runif(n*p), n, p)
+  beta &lt;- matrix(rnorm(p), p, 1)
+  y &lt;- X %*% beta + matrix(rnorm(n), n, 1)
+  solve(t(X) %*% X) %*% t(X) %*% y
+})[3]
+```
+
+```
+## elapsed 
+##   3.573
+```
+---
+
+## gpuR: Linear models
+
+```r
+# using gpuR
+system.time({
+  X &lt;- gpuMatrix(runif(n*p), n, p)
+  beta &lt;- gpuMatrix(rnorm(p), p, 1)
+  y &lt;- X %*% beta + gpuMatrix(rnorm(n), n, 1)
+  solve(t(X) %*% X) %*% t(X) %*% y
+})[3]
+```
+
+```
+## elapsed 
+##   0.468
+```
+---
+
+## gpuR: SVD
+
+```r
+# using base R
+n = 2000
+p = 750
+A &lt;- matrix(runif(n*p), n, p)
+gpuA &lt;- gpuMatrix(A)
+
+system.time({svd(A)})[3]
+```
+
+```
+## elapsed 
+##    3.58
+```
+
+```r
+# using gpuR
+system.time({svd(A)})[3]
+```
+
+```
+## elapsed 
+##   3.627
+```
+---
+
+## gpuR: Multivariate distance matrix regression
+- Similar to regression, but using distance matrix to compute sum of squared distances&lt;sup&gt;1&lt;/sup&gt;
+- Calculation of pairwise distance between subjects is one of the most expensive steps
+
+```r
+# using base R
+n = 1000; p = 1000; q = 10
+system.time({
+  X &lt;- matrix(rnorm(n*q), n, q)
+  Y &lt;- matrix(runif(n*p), n, p)
+  D &lt;- dist(Y)
+  mdmr(X, D)
+})[3]
+```
+
+```
+## elapsed 
+##   4.346
+```
+.footnote[&lt;sup&gt;1&lt;/sup&gt;[Zapala and Schork, 2012](https://doi.org/10.3389/fgene.2012.00190)]
+---
+
+## gpuR: Multivariate distance matrix regression
+
+```r
+# using gpuR
+system.time({
+  X &lt;- gpuMatrix(rnorm(n*q), n, q)
+  Y &lt;- gpuMatrix(runif(n*p), n, p)
+  D &lt;- dist(Y)
+  mdmr(as.matrix(X), as.matrix(D))
+})[3]
+```
+
+```
+## elapsed 
+##   2.188
+```
+---
+
+## gpuR: Summary
+- Works for both AMD and Nvidia GPUs
+- Requires minimal modification to code
+- Can speed up many large matrix operations
+- Often outperformed by Nvidia CUDA packages[&lt;sup&gt;1&lt;/sup&gt;](http://www.parallelr.com/r-hpac-benchmark-analysis-gpu/)
+---
+
+## OpenCL in R
+- `OpenCL` package provides a way to import OpenCL code
+- Again, need to specify device
+
+
+
+```r
+library(OpenCL) # uses OpenCL, works on Mac
+devices &lt;- oclDevices() # choose device
+ctx = oclContext(device = devices[[3]], precision = "best")
+# precision="best" chooses double if available
+```
+---
+
+## OpenCL: Importing very simple code
+
+```r
+# compute log of each vector element
+code = c("
+__kernel void logv(
+  __global numeric* output,
+ const unsigned int n,
+  __global numeric* input)
+{
+  size_t i = get_global_id(0);
+  if(i &lt; n)
+      output[i] = log(input[i]);
+}")
+# only allows for vector output
+k_log &lt;- oclSimpleKernel(ctx, "logv", code)
+log_ocl &lt;- function(x) as.numeric(oclRun(k_log, length(x), 
+                                         as.clBuffer(x, ctx)))
+```
+---
+
+## OpenCL: Testing log function
+
+```r
+a &lt;- runif(2e8, 1, 2)
+system.time({log(a)})[3]
+```
+
+```
+## elapsed 
+##   2.527
+```
+
+```r
+system.time({log_ocl(a)})[3]
+```
+
+```
+## elapsed 
+##   1.721
+```
+---
+
+## OpenCL: Memory limitations
+
+```r
+system.time({log_ocl(runif(3e8, 1, 2))})[3]
+```
+
+```
+Error in oclRun(k_log, length(x), as.clBuffer(x, ctx)) :  
+Kernel execution failed (oclError -4)
+```
+
+- Error code defined in header file[&lt;sup&gt;1&lt;/sup&gt;](https://tersetalk.wordpress.com/2012/04/13/opencl-error-codes/) as
+```
+CL_MEM_OBJECT_ALLOCATION_FAILURE
+```
+---
+
+## Conclusions
+- GPU is definitely useful for more than just gaming
+- Substantial speedups in simple matrix operations
+    - Limited advantage in complex tasks (e.g. SVD)
+    - Unable to handle larger objects
+- Easy to import OpenCL kernels
+--
+- Much more software available for Nvidia GPUs[&lt;sup&gt;1&lt;/sup&gt;](https://www.r-pkg.org/ctv/HighPerformanceComputing)
+    - Also see [`cuRnet`](https://github.com/InfOmics/cuRnet) for graph traversal
+    - [`gpuMagic`](https://bioconductor.org/packages/release/bioc/html/gpuMagic.html) for a GPU-enabled `sapply` function
+    - [`H2O4GPU`](https://cran.r-project.org/web/packages/h2o4gpu/vignettes/getting_started.html) for some basic machine learning functionalities
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "tomorrow-night-bright",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

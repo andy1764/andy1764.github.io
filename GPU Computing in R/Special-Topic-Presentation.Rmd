@@ -1,0 +1,331 @@
+---
+title: "How to use your GPU for things other than gaming"
+author:
+  - Andrew Chen
+output:
+  xaringan::moon_reader:
+    css: ["AC_theme.css", "AC_theme_add.css"]
+    nature:
+      highlightStyle: tomorrow-night-bright
+      beforeInit: "macros.js"
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
+header_includes:
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.retina = 2, # higher quality plots
+  dev = "svg", # vector graphics device
+  dev.args=list(bg="transparent") # transparent plot backgrounds
+)
+
+library(ggplot2)
+# Dark Theme
+theme_set(theme_minimal())
+theme_update(
+  panel.background = element_rect(fill = "transparent", colour = NA),
+  plot.background = element_rect(fill = "transparent", colour = NA),
+  legend.background = element_rect(fill = "transparent", colour = NA),
+  legend.key = element_rect(fill = "transparent", colour = NA),
+  text = element_text(colour = "white"),
+  axis.text = element_text(colour = "white"))
+
+library(MDMR)
+```
+
+## Why do we have GPUs
+- Graphical processing units (GPUs) were named by Sony for the PlayStation console
+- Intended for huge number of simple parallel operations
+    - e.g. increasing the brightness of every pixel on a screen
+--
+    - or most tasks involving rendering, lighting, etc.
+
+
+.center[
+<video autoplay muted>
+    <source src="https://thumbs.gfycat.com/FelineHopefulCassowary-mobile.mp4" type="video/mp4" />
+</video>
+]
+---
+
+## Ray-tracing example
+.center[
+<video autoplay muted>
+    <source src="https://thumbs.gfycat.com/ImaginativeSlimyAlleycat-mobile.mp4" type="video/mp4" />
+</video>
+]
+---
+
+## But there are other uses
+- General-purpose computing on GPUs
+    - Enables CPU computations on GPUs
+    - Popularized recently by frameworks such as OpenCL and Nvidia CUDA
+- Useful for calculations in
+    - Matrix/vector operations
+    - Fast fourier transforms
+    - Neural networks
+    - Image segmentation/processing<sup>1</sup>
+
+.footnote[
+<sup>1</sup>[Smistad et al., 2015](https://www.sciencedirect.com/science/article/pii/S1361841514001819)
+]
+---
+
+## CPUs vs GPUs
+- Nvidia GeForce RTX 2080 Ti has 4,352 GPU cores at a clock speed of 1,350MHz
+    - A high-end CPU, say the Intel Core i7-9700K, has 8 cores at a clock speed of 3,600MHz
+--
+- GPUs good at applying same operation to many data units[<sup>1</sup>](https://graphics.stanford.edu/~mhouston/public_talks/R520-mhouston.pdf)
+    - Optimized for parallel processing
+--
+- CPUs better for executing a smaller number of complex tasks
+    - Optimized for serial processing
+---
+
+## Considerations for GPU computing
+- OpenCL vs Nvidia CUDA
+    - CUDA written only for Nvidia GPUs
+    - Mac support for CUDA ended[<sup>1</sup>](https://gizmodo.com/apple-and-nvidia-are-over-1840015246)
+--
+- Single-precision vs double-precision
+    - Loss of performance for double-precision computing
+--
+- Object storage
+    - GPUs are generally less capable of storing large objects to memory
+    - Moving object from CPU to GPU and back is slow
+--
+- Computer hardware
+    - Low-end GPU may not see performance gains over high-end CPU
+    - Available software depends on your system specifications
+---
+
+## gpuR: GPU matrix computations in R
+- `gpuR` provides tools to perform basic matrix operations using the GPU
+- Simply need to specify which device to use
+```{r load, include=FALSE}
+library(gpuR)
+```
+
+```{r}
+library(gpuR) # uses OpenCL, works on Mac
+listContexts()
+setContext(3) # select GPU to use
+```
+
+---
+
+## gpuR: Matrix inversion
+```{r}
+# using base R
+p = 2000
+
+system.time({
+  A <- matrix(runif(p^2), p, p)
+  solve(A)
+})[3]
+
+# using gpuR
+system.time({
+  A <- gpuMatrix(runif(p^2), p, p)
+  solve(A)
+})[3]
+```
+---
+
+## gpuR: Small matrix inversion
+```{r}
+# using base R
+p = 200
+
+system.time({
+  A <- matrix(runif(p^2), p, p)
+  solve(A)
+})[3]
+
+# using gpuR
+system.time({
+  A <- gpuMatrix(runif(p^2), p, p)
+  solve(A)
+})[3]
+```
+---
+
+## gpuR: Matrix inversion comparison
+```{r, eval=FALSE, echo=FALSE}
+inv <- sapply(c(seq(50, 450, 50), seq(500, 2500, 500)), function(p) c(
+  p,
+  system.time({
+    A <- matrix(runif(p^2), p, p)
+    solve(A)
+  })[3],
+  system.time({
+    A <- gpuMatrix(runif(p^2), p, p)
+    solve(A)
+  })[3]
+))
+
+save(inv, file = "gpuR_inv.Rdata")
+```
+
+```{r echo=FALSE, results='hide', message=FALSE, warning=FALSE}
+load("gpuR_inv.Rdata")
+
+ggplot(data.frame(p = rep(inv[1,], 2), Time = log(c(inv[2,], inv[3,])),
+                  Method = c(rep("Base", ncol(inv)), rep("GPU", ncol(inv))))) +
+  geom_line(aes(x = p, y = Time, group = Method, color = Method)) + 
+  labs(y = "log2(Time)")
+  scale_y_continuous("log2")
+```
+---
+
+## gpuR: Linear models
+```{r}
+# using base R
+n = 2000
+p = 1000
+
+system.time({
+  X <- matrix(runif(n*p), n, p)
+  beta <- matrix(rnorm(p), p, 1)
+  y <- X %*% beta + matrix(rnorm(n), n, 1)
+  solve(t(X) %*% X) %*% t(X) %*% y
+})[3]
+```
+---
+
+## gpuR: Linear models
+```{r}
+# using gpuR
+system.time({
+  X <- gpuMatrix(runif(n*p), n, p)
+  beta <- gpuMatrix(rnorm(p), p, 1)
+  y <- X %*% beta + gpuMatrix(rnorm(n), n, 1)
+  solve(t(X) %*% X) %*% t(X) %*% y
+})[3]
+```
+---
+
+## gpuR: SVD
+```{r}
+# using base R
+n = 2000
+p = 750
+A <- matrix(runif(n*p), n, p)
+gpuA <- gpuMatrix(A)
+
+system.time({svd(A)})[3]
+
+# using gpuR
+system.time({svd(A)})[3]
+```
+---
+
+## gpuR: Multivariate distance matrix regression
+- Similar to regression, but using distance matrix to compute sum of squared distances<sup>1</sup>
+- Calculation of pairwise distance between subjects is one of the most expensive steps
+```{r, warning=FALSE}
+# using base R
+n = 1000; p = 1000; q = 10
+system.time({
+  X <- matrix(rnorm(n*q), n, q)
+  Y <- matrix(runif(n*p), n, p)
+  D <- dist(Y)
+  mdmr(X, D)
+})[3]
+```
+.footnote[<sup>1</sup>[Zapala and Schork, 2012](https://doi.org/10.3389/fgene.2012.00190)]
+---
+
+## gpuR: Multivariate distance matrix regression
+```{r, warning=FALSE}
+# using gpuR
+system.time({
+  X <- gpuMatrix(rnorm(n*q), n, q)
+  Y <- gpuMatrix(runif(n*p), n, p)
+  D <- dist(Y)
+  mdmr(as.matrix(X), as.matrix(D))
+})[3]
+```
+---
+
+## gpuR: Summary
+- Works for both AMD and Nvidia GPUs
+- Requires minimal modification to code
+- Can speed up many large matrix operations
+- Often outperformed by Nvidia CUDA packages[<sup>1</sup>](http://www.parallelr.com/r-hpac-benchmark-analysis-gpu/)
+---
+
+## OpenCL in R
+- `OpenCL` package provides a way to import OpenCL code
+- Again, need to specify device
+```{r include=FALSE}
+library(OpenCL)
+```
+
+```{r, warning=FALSE}
+library(OpenCL) # uses OpenCL, works on Mac
+devices <- oclDevices() # choose device
+ctx = oclContext(device = devices[[3]], precision = "best")
+# precision="best" chooses double if available
+```
+---
+
+## OpenCL: Importing very simple code
+```{r}
+# compute log of each vector element
+code = c("
+__kernel void logv(
+  __global numeric* output,
+ const unsigned int n,
+  __global numeric* input)
+{
+  size_t i = get_global_id(0);
+  if(i < n)
+      output[i] = log(input[i]);
+}")
+# only allows for vector output
+k_log <- oclSimpleKernel(ctx, "logv", code)
+log_ocl <- function(x) as.numeric(oclRun(k_log, length(x), 
+                                         as.clBuffer(x, ctx)))
+```
+---
+
+## OpenCL: Testing log function
+```{r}
+a <- runif(2e8, 1, 2)
+system.time({log(a)})[3]
+system.time({log_ocl(a)})[3]
+```
+---
+
+## OpenCL: Memory limitations
+```{r, eval=FALSE}
+system.time({log_ocl(runif(3e8, 1, 2))})[3]
+```
+
+```
+Error in oclRun(k_log, length(x), as.clBuffer(x, ctx)) :  
+Kernel execution failed (oclError -4)
+```
+
+- Error code defined in header file[<sup>1</sup>](https://tersetalk.wordpress.com/2012/04/13/opencl-error-codes/) as
+```
+CL_MEM_OBJECT_ALLOCATION_FAILURE
+```
+---
+
+## Conclusions
+- GPU is definitely useful for more than just gaming
+- Substantial speedups in simple matrix operations
+    - Limited advantage in complex tasks (e.g. SVD)
+    - Unable to handle larger objects
+- Easy to import OpenCL kernels
+--
+- Much more software available for Nvidia GPUs[<sup>1</sup>](https://www.r-pkg.org/ctv/HighPerformanceComputing)
+    - Also see [`cuRnet`](https://github.com/InfOmics/cuRnet) for graph traversal
+    - [`gpuMagic`](https://bioconductor.org/packages/release/bioc/html/gpuMagic.html) for a GPU-enabled `sapply` function
+    - [`H2O4GPU`](https://cran.r-project.org/web/packages/h2o4gpu/vignettes/getting_started.html) for some basic machine learning functionalities
