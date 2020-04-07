@@ -28,7 +28,7 @@ class: center, middle, inverse, title-slide
 
 
 .center[
-&lt;video autoplay muted&gt;
+&lt;video loop autoplay muted&gt;
     &lt;source src="https://thumbs.gfycat.com/FelineHopefulCassowary-mobile.mp4" type="video/mp4" /&gt;
 &lt;/video&gt;
 ]
@@ -36,7 +36,7 @@ class: center, middle, inverse, title-slide
 
 ## Ray-tracing example
 .center[
-&lt;video autoplay muted&gt;
+&lt;video loop autoplay muted&gt;
     &lt;source src="https://thumbs.gfycat.com/ImaginativeSlimyAlleycat-mobile.mp4" type="video/mp4" /&gt;
 &lt;/video&gt;
 ]
@@ -45,7 +45,7 @@ class: center, middle, inverse, title-slide
 ## But there are other uses
 - General-purpose computing on GPUs
     - Enables CPU computations on GPUs
-    - Popularized recently by frameworks such as OpenCL and Nvidia CUDA
+    - Popularized by frameworks such as OpenCL and Nvidia CUDA
 - Useful for calculations in
     - Matrix/vector operations
     - Fast fourier transforms
@@ -376,6 +376,7 @@ CL_MEM_OBJECT_ALLOCATION_FAILURE
     - Unable to handle larger objects
 - Easy to import OpenCL kernels
 --
+
 - Much more software available for Nvidia GPUs[&lt;sup&gt;1&lt;/sup&gt;](https://www.r-pkg.org/ctv/HighPerformanceComputing)
     - Also see [`cuRnet`](https://github.com/InfOmics/cuRnet) for graph traversal
     - [`gpuMagic`](https://bioconductor.org/packages/release/bioc/html/gpuMagic.html) for a GPU-enabled `sapply` function

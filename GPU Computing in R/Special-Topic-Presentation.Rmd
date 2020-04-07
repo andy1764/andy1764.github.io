@@ -46,7 +46,7 @@ library(MDMR)
 
 
 .center[
-<video autoplay muted>
+<video controls loop autoplay muted>
     <source src="https://thumbs.gfycat.com/FelineHopefulCassowary-mobile.mp4" type="video/mp4" />
 </video>
 ]
@@ -54,7 +54,7 @@ library(MDMR)
 
 ## Ray-tracing example
 .center[
-<video autoplay muted>
+<video controls loop autoplay muted>
     <source src="https://thumbs.gfycat.com/ImaginativeSlimyAlleycat-mobile.mp4" type="video/mp4" />
 </video>
 ]
@@ -63,7 +63,7 @@ library(MDMR)
 ## But there are other uses
 - General-purpose computing on GPUs
     - Enables CPU computations on GPUs
-    - Popularized recently by frameworks such as OpenCL and Nvidia CUDA
+    - Popularized by frameworks such as OpenCL and Nvidia CUDA
 - Useful for calculations in
     - Matrix/vector operations
     - Fast fourier transforms
@@ -325,6 +325,7 @@ CL_MEM_OBJECT_ALLOCATION_FAILURE
     - Unable to handle larger objects
 - Easy to import OpenCL kernels
 --
+
 - Much more software available for Nvidia GPUs[<sup>1</sup>](https://www.r-pkg.org/ctv/HighPerformanceComputing)
     - Also see [`cuRnet`](https://github.com/InfOmics/cuRnet) for graph traversal
     - [`gpuMagic`](https://bioconductor.org/packages/release/bioc/html/gpuMagic.html) for a GPU-enabled `sapply` function
