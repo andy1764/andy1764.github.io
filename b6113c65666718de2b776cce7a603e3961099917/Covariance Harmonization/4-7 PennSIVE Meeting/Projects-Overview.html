@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Projects-Overview.utf8</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <script src="Projects-Overview_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="Projects-Overview_files/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="PennSIVE-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Covariance Harmonization and Inference
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=750em>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+## Outline of Projects
+- Correcting Covariance Batch Effects: CovBat
+- Harmonization of functional connectivity matrices (WIP)
+- Covariance regression using principal components analysis (WIP)
+---
+class: divider, center, middle
+# Correcting Covariance Batch Effects: CovBat
+---
+
+## CovBat Model
+.footnote[&lt;sup&gt;1&lt;/sup&gt;[Johnson et al., 2007](https://academic.oup.com/biostatistics/article/8/1/118/252073)]
+
+**Step 1**: Remove scanner effect in mean and variance via ComBat&lt;sup&gt;1&lt;/sup&gt; and then residualize out intercept and covariates
+`$$e_{ijv}^{ComBat} = \frac{y_{ijv} - \hat{\alpha}_v - \mathbf{x}_{ij}' \hat{\beta}_v - \gamma_{iv}^*}{\delta_{iv}^*}$$`
+**Step 2**: Perform principal components analysis (PCA) to obtain scores
+$$
+`\begin{aligned}
+\Sigma &amp;= \sum_{k=1}^q \lambda_k \phi_k \phi_k' &amp; &amp; &amp; e_{ij}^{ComBat} &amp;= \sum_{k=1}^q \xi_{ijk} \phi_k
+\end{aligned}`
+$$
+
+**Step 3**: Harmonize mean and variance of first `\(K\)` PC scores
+
+`$$e_{ij}^{CovBat} = \sum_{k=1}^K \xi_{ijk}^{CovBat} \phi_k + \sum_{l=K+1}^q \xi_{ijl} \phi_l$$`
+
+---
+## CovBat Harmonizes Covariance
+![](adni_corr.png)
+
+---
+## CovBat Obscures Detection of Scanner
+&lt;img src="adni_auc.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+## CovBat Improves Detection of Covariates
+![](adni_auc_cov.png)
+
+---
+class: divider, middle, center
+# Functional Connectivity Harmonization
+---
+
+## Problem Setting
+- Resting-state fMRI has been become an increasingly popular tool for understanding brain function and pathology
+- Consists of fMRI sequence acquired without any associated task
+- Typically analyzed as `\(p\times p\)` correlation matrices calculated across regions of interest over time
+- How do we correct for scanner differences across these objects?
+---
+
+## FC Harmonization using CPCs
+Let `\(\Sigma_{ij}\)` be the covariance matrices within site `\(i\)` for subject `\(j\)`. We assume that there exist common principal components (CPCs) across the functional connectivity matrices such that
+`$$\Sigma_{ij} = \Phi \Lambda_{ij}\Phi^T$$`
+where `\(\Lambda_{ij}\)` are `\(p\times p\)` diagonal matrices with entries `\(\lambda_{ijk}\)`
+
+We then directly apply the ComBat model to `\(q\)` CPC eigenvalues such that
+`$$\lambda_{ijk} = x_{ij}^T \beta_k + \gamma_{ik} + \delta_{ik} e_{ijk}$$`
+for `\(k=1,2,\ldots,q\)` where `\(q \leq p\)`.  
+--
+
+
+Ideally, this removes scanner effect from features shared between subjects, which is ultimately what would be important for later inference.
+---
+
+## Estimation of CPCs
+- For now, `\(q\)` is fixed at some value, but there could be a data-driven way (e.g. percentage of norm captured by CPC approximation)
+- Estimation of CPCs can proceed via any method, major ones include the MLE estimation&lt;sup&gt;1&lt;/sup&gt;, stepwise CPC&lt;sup&gt;2&lt;/sup&gt;, or potentially covariate-assisted principal components (CAP)&lt;sup&gt;3&lt;/sup&gt;
+- However, no guarantees that any of these CPC methods fit the data well
+    - Currently running into issues with how well the CPCs fit the data
+    - Correction works on relatively small part of the FC matrices (in percentage of norm) even with large number of CPCs
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Flury, 1986](https://projecteuclid.org/euclid.aos/1176349930)  
+&lt;sup&gt;2&lt;/sup&gt;[Trendafilov, 2010](https://doi.org/10.1016/j.csda.2010.03.010)  
+&lt;sup&gt;3&lt;/sup&gt;[Zhao et al., 2019](https://doi.org/10.1093/biostatistics/kxz057)
+]
+---
+
+## Log-Transformation Approaches
+- Apply log transformation then vectorize subject-specific matrices then perform PCA to obtain `\(\boldsymbol{\Phi}_k\)`, which are just the eigenvectors arranged as `\(p \times p\)` symmetric matrices
+`$$\log\Sigma_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \boldsymbol{\Phi}_k + \mathbf{E}_{ij}$$`
+- Apply ComBat including covariates to the `\(\Lambda_{ijk}\)`, harmonizing across sites indexed by `\(i\)`
+- Recover CovBat-adjusted FC matrices by taking the matrix exponential
+- Guarantees positive definiteness
+--
+
+- We also tried simply applying ComBat to the entries of `\(\log\Sigma_{ij}\)`
+---
+
+## BLSA/CARDIA Data Example
+- For initial tests, we are using a subset of data from the Baltimore Longitudinal Study of Aging (BLSA) and the Coronary Artery Risk Development in Young Adults (CARDIA) study
+- Starting with 50 subjects per site, and random subset of 50 ROIs from the 264 available ROIs
+
+
+
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Number of Subjects &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age (mean(SD)) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 67.52 (15.10) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50.12 (3.35) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 49.78 (3.72) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50.24 (3.61) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 17 (34.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 19 (38.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 25 (50.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 19 (38.0) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## Multivariate Distance Matrix Regression
+- MDMR&lt;sup&gt;1,2&lt;/sup&gt; is a technique for relating an arbitrary number of dependent variables to independent variables
+    - Only relies on a distance matrix calculated using any metric
+- Effective in high-dimensional settings, including FC
+- Important to consider which metric to use
+    - Both Frobenius norm and log-Euclidean&lt;sup&gt;3&lt;/sup&gt; norm are tested
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Zapala and Schork, 2012](https://doi.org/10.3389/fgene.2012.00190)  
+&lt;sup&gt;2&lt;/sup&gt;[McArdle and Anderson, 2001](https://doi.org/10.1890/0012-9658(2001)082[0290:FMMTCD]2.0.CO;2)  
+&lt;sup&gt;3&lt;/sup&gt;[Arsigny et al., 2016](https://doi.org/10.1002/mrm.20965)
+]
+---
+
+## All Methods Considered
+- Bolded methods guarantee positive definiteness
+    - For others, we find the nearest PD matrix
+- Tried all methods using covariance and correlation as inputs
+
+
+- FC ComBat: ComBat on Fisher-transformed off-diagonal elements
+- **Log-ComBat**: Log then ComBat on all elements
+- **Log-CovBat**: Log then ComBat on PC scores
+- CPC eigenvalues harmonized by taking the log and applying ComBat
+    - Not handled
+    - ComBat on all elements
+    - **Removed entirely**
+---
+
+## MDMR Results: Covariance Inputs
+
+- FC ComBat excluded since it only operates on correlation matrices
+- MDMR implemented via 10,000 permutations of the independent variables
+- Results reported for both covariance and correlation outputs
+
+.center[Results for Frobenius Distance]
+.small[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Site &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All.Corr &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Age.Corr &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex.Corr &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Site.Corr &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001848 !important;" &gt;0.102&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00194C !important;" &gt;0.082&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.004&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.016&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00153E !important;" &gt;0.156&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.004&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001A4D !important;" &gt;0.074&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.004&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001C53 !important;" &gt;0.038&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000E2A !important;" &gt;0.268&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001D56 !important;" &gt;0.028&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E59 !important;" &gt;0.006&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E59 !important;" &gt;0.008&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001847 !important;" &gt;0.11&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001847 !important;" &gt;0.106&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.002&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.016&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00143B !important;" &gt;0.172&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000F2C !important;" &gt;0.254&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000E2B !important;" &gt;0.258&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #180000 !important;" &gt;0.58&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000105 !important;" &gt;0.47&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000715 !important;" &gt;0.384&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #5F0000 !important;" &gt;0.812&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #640000 !important;" &gt;0.826&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001849 !important;" &gt;0.098&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #930000 !important;" &gt;0.982&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## MDMR Results: Covariance Inputs
+.center[Results for Log-Euclidean Distance]
+.small[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Site &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All.Corr &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Age.Corr &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex.Corr &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Site.Corr &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001338 !important;" &gt;0.194&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001D56 !important;" &gt;0.024&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001B50 !important;" &gt;0.058&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001949 !important;" &gt;0.096&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E59 !important;" &gt;0.006&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.002&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001D56 !important;" &gt;0.024&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00153F !important;" &gt;0.154&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.016&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00143D !important;" &gt;0.164&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001C53 !important;" &gt;0.042&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00194B !important;" &gt;0.088&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000D28 !important;" &gt;0.278&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00194B !important;" &gt;0.088&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00153E !important;" &gt;0.156&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.002&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #840000 !important;" &gt;0.934&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #200000 !important;" &gt;0.608&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #240000 !important;" &gt;0.618&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000E2A !important;" &gt;0.266&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #3C0000 !important;" &gt;0.698&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #670000 !important;" &gt;0.84&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #8F0000 !important;" &gt;0.968&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000C25 !important;" &gt;0.296&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #950000 !important;" &gt;0.988&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #970000 !important;" &gt;0.998&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## MDMR Results: Correlation Inputs
+
+- Results reported for correlation outputs
+- For log-Euclidean distance, had to find the nearest PD matrix to FC ComBat output
+
+.center[Results for Frobenius Distance]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Site &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.004&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.016&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.002&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E59 !important;" &gt;0.008&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000E2B !important;" &gt;0.26&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.002&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.004&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.004&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E59 !important;" &gt;0.006&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.004&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.016&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #950000 !important;" &gt;0.988&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E59 !important;" &gt;0.006&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #1C0000 !important;" &gt;0.592&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001B4F !important;" &gt;0.064&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #2F0000 !important;" &gt;0.654&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## MDMR Results: Correlation Inputs
+.center[Results for Log-Euclidean Distance]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Site &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001B50 !important;" &gt;0.058&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001744 !important;" &gt;0.124&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001A4D !important;" &gt;0.074&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001D56 !important;" &gt;0.022&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #520000 !important;" &gt;0.768&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E59 !important;" &gt;0.008&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00194A !important;" &gt;0.09&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.004&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E59 !important;" &gt;0.006&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E5A !important;" &gt;0.004&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000717 !important;" &gt;0.372&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001C54 !important;" &gt;0.036&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000614 !important;" &gt;0.388&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## FC Harmonization Summary
+- Results depend heavily on the choice of metric
+    - Promising results for CPC+ComBat and log-ComBat which show strong harmonization performance in both metrics
+- Need to implement and test CPC-based regression methods
+- Adapting CAP code for application in harmonization
+- Further testing of network metrics
+- Working on an R package to implement all methods and tests
+---
+class: divider, center, middle
+# Covariance Regression
+---
+
+## Motivation: ABCD Study
+- Applied CovBat to the Longitudinal Study of Adolescent Brain Cognitive Development (ABCD Study)
+- Noticed substantial differences in covariance between scanners especially between Siemens Prisma and Siemens Prisma fit scanners
+    - These are meant to be almost equivalent models
+- Used a permutation test to investigate
+---
+
+## ABCD Study Demographics
+
+
+&lt;style type="text/css"&gt;
+.small { font-size: 70% }
+&lt;/style&gt;
+- Cortical thickness values computed using 3T scans for 6341 subjects
+    - Excluded subjects without sex or scanner ID
+    - Also excluded subjects with conflicting scan information, *n* = 4857 included
+- Demographics stratified by scanner model shown below
+
+.small[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; GE Discovery MR750 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; GE Signa Creator &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Philips Achieva dStream &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Philips Ingenia &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Siemens Prisma &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Siemens Prisma Fit &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Number of Subjects &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1570 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 448 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 259 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1149 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1398 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age (Mean (SD)) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 133.4 (14.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 123.5 (12.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 133.8 (13.5) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 142.0 (11.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 143.7 (9.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 135.4 (14.0) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 830 (52.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 ( 50.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 240 (53.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 120 (46.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 625 (54.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 755 (54.0) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Handedness score rating &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Right-handed &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1254 (79.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 (100.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 362 (80.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 192 (74.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 904 (78.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1097 (78.5) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Left-handed &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 105 ( 6.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 (  0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 21 ( 4.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 25 ( 9.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 84 ( 7.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 97 ( 6.9) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Mixed &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 211 (13.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 (  0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 65 (14.5) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 42 (16.2) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 161 (14.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 204 (14.6) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+## Correlation Permutation Test
+- To test our hypothesis that correlation between cortical thickness values differs across scanner model, we design the following permutation test:
+    1. Shuffle scanner model and scanner ID
+    2. Compute correlation matrices within each scanner ID
+    3. Find average pairwise distance between correlation matrices of different scanner models
+    4. Repeat steps 1-3 one thousand times
+    5. Compare the true average pairwise distance against the permutation values
+
+
+- This test accounts for the sample size within each scanner ID by keeping it fixed across permutations
+
+---
+## Prisma vs. Prisma Fit
+- Found large difference in correlation structure between Prisma and Prisma fit scanners (true value in blue, *p* = 0.005)
+- Fitting a mixed model to account for nesting by scanner ID, no significant difference between subjects acquired on either scanner in age (*p* = 0.1588168) or sex (*p* = 0.9984593)
+&lt;img src="Projects-Overview_files/figure-html/unnamed-chunk-13-1.svg" width="60%" style="display: block; margin: auto;" /&gt;
+---
+## All Comparisons Table
+&lt;style type="text/css"&gt;
+.medium { font-size: 85% }
+&lt;/style&gt;
+
+.medium[
+&lt;table class="table table-bordered" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; GE Discovery MR750 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Philips Achieva dStream &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Philips Ingenia &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Siemens Prisma &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Siemens Prisma Fit &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; GE Discovery MR750 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Philips Achieva dStream &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; &lt;span style="     color: #990000 !important;"&gt;0.001&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Philips Ingenia &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; &lt;span style="     color: #990000 !important;"&gt;0.001&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.901 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Siemens Prisma &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.031 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; &lt;span style="     color: #990000 !important;"&gt;0.001&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; &lt;span style="     color: #990000 !important;"&gt;0.001&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;"&gt; Siemens Prisma Fit &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; &lt;span style="     color: #990000 !important;"&gt;0.002&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; &lt;span style="     color: #990000 !important;"&gt;0.001&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+*p*-values in &lt;font color="990000"&gt;red&lt;/font&gt; are significant at the 0.05 level after Bonferroni correction
+---
+
+## PCA-Based Covariance Regression
+We work with a special case of an existing model.&lt;sup&gt;1&lt;/sup&gt; Assume that the covariance matrices are positive definite and impose structure on the error covariances such that
+`$$\boldsymbol{\Sigma}_i=\sum_{k=1}^q \lambda_{ik} \boldsymbol{\phi}_k \boldsymbol{\phi}_k^T$$`
+where `\(\boldsymbol{\phi}_k\)` is are the eigenvectors of the response matrix `\(\boldsymbol{Y}\)` and `\(\lambda_{ik}\)` are the corresponding eigenvalues. We furthermore assume a log-linear relationship between `\(r\leq q\)` eigenvalues and predictors such that
+`$$\log(\lambda_{ik}) = \boldsymbol{x}_i^T \boldsymbol{\gamma}_k, \hspace{5mm}\text{for}\hspace{2.5mm}k=1,2,\ldots,r$$`
+which implies that
+`$$\boldsymbol{\Sigma}_i=\sum_{k=1}^r \exp({\boldsymbol{x}_i^T \gamma_k})\boldsymbol{\phi}_k \boldsymbol{\phi}_k^T+\boldsymbol{F}_i$$`
+.footnote[&lt;sup&gt;1&lt;/sup&gt;[Boik, 2002](https://www.jstor.org/stable/4140565)]
+---
+
+## Covariance Regression in ABCD
+
+- Permutation tests showed significant difference in correlation across scanner manufacturers and models
+- We regress all 68 PC score variance on age, sex, handedness, and scanner manufacturer
+- Likelihood ratio test comparing against model without scanner manufacturer yields 62 PC scores with variance significantly associated with manufacturer after Bonferroni correction
+
+&lt;img src="Projects-Overview_files/figure-html/lr_plot-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+---
+
+## Covariance Regression Directions
+- The theory is already well-established for this model, even for correlation matrix outcomes&lt;sup&gt;1&lt;/sup&gt;
+- We have also applied the method to covariance harmonization to control for covariate effects in variance/covariance adjustment
+- Potential extension to preprocessing
+    - Often is the case that motion&lt;sup&gt;2&lt;/sup&gt; or global signal&lt;sup&gt;3&lt;/sup&gt; is regressed out of ROI-level time series then residuals used to calculated correlation matrix
+    - Potential loss of information: an example being if motion is correlated with your outcomes of interest
+    - Can we directly regress out confounders from correlation or covariance matrix while controlling for outcome of interest?
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Boik, 2013](https://doi.org/10.1016/j.jmva.2012.11.017)  
+&lt;sup&gt;2&lt;/sup&gt;[Satterthwaite et al., 2013](https://doi.org/10.1016/j.neuroimage.2012.08.052)  
+&lt;sup&gt;3&lt;/sup&gt;[Murphy and Fox, 2017](https://doi.org/10.1016/j.neuroimage.2016.11.052)
+]
+---
+
+## Summary
+- Correcting Covariance Batch Effects: CovBat
+    - Successfully harmonizes covariance across scanners
+    - Wrapping up, but looking into extensions to longitudinal data and comparison with other batch effects correction for machine learning applications
+--
+- Harmonization of functional connectivity matrices (WIP)
+    - CPC and log-transformation provide two separate approaches to harmonization
+    - Working on further investigation into evaluation metrics
+--
+- Covariance regression using principal components analysis (WIP)
+    - Model itself is already established
+    - Adaptation to neuroimaging data is novel and may require extensions of basic model
+--
+
+Any feedback would be greatly appreciated!
+---
+
+## Acknowledgements
+.pull-left[
+**Advisors**  
+Taki Shinohara  
+Haochang Shou
+
+**ADNI Preprocessing**  
+Joanne C. Beer  
+Nicholas J. Tustison  
+Philip A. Cook
+]
+
+.pull-right[
+**BLSA/CARDIA Preprocessing**  
+Raymond Pomponio  
+Dhivya Srinivasan
+
+**ABCD Preprocessing and Advice**
+Theodore D. Satterthwaite  
+Adam Pines  
+Mark A. Elliot
+]
+
+&lt;br/&gt;
+.center[![:scale 60%](PennSIVE_group.jpeg)]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

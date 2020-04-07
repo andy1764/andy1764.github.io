@@ -212,15 +212,15 @@ system.time({
 ## gpuR: SVD
 ```{r}
 # using base R
-n = 2000
-p = 750
-A <- matrix(runif(n*p), n, p)
-gpuA <- gpuMatrix(A)
-
-system.time({svd(A)})[3]
+p = 10000
+system.time({
+  A <- matrix(runif(p^2), p, p)
+  })[3]
 
 # using gpuR
-system.time({svd(A)})[3]
+system.time({
+  A <- gpuMatrix(runif(p^2), p, p)
+  })[3]
 ```
 ---
 

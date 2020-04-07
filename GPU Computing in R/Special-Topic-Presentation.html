@@ -127,7 +127,7 @@ system.time({
 
 ```
 ## elapsed 
-##   7.825
+##   8.145
 ```
 
 ```r
@@ -140,7 +140,7 @@ system.time({
 
 ```
 ## elapsed 
-##   2.127
+##       2
 ```
 ---
 
@@ -171,7 +171,7 @@ system.time({
 
 ```
 ## elapsed 
-##   0.058
+##   0.063
 ```
 ---
 
@@ -198,7 +198,7 @@ system.time({
 
 ```
 ## elapsed 
-##   3.617
+##   3.766
 ```
 ---
 
@@ -216,7 +216,7 @@ system.time({
 
 ```
 ## elapsed 
-##   0.497
+##   0.515
 ```
 ---
 
@@ -224,27 +224,27 @@ system.time({
 
 ```r
 # using base R
-n = 2000
-p = 750
-A &lt;- matrix(runif(n*p), n, p)
-gpuA &lt;- gpuMatrix(A)
-
-system.time({svd(A)})[3]
+p = 10000
+system.time({
+  A &lt;- matrix(runif(p^2), p, p)
+  })[3]
 ```
 
 ```
 ## elapsed 
-##   3.755
+##   3.426
 ```
 
 ```r
 # using gpuR
-system.time({svd(A)})[3]
+system.time({
+  A &lt;- gpuMatrix(runif(p^2), p, p)
+  })[3]
 ```
 
 ```
 ## elapsed 
-##   3.411
+##   3.631
 ```
 ---
 
@@ -265,7 +265,7 @@ system.time({
 
 ```
 ## elapsed 
-##   3.629
+##   3.018
 ```
 .footnote[&lt;sup&gt;1&lt;/sup&gt;[Zapala and Schork, 2012](https://doi.org/10.3389/fgene.2012.00190)]
 ---
@@ -284,7 +284,7 @@ system.time({
 
 ```
 ## elapsed 
-##   1.919
+##   1.764
 ```
 ---
 
@@ -339,7 +339,7 @@ system.time({log(a)})[3]
 
 ```
 ## elapsed 
-##   2.337
+##    2.74
 ```
 
 ```r
@@ -348,7 +348,7 @@ system.time({log_ocl(a)})[3]
 
 ```
 ## elapsed 
-##   1.725
+##   0.824
 ```
 ---
 
