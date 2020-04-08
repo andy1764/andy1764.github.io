@@ -1,11 +1,13 @@
 ---
-title: "PennSIVE Template in Xaringan<html><div style='float:center'></div><hr color='#82bbdc' size=2em width=750em></html>"
+title: "PennSIVE Template in Xaringan<html><div style='float:center'></div><hr color='#82bbdc' size=2em width=900em></html>"
 author:
   - Andrew Chen
+  - and whoever else
 output:
   xaringan::moon_reader:
-    css: ["PennSIVE-theme.css"]
+    css: ["PennSIVE-theme-wide.css"]
     nature:
+      ratio: "16:9"
       beforeInit: "macros.js"
       countIncrementalSlides: false
       slideNumberFormat: "%current%"

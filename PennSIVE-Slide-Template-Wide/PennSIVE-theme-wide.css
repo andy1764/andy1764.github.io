@@ -36,9 +36,9 @@ h1, h2, h3 {
   background-color: #FFFFFF;
   font-size: 22px;
   background-image: url(logos/cwp-pennSIVE_Logo_icon.svg);
-  background-size: 7.5%;
+  background-size: 5.5%;
   background-position: 95% 5%;
-  padding: 1em 4em 1em 4em;
+  padding: 1em 5em 5em 4em;
 }
 .remark-slide-content h1 {
     font-size: 44px;
@@ -86,8 +86,8 @@ a, a > code {
   background-color: #011F5B;
   color: #FFFFFF;
   background-image: url(logos/cwp-pennSIVE_Logo_FINAL_main_logo_only.svg);
-  background-size: 15%;
-  background-position: 50% 15%;
+  background-size: 10%;
+  background-position: 50% 12.5%;
 }
 .divider h1 {
   color: #FFFFFF;
@@ -118,12 +118,17 @@ a, a > code {
 .title-slide {
   background-color: #011F5B;
   background-image: url(logos/cwp-pennSIVE_Logo_FINAL_main_W-O_tagline_horizontal-04.svg);
-  background-size: 50%;
+  background-size: 35%;
   background-position: 50% 12.5%;
 }
 .title-slide .remark-slide-number {
   display: none;
 }
+
+.middle{
+padding-top: 5em;
+}
+
 /* fixes MathJax font size */
 .mjx-chtml{
   font-size: 1em !important;
