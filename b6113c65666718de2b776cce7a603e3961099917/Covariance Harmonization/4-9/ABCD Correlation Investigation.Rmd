@@ -57,7 +57,7 @@ class: divider, center, middle
 ```
 - Cortical thickness values computed using 3T scans for 6341 subjects
     - Excluded subjects without sex or scanner ID
-    - Also excluded subjects with conflicting scan information, *n* = 4857 included
+    - For each subject, we used their first baseline scan, *n* = 4857 included
 - Demographics stratified by scanner model shown below
 
 .small[
