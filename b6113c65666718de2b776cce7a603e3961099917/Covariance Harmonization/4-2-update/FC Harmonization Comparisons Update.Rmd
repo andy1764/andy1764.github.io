@@ -1,0 +1,388 @@
+---
+title: "Comparison of Multiple FC Harmonization Methods: Updated"
+author:
+  - Andrew Chen
+  - Advised by Haochang Shou and Taki Shinohara
+output:
+  xaringan::moon_reader:
+    css: ["PennSIVE-theme.css"]
+    nature:
+      beforeInit: "macros.js"
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
+header_includes:
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(ggplot2)
+library(patchwork)
+library(reshape2)
+library(dplyr)
+library(tableone)
+library(FCharmony)
+library(kableExtra)
+options("kableExtra.html.bsTable" = T)
+
+plot_mat <- function(cov, lims = c(-max(abs(cov_melt$value)), max(abs(cov_melt$value)))) {
+  dimnames(cov) <- list(NULL, NULL)
+  cov_melt <- melt(cov)
+  ggplot(data = cov_melt, aes(x=Var1, y=Var2, fill=value)) + 
+    geom_tile() + 
+    scale_fill_gradientn(
+      colours = c("red", "white", "blue"), 
+      limits = lims) +
+    labs(fill = "") + 
+    theme_classic() +
+    theme(axis.line = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank())
+}
+```
+
+```{css}
+.medium{font-size: 85%}
+.small{font-size: 65%}
+```
+
+### Overview of FC Harmonization Methods
+.footnote[
+<sup>1</sup>[Yu et al., 2018](https://doi.org/10.1002/hbm.24241)  
+<sup>2</sup>[Zhao et al., 2019](https://doi.org/10.1093/biostatistics/kxz057)]
+- Harmonization of off-diagonal elements
+    - ComBat applied directly<sup>1</sup>
+--
+- Log-transformation approaches
+    - Apply PCA to off-diagonal elements then use ComBat on the scores
+    - ComBat applied to the elements directly
+--
+- Harmonization of common principal component (CPC) eigenvalues
+    - Apply ComBat to eigenvalues or log of eigenvalues
+    - Assume log-linear relationship with covariates and regress out
+    - Estimate CPCs using covariate-assisted principal (CAP) components<sup>2</sup>
+---
+
+### General Methodological Considerations
+- Positive semi-definite constraints
+    - Direct manipulation of FC matrices do not guarantee
+    - Modification of log-transformed FC does
+    - CPC-based methods can guarantee
+--
+- Correlation or covariance
+    - Most downstream analyses rely on correlation
+    - Can start with covariance or correlation input
+    - No methods can guarantee correlation output
+--
+- Common structure among FC matrices
+    - Empirical results show that majority of structure is not shared (CPC and PVD both confirm)
+    - How to handle the error terms?
+---
+
+## Evaluation Criteria
+- Norm-based approaches
+    - Can evaluate pairwise distances between groups using any metric
+    - MDMR can test by comparing within-group and between-group distances
+--
+- Network measures
+    - Network connectivity: sum of all edges
+    - Global efficiency: average of shortest path lengths
+    - Local efficiency of a node: global efficiency of all connected nodes
+        For a subgraph, we simply take the sum of all included local efficiencies
+--
+- Covariance regression models (WIP)
+    - Could look at mass univariate testing of off-diagonal elements
+    - Can also test for effects of site and covariates by assuming models on CPCs, CAPs, or other shared structures
+---
+
+## FC Harmonization using CPCs
+Let $\Sigma_{ij}$ be the covariance matrices within site $i$ for subject $j$. We assume that there exist common principal components (CPCs) across the functional connectivity matrices such that
+$$\Sigma_{ij} = \Phi \Lambda_{ij}\Phi^T + E_{ij}$$
+where $\Lambda_{ij}$ are $p\times p$ diagonal matrices with entries $\lambda_{ijk}$ and $E_{ij}$ are the error terms.
+
+We then directly apply the ComBat model to the log of $q$ CPC eigenvalues such that
+$$\log\lambda_{ijk} = x_{ij}^T \beta_k + \gamma_{ik} + \delta_{ik} e_{ijk}$$
+for $k=1,2,\ldots,q$ where $q \leq p$.
+---
+
+## Estimation of CPCs
+- For now, $q$ is fixed at some value, but there could be a data-driven way (e.g. percentage of norm captured by CPC approximation)
+- Estimation of CPCs is achieved through stepwise CPC<sup>1</sup>
+- Currently testing three different approaches for handling the error terms
+    - Do nothing
+    - Element-wise ComBat
+    - Remove entirely
+
+.footnote[
+<sup>1</sup>[Trendafilov, 2010](https://doi.org/10.1016/j.csda.2010.03.010)  
+]
+---
+
+## Log-CovBat
+- Apply log transformation then vectorize subject-specific matrices then perform PCA to obtain $\boldsymbol{\Phi}_k$, which are just the eigenvectors arranged as $p \times p$ symmetric matrices
+$$\log\Sigma_{ij} = \sum_{k = 1}^K \Lambda_{ijk} \boldsymbol{\Phi}_k + \mathbf{E}_{ij}$$
+- Apply ComBat including covariates to the $\Lambda_{ijk}$, harmonizing across sites indexed by $i$
+- Recover CovBat-adjusted FC matrices by taking the matrix exponential
+- Guarantees positive definiteness
+- We also tried simply applying ComBat to the entries of $\log\Sigma_{ij}$
+---
+
+## All Methods Considered
+- Bolded methods guarantee positive definiteness
+    - For others, we find the nearest PD matrix
+- Tried all methods using covariance and correlation as inputs
+
+
+- FC ComBat: ComBat on Fisher-transformed off-diagonal elements
+- **Log-ComBat**: Log then ComBat on all elements
+- **Log-CovBat**: Log then ComBat on PC scores
+- CPC eigenvalues harmonized by taking the log and applying ComBat
+    - Not handled
+    - ComBat on all elements
+    - **Removed entirely**
+---
+
+## BLSA/CARDIA Data Example
+- For initial tests, we are using a subset of data from the Baltimore Longitudinal Study of Aging (BLSA) and the Coronary Artery Risk Development in Young Adults (CARDIA) study
+- Starting with 50 subjects per site, and random subset of 50 ROIs from the 264 available ROIs
+
+```{r, include=FALSE}
+load("../../BLSA CARDIA Example/blsa_cardia_small.Rdata")
+```
+
+```{r, include=FALSE}
+BLSA_CARDIA_demo$site <- droplevels(BLSA_CARDIA_demo$site)
+demotab <- CreateTableOne(vars = c("age_at_scan", "sex"), data = BLSA_CARDIA_demo, strata = "site")
+tabout <- print(demotab)
+rownames(tabout) <- c("Number of Subjects", "Age (mean(SD))", "Male (%)")
+```
+
+```{r demo, results="asis"}
+knitr::kable(tabout[,1:4], "html") %>% kable_styling()
+```
+---
+
+## Examples: Covariance
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- BLSA_CARDIA
+s <- 1
+site <- droplevels(BLSA_CARDIA_demo$site)
+subj <- c(which(site == levels(site)[1])[s],
+          which(site == levels(site)[2])[s],
+          which(site == levels(site)[3])[s],
+          which(site == levels(site)[4])[s])
+
+plot_mat(fc[,,subj[1]]) + labs(title = "BLSA") + 
+  plot_mat(fc[,,subj[2]]) + labs(title = "CARDIA1") +
+  plot_mat(fc[,,subj[3]]) + labs(title = "CARDIA3") +
+  plot_mat(fc[,,subj[4]]) + labs(title = "CARDIA4")
+```
+
+---
+## Examples: Correlation
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## FC ComBat Correlations
+```{r}
+load("../../BLSA CARDIA Example/corr_dats.Rdata")
+```
+
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- yu_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-ComBat Correlations
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- log_c_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## Log-CovBat Correlations
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- log_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## CPC+None Correlations
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## CPC+ComBat Correlations
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_c_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## CPC+Remove Correlations
+```{r fig.width=8, fig.height=7, fig.show='hold', fig.align='center', out.width='80%', fig.retina=3}
+fc <- cpc_r_out$dat.out
+plot_mat(cov2cor(fc[,,subj[1]])) + labs(title = "BLSA") + 
+  plot_mat(cov2cor(fc[,,subj[2]])) + labs(title = "CARDIA1") +
+  plot_mat(cov2cor(fc[,,subj[3]])) + labs(title = "CARDIA3") +
+  plot_mat(cov2cor(fc[,,subj[4]])) + labs(title = "CARDIA4")
+```
+---
+
+## MDMR Results: Covariance Inputs
+```{r}
+load("all_cov_harmony_out.Rdata")
+```
+- FC ComBat excluded since it only operates on correlation matrices
+- MDMR implemented via 10,000 permutations of the independent variables
+- Results reported for both covariance and correlation outputs
+
+.center[Results for Frobenius Distance]
+.small[
+```{r , results="asis"}
+ccolors <- colorRampPalette(c("#011F5B", "#000000", "#990000"))(256)
+color_kable <- function(x) {
+  colored <- as.data.frame(x) %>% 
+    mutate_if(is.numeric, function(y) {
+      cell_spec(y, "html", 
+                color = ccolors[round(scales::rescale(y, to = c(1, 256), from = 0:1))])}
+    )
+  rownames(colored) <- rownames(x)
+  knitr::kable(colored, "html", escape = FALSE, row.names = TRUE)
+}
+
+colnames(all_reg) <- c("All", "Age", "Sex", "Site", 
+                         "All.Corr", "Age.Corr", "Sex.Corr", "Site.Corr")
+colnames(all_regL) <- c("All", "Age", "Sex", "Site", 
+                         "All.Corr", "Age.Corr", "Sex.Corr", "Site.Corr")
+color_kable(all_reg)
+```
+]
+---
+
+## MDMR Results: Covariance Inputs
+.center[Results for Log-Euclidean Distance]
+.small[
+```{r , results="asis"}
+color_kable(all_regL)
+```
+]
+---
+
+## MDMR Results: Correlation Inputs
+```{r}
+load("all_corr_harmony_out.Rdata")
+```
+- Results reported for correlation inputs and outputs
+- For log-Euclidean distance, had to find the nearest PD matrix to FC ComBat output
+
+.center[Results for Frobenius Distance]
+```{r , results="asis"}
+colnames(all_reg) <- c("All", "Age", "Sex", "Site")
+colnames(all_regL) <- c("All", "Age", "Sex", "Site")
+color_kable(all_reg)
+```
+---
+
+## MDMR Results: Correlation Inputs
+.center[Results for Log-Euclidean Distance]
+```{r , results="asis"}
+color_kable(all_regL)
+```
+---
+
+## MDMR Results: Covariance Inputs
+.center[Results for Log-Euclidean Distance]
+.small[
+```{r , results="asis"}
+color_kable(all_regL)
+```
+]
+---
+
+## Network Results: Covariance Inputs
+```{r}
+load("all_cov_harmony_out.Rdata")
+```
+- Results reported for covariance inputs and correlation outputs
+
+.center[Results for Covariate Association]
+.small[
+```{r , results="asis"}
+color_kable(round(all_yu$net.results,2)[,-1])
+```
+]
+---
+
+## Network Results: Covariance Inputs
+.center[Results for Site Association]
+.small[
+```{r , results="asis"}
+color_kable(round(all_yu$net.results.site,2))
+```
+]
+---
+
+## Network Results: Covariance Inputs
+```{r}
+load("all_corr_harmony_out.Rdata")
+```
+- Results reported for correlation inputs and outputs
+
+.center[Results for Covariate Association]
+.small[
+```{r , results="asis"}
+color_kable(round(all_yu$net.results,2)[,-1])
+```
+]
+---
+
+## Network Results: Covariance Inputs
+.center[Results for Site Association]
+.small[
+```{r , results="asis"}
+color_kable(round(all_yu$net.results.site,2))
+```
+]
+---
+
+## Summary
+- Results depend heavily on the choice of metric
+    - Promising results for CPC+ComBat and log-ComBat which show strong harmonization performance in both metrics
+- Need to implement and test CPC-based regression methods
+- Adapting CAP code for application in harmonization
+- Further testing of network metrics
+- Working on an R package to implement all methods and tests
+
+```{r, eval=FALSE}
+pagedown::chrome_print() # print as pdf
+```
+

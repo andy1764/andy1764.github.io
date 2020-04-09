@@ -36,12 +36,10 @@ Functional Connectivity CovBat [PDF](Covariance Harmonization/FC-CovBat.pdf)
 1/29: Toward a Covariance Regression Model [Slides](Covariance Harmonization/1-29/1-29-Toward-a-Covariance-Regression-Model.html)  
 2/5: FC CovBat Distance and MDMR [Slides](Covariance Harmonization/2-5/2-5-FC-CovBat-Norms-and-MDMR.html)  
 2/12: Proposed Covariance Regression vs. CAP [Slides](Covariance Regression/2-12/2-12-Comparison-to-CAP.html)  
-2/18: ABCD Investigation Draft (DEPRECATED) [Slides](Covariance Harmonization/2-18/2-18-ABCD-Correlation-Investigation.html)  
 2/19: CovBat vs Wachinger [Slides](Covariance Harmonization/2-19/2-19-CovBat-vs-Wachinger.html)  
-2/28: ABCD Investigation Summary (DEPRECATED) [Slides](Covariance Harmonization/2-28/2-28-ABCD-Correlation-Investigation.html)  
 3/19: General Updates and Potential Directions [Slides](Covariance Harmonization/3-19/3-19-Next-Steps.html)  
-4/2: FC Harmonization Methods Comparison (DEPRECATED) [Slides](Covariance Harmonization/4-2/4-2-FC-Harmonization-Comparisons.html)  
-4/9: ABCD Differences in Correlation [Slides](Covariance Harmonization/4-9/ABCD-Correlation-Investigation.html)
+4/2: FC Harmonization Methods Comparison [Slides](Covariance Harmonization/4-2-update/FC-Harmonization-Comparisons-Update.html) [4/2](Covariance Harmonization/4-2/4-2-FC-Harmonization-Comparisons.html)  
+4/9: ABCD Differences in Correlation [Slides](Covariance Harmonization/4-9/ABCD-Correlation-Investigation.html) [2/28](Covariance Harmonization/2-28/2-28-ABCD-Correlation-Investigation.html) [2/18](Covariance Harmonization/2-18/2-18-ABCD-Correlation-Investigation.html)  
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
@@ -51,6 +49,7 @@ DBEI Chalk Talk (4/23/2019) [Slides](Spring Rotation 2019/ADNI_CIA_presentation_
 
 # Other Projects
 PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template/PennSIVE-Slides-using-Xaringan.html)  [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template)  
+Widescreen PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template-Wide/PennSIVE-Slides-using-Xaringan-Wide.html) [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template-Wide)  
 4/7: GPU Computing in R [Slides](../GPU Computing in R/Special-Topic-Presentation.html)
 
 ### Data Club Meetings
