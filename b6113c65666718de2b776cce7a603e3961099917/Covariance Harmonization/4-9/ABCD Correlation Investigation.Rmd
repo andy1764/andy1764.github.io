@@ -113,7 +113,7 @@ print(comp_x, "html", comment = FALSE, sanitize.text.function=function(x){x})
 ## Conclusions
 - We found that notable differences in correlation structure existed between subjects acquired on Prisma and Prisma fit scanners
     - This difference was not present between Philips scanners (Achieva dStream vs Ingenia, *p* = `r p[2]`)
-    - Scanners of different manufacturers are all significantly different
+    - Scanners of different manufacturers are also considerably different
     
 
 - Suggests that significant scanner effects on covariance exist and harmonization of covariance is necessary
