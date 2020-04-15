@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>MS Thesis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="" />
+    <script src="MS-Thesis-Presentation_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="MS-Thesis-Presentation_files/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="AC_theme.css" type="text/css" />
+    <link rel="stylesheet" href="AC_theme_add.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+class: title-slide, middle
+## Use of Trajectory Cluster Analysis to Identify Subgroups of Pediatric Crohn's Disease
+&lt;hr color='#70c0b1' size=2em&gt;
+### Andrew Chen
+### Advised by Jing Huang, PhD
+### In collaboration with Ronen Stein, MD
+
+---
+
+## Motivation
+- Crohn's disease (CD) is a severe chronic inflammatory bowel disease
+    - Affects as many as 780,000 Americans[&lt;sup&gt;1&lt;/sup&gt;](https://www.chop.edu/conditions-diseases/crohns-disease)
+    - Recently recognized as one of the most important chronic conditions in children
+- Treatment and clinical presentation of Pediatric CD are highly heterogeneous
+
+&lt;br /&gt;
+.center[![:scale 60%](Figures/gi-tract-normal-vs-crohns-cropped-16x9.jpg)]
+---
+
+## Longitudinal Subtyping of Pediatric CD
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Weiser et al., 2018](https://dx.doi.org/10.1136%2Fgutjnl-2016-312518)  
+&lt;sup&gt;2&lt;/sup&gt;[Mossotto et al., 2017](https://www.nature.com/articles/s41598-017-02606-2)
+]
+.pull-left[
+- Previous research primarily utilized cross-sectional data including gene expression&lt;sup&gt;1&lt;/sup&gt;, endoscopic, and histological samples&lt;sup&gt;2&lt;/sup&gt;
+- Researchers have yet to leverage longitudinal electronic health record (EHR) in subtyping
+]
+--
+.pull-right[
+- EHRs at Children's Hospital of Philadelphia (CHOP) include
+    - **C-reactive protein (CRP)**
+    - Calprotectin
+    - Infliximab concentration
+]
+--
+&lt;img src="MS-Thesis-Presentation_files/figure-html/raw_crp-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+## Trajectory Cluster Analysis
+**Step 1**: Perform functional principal components analysis (FPCA) on CRP values to identify unique patterns of disease trajectory in the study population
+--
+
+
+**Step 2**: Cluster using a Gaussian mixture model to identify subgroups of pediatric CD patients
+--
+
+- Shown to have strong performance compared to other functional clustering techniques&lt;sup&gt;1&lt;/sup&gt;
+- Chose number of FPCs that explain 75% of the variation
+- Follow-up analyses examined distributions of patient characteristics and long-term outcomes
+    - Chi-squared tests for categorical variables
+    - One-way ANOVA for continuous variables
+- Other follow-up analyses consisted of Cox regression of long-term outcomes on known clinical covariates and subtype assignment
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Jacques and Preda, 2014](https://doi.org/10.1007/s11634-013-0158-y)
+]
+
+---
+
+## Study Design and Demographics
+.pull-left[
+- Obtained EHRs from children with diagnosis of pediatric CD between 2009 and 2017
+    - Also started on Remicade (infliximab) therapy between January 2010 and December 2017
+- Excluded patients with less than two CRP measurements within 2.5 years of diagnosis
+- Defined early onset as having been diagnosed before age five
+]
+.pull-right[.small[
+
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variables &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Overall &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Number of Subjects &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 404 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 242 (59.9) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age at diagnosis, mean (SD) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12.62 (3.34) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Early Onset (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10 (2.5) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Baseline Phenotype (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Stricturing and Penetrating &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 25 (6.2) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Inflammatory &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 300 (74.3) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Penetrating &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 28 (6.9) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Stricturing &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 51 (12.6) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Perianal (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 61 (15.1) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Type of Combination Therapy (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Azathioprine &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 15 (3.7) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Mercaptopurine &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 19 (4.7) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Methotrexate &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 109 (27.0) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; None &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 261 (64.6) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]]
+---
+
+## FPCA Results
+
+
+&lt;img src="MS-Thesis-Presentation_files/figure-html/unnamed-chunk-1-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Subgrouping Results
+&lt;img src="MS-Thesis-Presentation_files/figure-html/mean_clust-1.svg" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="MS-Thesis-Presentation_files/figure-html/raw_clust-1.svg" style="display: block; margin: auto;" /&gt;
+---
+
+## Subgrouping Results: Comparisons
+
+
+.small[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variables &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; 1 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; 2 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; 3 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; 4 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Number of Subjects &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 36 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 103 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 222 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 43 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 17 (47.2) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 65 (63.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 133 (59.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 27 (62.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.392 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age at diagnosis, mean (SD) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12.88 (3.54) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12.44 (3.34) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12.74 (3.38) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12.21 (3.03) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.690 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Early Onset (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 (2.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3 (2.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 (2.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 (0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.745 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Baseline Phenotype (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Stricturing and Penetrating &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 8 (22.2) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4 (3.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12 (5.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 (0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Inflammatory &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 19 (52.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 84 (81.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 180 (81.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 40 (93.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Penetrating &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4 (11.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 (5.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 (2.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 (2.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Stricturing &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 5 (13.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 9 (8.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 24 (10.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 (4.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Ileocolonoscopy at 10 years (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12 (33.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 14 (13.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 15 (6.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 (4.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Surgery at 10 years (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 (16.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10 (9.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12 (5.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 (2.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.038 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Type of Combination Therapy (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.205 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Azathioprine &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 (2.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 8 (7.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 (2.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 (0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Mercaptopurine &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 (0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 (5.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 11 (5.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 (4.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Methotrexate &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10 (27.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 30 (29.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 61 (27.5) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 8 (18.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; None &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 25 (69.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 59 (57.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 144 (64.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 33 (76.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Baseline CRP, mean (SD) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10.00 (10.38) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4.88 (4.22) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2.88 (3.05) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2.53 (2.89) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Remicade Start, mean (SD) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.78 (0.88) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1.06 (1.34) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.86 (1.27) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.45 (0.85) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.057 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Subgrouping Results: Comparisons
+.small[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variables &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; 1 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; 2 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; 3 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; 4 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Number of Subjects &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 36 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 103 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 222 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 43 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 17 (47.2) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 65 (63.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 133 (59.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 27 (62.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.392 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age at diagnosis, mean (SD) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12.88 (3.54) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12.44 (3.34) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12.74 (3.38) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12.21 (3.03) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.690 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Early Onset (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 (2.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3 (2.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 (2.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 (0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.745 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; Baseline Phenotype (%) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;font-weight: bold;color: #70c0b1 !important;" indentlevel="1"&gt; Stricturing and Penetrating &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 8 (22.2) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 4 (3.9) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 12 (5.4) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 0 (0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;font-weight: bold;color: #70c0b1 !important;" indentlevel="1"&gt; Inflammatory &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 19 (52.8) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 84 (81.6) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 180 (81.1) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 40 (93.0) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;font-weight: bold;color: #70c0b1 !important;" indentlevel="1"&gt; Penetrating &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 4 (11.1) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 6 (5.8) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 6 (2.7) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 1 (2.3) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;font-weight: bold;color: #70c0b1 !important;" indentlevel="1"&gt; Stricturing &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 5 (13.9) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 9 (8.7) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 24 (10.8) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 2 (4.7) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; Ileocolonoscopy at 10 years (%) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 12 (33.3) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 14 (13.6) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 15 (6.8) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 2 (4.7) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; Surgery at 10 years (%) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 6 (16.7) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 10 (9.7) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 12 (5.4) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 1 (2.3) &lt;/td&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; 0.038 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Type of Combination Therapy (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.205 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Azathioprine &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1 (2.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 8 (7.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 (2.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 (0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Mercaptopurine &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 (0.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 (5.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 11 (5.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2 (4.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Methotrexate &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10 (27.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 30 (29.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 61 (27.5) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 8 (18.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; None &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 25 (69.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 59 (57.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 144 (64.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 33 (76.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Baseline CRP, mean (SD) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 10.00 (10.38) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4.88 (4.22) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2.88 (3.05) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2.53 (2.89) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Remicade Start, mean (SD) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.78 (0.88) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1.06 (1.34) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.86 (1.27) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.45 (0.85) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.057 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Cluster 1: Non-responder Patients
+&lt;img src="MS-Thesis-Presentation_files/figure-html/cl1-1.svg" style="display: block; margin: auto;" /&gt;
+- Characterized by high baseline CRP (mean 10.38 mg/dL) and frequent relapses after diagnosis
+- Higher proportion of non-inflammatory disease phenotypes, with more patients having penetrating, stricturing, or both phenotypes (n = 17, 47.2%)
+- Highest proportion of patients of receiving ileocolonoscopy (33.3%) or other surgeries (16.7%)
+---
+
+## Cluster 2: Patients with moderate disease control
+&lt;img src="MS-Thesis-Presentation_files/figure-html/cl2-1.svg" style="display: block; margin: auto;" /&gt;
+- Less severe disease activity at the baseline (mean CRP 4.88 mg/dL) and moderate disease control over the study period
+- Higher rate of having an ileocolonoscopy performed (13.6%)
+
+---
+
+## Cluster 3: Patients with well-controlled disease
+&lt;img src="MS-Thesis-Presentation_files/figure-html/cl3-1.svg" style="display: block; margin: auto;" /&gt;
+- Low baseline CRP (mean 2.88 mg/dL) and good disease control
+- Lesser proportion of patients on combined therapy (35.1%) compared to Subgroup 2 (42.7%). 
+
+---
+
+## Cluster 4: Patients with less severe disease
+&lt;img src="MS-Thesis-Presentation_files/figure-html/cl4-1.svg" style="display: block; margin: auto;" /&gt;
+- Lowest baseline CRP (mean 2.53) as well as the highest proportion of inflammatory (93.0%)
+- Proportion undergoing ileocolonoscopy (4.7%) or other surgeries (2.3%) were the lowest out of all the subgroups
+- Lowest proportion on combined therapy (23.3%)
+---
+
+## Ileocolonoscopy Analysis
+.pull-left[
+&lt;img src="MS-Thesis-Presentation_files/figure-html/ileo-1.svg" width="100%" /&gt;
+]
+.pull-right[
+![](MS-Thesis-Presentation_files/figure-html/ileo_phenotype-1.svg)&lt;!-- --&gt;
+]
+---
+
+## Ileocolonoscopy Analysis: Cox Regression
+.pull-left[
+- Cox regression fit including sex, age at diagnosis, phenotype, and subgroup
+- Likelihood ratio test shows that addition of subgroup improves model fit (*p* = 0.0035)
+]
+.pull-right[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variables &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Hazard Ratio &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.087 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.788 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age at Diagnosis &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.150 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.022 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; Inflammatory &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: #70c0b1 !important;"&gt; 0.035 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: #70c0b1 !important;"&gt; 0.000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Penetrating &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.265 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.023 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Stricturing &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.066 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.860 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Subgroup 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.979 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.959 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;font-weight: bold;color: #70c0b1 !important;"&gt; Subgroup 3 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: #70c0b1 !important;"&gt; 0.409 &lt;/td&gt;
+   &lt;td style="text-align:right;font-weight: bold;color: #70c0b1 !important;"&gt; 0.028 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Subgroup 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.350 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.178 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Conclusions
+- Pediatric CD can be divided into subgroups using available EHR data
+- These subgroups distinguish levels of disease control beyond baseline patient characteristics and treatment information
+    - Provide additional insight into long-term outcomes
+--
+
+
+- Further investigation could enable earlier detection of these subgroups
+- Potentially could be used to tailor treatment regimens
+--
+
+
+### Acknowledgements
+Huge thanks to Jing for suggesting and supervising this project.
+
+Additional thanks to Yong for his advice and Ronen for his help in interpretting results and sharing his extensive clinical knowledge.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "tomorrow-night-bright",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

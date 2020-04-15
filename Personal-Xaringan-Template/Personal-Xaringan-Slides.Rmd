@@ -17,22 +17,27 @@ header_includes:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  echo = TRUE,
-  fig.retina = 2, # higher quality plots
+  echo = FALSE,
   dev = "svg", # vector graphics device
   dev.args=list(bg="transparent") # transparent plot backgrounds
 )
 
 library(ggplot2)
 # Dark Theme
-theme_set(theme_minimal())
+theme_set(theme_classic())
 theme_update(
   panel.background = element_rect(fill = "transparent", colour = NA),
   plot.background = element_rect(fill = "transparent", colour = NA),
   legend.background = element_rect(fill = "transparent", colour = NA),
   legend.key = element_rect(fill = "transparent", colour = NA),
   text = element_text(colour = "white"),
-  axis.text = element_text(colour = "white"))
+  axis.text = element_text(colour = "white"),
+  axis.line = element_line(colour = "white"),
+  axis.ticks.x = element_line(colour = "white"),
+  axis.ticks.y = element_line(colour = "white"))
+library(kableExtra)
+options(knitr.kable.NA = '')
+options("kableExtra.html.bsTable" = T)
 
 # How to make the base theme for AC_theme.css
 library(xaringanthemer)

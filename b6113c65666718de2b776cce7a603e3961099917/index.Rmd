@@ -47,6 +47,9 @@ DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190
 # Spring Rotation 2019: Penalized Co-Inertia Analysis
 DBEI Chalk Talk (4/23/2019) [Slides](Spring Rotation 2019/ADNI_CIA_presentation_abridged.html)
 
+# Master's Thesis: Functional Clustering of Pediatric CD
+BIP Presentation (4/15/2020) [Slides](Master's Thesis/MS-Thesis-Presentation.html)
+
 # Other Projects
 PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template/PennSIVE-Slides-using-Xaringan.html)  [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template)  
 Widescreen PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template-Wide/PennSIVE-Slides-using-Xaringan-Wide.html) [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template-Wide)  

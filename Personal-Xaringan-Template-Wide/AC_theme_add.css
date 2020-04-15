@@ -1,0 +1,52 @@
+/* -------------------------------------------------------
+ *
+ *  Additional css modifications by Andrew Chen for AC-Theme
+ *  Contact via email: andrewac@pennmedicine.upenn.edu
+ *
+ * ------------------------------------------------------- */
+@import url(https://fonts.googleapis.com/css?family=Montserrat);
+@import url(https://fonts.googleapis.com/css?family=Lato);
+@import url(https://fonts.googleapis.com/css?family=IBM+Plex+Mono);
+
+body {
+  font-family: Lato, Verdana, sans-serif;
+  font-weight: 400;
+}
+h1, h2, h3 {
+  font-family: Montserrat, Verdana, sans-serif;
+  font-weight: 600;
+}
+.remark-code, .remark-inline-code {
+  font-family: IBM Plex Mono, 'Lucida Console', Monaco, monospace;
+  border-radius: 3px;
+}
+.remark-code {
+  font-size: 0.8em;
+}
+/* fixes MathJax font size */
+.mjx-chtml{
+  font-size: 1em !important;
+}
+
+.remark-slide-number {
+  opacity: 1;
+  margin-bottom: 0;
+  margin-right: 0;
+  font-size: 0.7em;
+}
+.footnote {
+  opacity: 1;
+  position: fixed;
+  bottom: 0;
+  padding-right: 60px;
+  font-size: 0.7em;
+}
+
+.title-slide h3 {
+  line-height: 0.5em;
+}
+
+/* additional css definitions */
+.small {
+  font-size: 0.7em;
+}
