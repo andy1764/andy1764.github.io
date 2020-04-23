@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>FC Harmonization: Log Methods Investigation</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# FC Harmonization: Log Methods Investigation (Update)
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 60%}
+&lt;/style&gt;
+
+## TL;DR
+- Empirical Bayes priors seem to fit the vectorized matrices reasonably well
+- Null simulation shows that all methods seem to not be introducing spurious associations
+    - Including LCPC+CovBat, which had mildly concerning results earlier
+- Mean of log matrices provides reasonable way to visualize harmonization results
+    - But site effects are not particularly visible in mean of original or log matrices
+---
+
+## How do ComBat/CovBat fit the data?
+- For CPC+ComBat approach let's take a look
+
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-3-1.png" width="49%" /&gt;&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-3-2.png" width="49%" /&gt;
+---
+
+## How do ComBat/CovBat fit the data?
+- For LCPC+ComBat,
+
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-4-1.png" width="49%" /&gt;&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-4-2.png" width="49%" /&gt;
+---
+
+## Null simulation
+- Scenario with no site effect or covariate effect
+- Draw data `\(y_{ijk}\)` from `\(N(0, \Sigma)\)` where `\(\Sigma\)` is a BLSA subject's FC matrix
+    - Estimate FC matrices `\(\Sigma_{ij}\)` from within-subject data `\(y_{ijk}\)` where `\(k=1,\ldots,100\)`
+- Binary covariate `\(x_{ij}\sim\text{Bernoulli}\,(0.5)\)`
+- Results reported for 4 sites with 50 subjects each
+---
+
+## Null sim: MDMR
+
+- Results reported for correlation inputs and outputs
+- For log-Euclidean distance, had to find the nearest PD matrix to FC ComBat output
+
+.center[Results for Frobenius Distance]
+.medium[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Covariate &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Site &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00143A !important;" &gt;0.176&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00091B !important;" &gt;0.348&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001338 !important;" &gt;0.194&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001134 !important;" &gt;0.21&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001132 !important;" &gt;0.222&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001237 !important;" &gt;0.198&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000C23 !important;" &gt;0.306&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001031 !important;" &gt;0.228&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00040B !important;" &gt;0.434&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00143B !important;" &gt;0.174&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #970000 !important;" &gt;0.998&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #040000 !important;" &gt;0.514&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000E29 !important;" &gt;0.27&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001031 !important;" &gt;0.228&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000817 !important;" &gt;0.368&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00143B !important;" &gt;0.172&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001641 !important;" &gt;0.14&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #960000 !important;" &gt;0.992&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #480000 !important;" &gt;0.738&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #950000 !important;" &gt;0.99&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Null sim: MDMR
+.center[Results for log-Euclidean Distance]
+.medium[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Covariate &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Site &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00081A !important;" &gt;0.358&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #790000 !important;" &gt;0.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00143A !important;" &gt;0.178&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat-PD &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #8B0000 !important;" &gt;0.958&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001949 !important;" &gt;0.096&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #970000 !important;" &gt;0.998&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000510 !important;" &gt;0.412&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000308 !important;" &gt;0.45&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000717 !important;" &gt;0.372&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00050F !important;" &gt;0.416&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000612 !important;" &gt;0.398&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #940000 !important;" &gt;0.986&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000D28 !important;" &gt;0.278&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #200000 !important;" &gt;0.608&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000B22 !important;" &gt;0.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00040E !important;" &gt;0.42&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000B21 !important;" &gt;0.318&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00143D !important;" &gt;0.164&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00143B !important;" &gt;0.172&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #960000 !important;" &gt;0.992&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #1E0000 !important;" &gt;0.6&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #970000 !important;" &gt;0.996&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+## Null sim: Network
+- Results reported for correlation inputs and outputs
+
+.center[Results for Covariate Association]
+.small[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Global.Eff.r2 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Local.Eff.Sum.r2 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #020000 !important;" &gt;0.51&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #020000 !important;" &gt;0.51&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #1B0000 !important;" &gt;0.59&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000103 !important;" &gt;0.48&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000001 !important;" &gt;0.49&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000001 !important;" &gt;0.49&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000308 !important;" &gt;0.45&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000D26 !important;" &gt;0.29&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000D28 !important;" &gt;0.28&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #060000 !important;" &gt;0.52&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001847 !important;" &gt;0.11&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001744 !important;" &gt;0.12&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.5&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001847 !important;" &gt;0.11&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001847 !important;" &gt;0.11&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000308 !important;" &gt;0.45&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00143C !important;" &gt;0.17&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001338 !important;" &gt;0.19&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #520000 !important;" &gt;0.77&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000B22 !important;" &gt;0.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000B22 !important;" &gt;0.31&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.5&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000612 !important;" &gt;0.4&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000612 !important;" &gt;0.4&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #710000 !important;" &gt;0.87&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #3A0000 !important;" &gt;0.69&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #011F5B !important;" &gt;0&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #4C0000 !important;" &gt;0.75&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #610000 !important;" &gt;0.82&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001030 !important;" &gt;0.23&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001030 !important;" &gt;0.23&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #710000 !important;" &gt;0.87&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000C24 !important;" &gt;0.3&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #001E58 !important;" &gt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000D26 !important;" &gt;0.29&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Null sim: Network
+.center[Results for Site Association]
+.small[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Network.connectivity.p &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Global.Eff.p &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Local.Eff.Sum.p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #800000 !important;" &gt;0.92&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000B22 !important;" &gt;0.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000B20 !important;" &gt;0.32&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #6B0000 !important;" &gt;0.85&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00091C !important;" &gt;0.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000D26 !important;" &gt;0.29&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #610000 !important;" &gt;0.82&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #020000 !important;" &gt;0.51&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00030B !important;" &gt;0.44&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #930000 !important;" &gt;0.98&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #0F0000 !important;" &gt;0.55&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #060000 !important;" &gt;0.52&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00030B !important;" &gt;0.44&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #8F0000 !important;" &gt;0.97&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #890000 !important;" &gt;0.95&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #8F0000 !important;" &gt;0.97&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #00040C !important;" &gt;0.43&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000715 !important;" &gt;0.38&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #770000 !important;" &gt;0.89&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #930000 !important;" &gt;0.98&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #950000 !important;" &gt;0.99&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+none &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #020000 !important;" &gt;0.51&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #8F0000 !important;" &gt;0.97&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #870000 !important;" &gt;0.94&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #770000 !important;" &gt;0.89&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #670000 !important;" &gt;0.84&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #6B0000 !important;" &gt;0.85&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #6D0000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #950000 !important;" &gt;0.99&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #930000 !important;" &gt;0.98&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; LCPC+remove &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #670000 !important;" &gt;0.84&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #090000 !important;" &gt;0.53&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #0F0000 !important;" &gt;0.55&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Visual inspection of methods
+- Using the BLSA/CARDIA subset in the original slide set
+- For each method, we plot the Euclidean means for each site on the left side and mean of log-transformed matrices on the right (without diagonal)
+
+
+.center[Average pairwise Frobenius distances]
+.small[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; FC-ComBat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Log-ComBat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Log-CovBat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CPC+none &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CPC+ComBat &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.81027 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.18755 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.67672 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.12210 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.63914 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.12582 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.60455 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.16277 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.41229 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.48625 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.51494 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.04796 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.61547 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.17805 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.41581 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.54702 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.52680 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.04087 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.26987 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.00708 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.56662 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.88408 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.07777 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.75204 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.24763 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.03322 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.58988 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23.00695 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.08000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.74416 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.94798 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.97267 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.28141 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.27661 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.84957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.60678 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CPC+remove &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; LCPC+none &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; LCPC+ComBat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; LCPC+CovBat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; LCPC+remove &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.565926 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.77628 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.56910 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26.29478 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0011455 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.729611 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.61229 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.63980 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26.22694 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0012327 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.624295 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.61353 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.61949 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26.18909 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0012890 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.559615 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.32431 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.72721 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.42218 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0011782 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.442278 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.30550 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.71227 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.40622 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0012321 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.561639 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.02469 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.71484 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.27804 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0013224 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Visual inspection of methods
+.center[Average pairwise log-Euclidean distances]
+.small[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; FC-ComBat+PD &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Log-ComBat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Log-CovBat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CPC+none &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CPC+ComBat &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.94461 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.07176 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.56271 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.17633 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.70759 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.51922 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.16677 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.44667 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.85849 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.33671 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.29286 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.83515 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.29717 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 77.81608 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.81184 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.38484 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.68478 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.73013 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.70757 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.98204 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.87680 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.35032 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.80031 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.93022 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.91154 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.07511 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.89507 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.48380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.14743 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.88333 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.78074 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75.63105 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.85116 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.23396 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.01274 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.09254 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CPC+remove &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; LCPC+none &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; LCPC+ComBat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; LCPC+CovBat &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; LCPC+remove &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.896825 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.07487 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.40386 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.93881 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.549929 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.025379 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.32829 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.62345 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.29634 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.621987 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.931170 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.40600 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.63579 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.30828 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.567600 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.831850 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.59209 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.00614 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.48012 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.712987 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.728798 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.74283 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 72.06460 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.52625 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.644575 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3,CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.859099 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.60962 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.99808 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 71.62955 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.706361 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Examples: Correlation
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/eu_mean-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="FC-Log-Methods_update_files/figure-html/log_mean-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+---
+
+## FC ComBat Correlations
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-14-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+---
+
+## FC ComBat+PD Correlations
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-17-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+---
+
+## Log-ComBat
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-19-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-20-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+---
+
+## Log-CovBat
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-22-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-23-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## CPC+None
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-25-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-26-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+---
+
+## CPC+ComBat
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-28-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-29-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+---
+
+## CPC+Remove
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-31-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-32-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+---
+
+## Log-CPC+None
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-34-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-35-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+---
+
+## Log-CPC+ComBat
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-37-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-38-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+---
+
+## Log-CPC+CovBat
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-40-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-41-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+---
+
+## Log-CPC+Remove
+
+.pull-left[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-43-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+&lt;img src="FC-Log-Methods_update_files/figure-html/unnamed-chunk-44-1.png" width="576" style="display: block; margin: auto;" /&gt;
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
