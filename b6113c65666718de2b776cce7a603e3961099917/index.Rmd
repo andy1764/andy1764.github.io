@@ -41,6 +41,7 @@ Functional Connectivity CovBat [PDF](Covariance Harmonization/FC-CovBat.pdf)
 4/2: FC Harmonization Methods Comparison [Slides](Covariance Harmonization/4-2-update/FC-Harmonization-Comparisons-Update.html) [4/2](Covariance Harmonization/4-2/4-2-FC-Harmonization-Comparisons.html)  
 4/9: ABCD Differences in Correlation [Slides](Covariance Harmonization/4-9/ABCD-Correlation-Investigation.html) [2/28](Covariance Harmonization/2-28/2-28-ABCD-Correlation-Investigation.html) [2/18](Covariance Harmonization/2-18/2-18-ABCD-Correlation-Investigation.html)  
 4/17: FC Harmonization: Log Methods [Slides](Covariance Harmonization/4-17/FC-Log-Methods.html) [Updates](Covariance Harmonization/4-17/FC-Log-Methods_update.html)  
+4/30: FC Harmonization: Network Analyses [Slides](Covariance Harmonization/4-30/FC-Network-Analyses.html)
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
