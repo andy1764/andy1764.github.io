@@ -43,7 +43,8 @@ Functional Connectivity CovBat [PDF](Covariance Harmonization/FC-CovBat.pdf)
 4/17: FC Harmonization: Log Methods [Slides](Covariance Harmonization/4-17/FC-Log-Methods.html) [Updates](Covariance Harmonization/4-17/FC-Log-Methods_update.html)  
 4/30: FC Harmonization: Network Analyses [Slides](Covariance Harmonization/4-30/FC-Network-Analyses.html) [Abridged](Covariance Harmonization/4-30-edit/FC-Network-Analyses.html)  
 5/6: FC Harmonization: Regression [Slides](Covariance Harmonization/5-6/FC-Site-Differences.html)  
-5/20: CovBat Simulations: Additional Parameters [HTML](Covariance Harmonization/5-20/covbat_param_summary_static.html)
+5/20: CovBat Simulations: Additional Parameters [HTML](Covariance Harmonization/5-20/covbat_param_summary_static.html)  
+5/20: FC Harmonization: Communities [Slides](Covariance Harmonization/5-13/FC-Communities.html)  
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
