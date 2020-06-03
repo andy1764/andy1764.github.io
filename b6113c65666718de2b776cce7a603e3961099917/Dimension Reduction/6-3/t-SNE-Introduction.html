@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>t-SNE and Related Work</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# t-SNE and Related Work
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 70%}
+&lt;/style&gt;
+
+
+
+
+
+
+
+## Summary of t-SNE
+- t-Distributed Stochastic Neighbor Embedding (t-SNE) is an extremely popular tool for visualization of high-dimensional data (cited 13246 times!)
+- Aims to generate a set of lower-dimensional points that best preserves a similarity measure computed in the original space
+- Original form cannot apply to out-of-sample points, but extensions have been developed
+
+.footnote[
+[Maaten and Hinton, 2008](http://www.jmlr.org/papers/v9/vandermaaten08a.html)  
+]
+---
+
+## How does t-SNE work?
+- Given data `\(x_1, x_2, \ldots, x_n\)`, find lower-dimensional data `\(y_1, y_2, \ldots, y_n\)` that preserves important structures
+- Define probabilities that `\(x_i\)` "chooses" `\(x_j\)` as a neighbor as proportional to density of normal distribution centered on `\(x_i\)` with variance `\(\sigma_i^2\)`
+`$$p_{j|i} = \frac{\exp(-\lVert x_i-x_j\rVert^2/2\sigma_i^2)}{\sum_{k\ne l}\exp(-\lVert x_k-x_l\rVert^2/2\sigma_i^2)}$$`
+    - The variances `\(\sigma_i^2\)` are chosen to maintain a perplexity value, which ensures each point has a similar number of effective neighbors
+    - t-SNE works on the symmetric probabilities `\(p_{ij} = (p_{j|i} + p_{i|j})/2n\)` for computational reasons
+
+.footnote[
+[Maaten and Hinton, 2008](http://www.jmlr.org/papers/v9/vandermaaten08a.html)  
+]
+---
+
+## How does t-SNE work?
+- In lower-dimensional space, define probabilities for `\(y_i\)` and `\(y_j\)` as proportional to density of t-distribution with one degree of freedom
+`$$q_{ij} = \frac{(1 + \lVert y_i-y_j\rVert^2)^{-1}}{\sum_{k\ne l}(1 + \lVert y_k-y_l\rVert^2)^{-1}}$$`
+    - Original SNE used Gaussian density with fixed variance but suffers from the crowding problem
+- t-SNE then chooses `\(y_i\)` that minimize the KL divergence between the joint distributions of  `\(p_{ij}\)` and `\(q_{ij}\)`
+`$$C = \sum_i\sum_j p_{ij}\log\frac{p_{ij}}{q_{ij}}$$`
+- Gradient descent with a few modifications is used in the original t-SNE
+    - Faster approximate method often employed&lt;sup&gt;1&lt;/sup&gt;
+- Excellent introduction with interactive visualizations [here](https://distill.pub/2016/misread-tsne/)
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Maaten, 2014](http://lvdmaaten.github.io/publications/papers/JMLR_2014.pdf)  
+[Maaten and Hinton, 2008](http://www.jmlr.org/papers/v9/vandermaaten08a.html)  
+]
+---
+
+## t-SNE in ADNI: Diagnosis
+&lt;img src="t-SNE-Introduction_files/figure-html/unnamed-chunk-2-1.png" width="100%" /&gt;
+---
+
+## t-SNE in ADNI: Manufacturer
+&lt;img src="t-SNE-Introduction_files/figure-html/unnamed-chunk-3-1.png" width="100%" /&gt;
+---
+
+## t-SNE in ADNI: Manufacturer after ComBat
+&lt;img src="t-SNE-Introduction_files/figure-html/unnamed-chunk-4-1.png" width="100%" /&gt;
+---
+
+## t-SNE in ADNI: Manufacturer after CovBat
+&lt;img src="t-SNE-Introduction_files/figure-html/unnamed-chunk-5-1.png" width="100%" /&gt;
+---
+
+## PCA in ADNI: Manufacturer
+&lt;img src="t-SNE-Introduction_files/figure-html/unnamed-chunk-6-1.png" width="50%" /&gt;
+---
+
+## t-SNE vs. PCA in ADNI
+- Estimated densities `\(p_{ij}\)` for subject 1 along with `\(q_{ij}\)` and `\(q^{PCA}_{ij}\)` calculated using the first two PCs
+&lt;img src="t-SNE-Introduction_files/figure-html/unnamed-chunk-7-1.png" width="33%" /&gt;&lt;img src="t-SNE-Introduction_files/figure-html/unnamed-chunk-7-2.png" width="33%" /&gt;&lt;img src="t-SNE-Introduction_files/figure-html/unnamed-chunk-7-3.png" width="33%" /&gt;
+---
+
+## t-SNE in ABCD: Manufacturer
+&lt;img src="t-SNE-Introduction_files/figure-html/unnamed-chunk-8-1.png" width="100%" /&gt;
+---
+
+## t-SNE in ABCD: Manufacturer after ComBat
+&lt;img src="t-SNE-Introduction_files/figure-html/unnamed-chunk-9-1.png" width="100%" /&gt;
+---
+
+## Out-of-sample extensions
+- t-SNE is limited as a dimension reduction tool since it cannot be applied to new data
+- Kernel t-SNE learns a parametric mapping `\(f\)` such that `\(y_i = f_W(x_i)\)`&lt;sup&gt;1&lt;/sup&gt;
+    - `\(f_W(x)\)` takes the form `\(\sum_j \alpha_j \frac{k(x, x_j)}{\sum_l k(x, x_l)}\)` where `\(k(x,x_j)\)` is the Gaussian kernel and `\(x_j\)` comprise a fixed subsample of `\(x_1,\ldots,x_n\)`
+    - Parameters `\(\alpha_j\)` are `\(m\)`-dimensional and obtained by using t-SNE to find `\(x_j\)` and `\(y_j\)` in training sample
+- More general approach developed for any nonparametric dimension reduction tool&lt;sup&gt;2&lt;/sup&gt;
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Gisbrecht et al., 2015](https://doi.org/10.1016/j.neucom.2013.11.045)  
+&lt;sup&gt;2&lt;/sup&gt;[Passalis and Tefas, 2018](https://doi.org/10.1109/TNNLS.2017.2728818)
+]
+---
+
+## Similarity-induced embeddings
+.footnote[
+[Passlis and Tefas, 2018](https://doi.org/10.1109/TNNLS.2017.2728818)
+]
+
+- General framework covering t-SNE and related tools
+- Notes that distance-based dimension reduction (DR) tools are sensitive to outliers
+    - Also notes limitations in using second-order statistics
+- Defines similarity metric `\(S\)` such that `\(S_x(y) = S(x,y)\in [0,1]\)`
+    - Analogous to a kernel function, provides the density induced by `\(x\)`
+--
+
+
+- A similarity-induced embeddings is a function `\(f_W\)` such that `\(y_i = f_W(x_i)\)`
+    - `\(f_W\)` is constrained to take some parametric form
+    - Parameter optimization proceeds by minimizing some function `\(J\)` of the embedding similarity matrix `\(Q\)` with elements `\(Q_{ij} = S(f_W(x_i), f_W(x_j))\)` and a target similarity matrix `\(P\)`
+        - Penalization term included to enforce orthonormality of directions
+- t-SNE is a special case of their model with `\(J\)` chosen as the KL divergence
+---
+
+## Cloning a DR technique
+- Target matrix can be chosen to leverage any given information (e.g. class labels)
+- The authors suggest a way to clone an arbitrary mapping `\(y_i = g(x_i)\)` by using a target matrix
+`$$P_{ij} = \exp\left(-\frac{\lVert g(x_i) - g(x_j)\rVert^2}{\sigma_{copy}}\right)$$`
+- Used to succesfully clone t-SNE results
+
+.center[![:scale 55%](cKS-t-SNE.gif)]
+
+.footnote[
+[Passlis and Tefas, 2018](https://doi.org/10.1109/TNNLS.2017.2728818)
+]
+---
+
+## Potential extensions
+- Batch-corrected t-SNE (BC-t-SNE) introduced to avoid batch effects&lt;sup&gt;1&lt;/sup&gt;
+    - For each iteration, projects `\(y_i\)` onto subspace orthogonal to batch using linear regression
+.center[![:scale 45%](BC-t-SNE-fig1.png)]
+- Similarity-based dimension reduction while accounting for covariates `\(z_1, z_2, \ldots, z_n\)`
+    - Is there some way to incorporate a target matrix using similarities calculated on `\(z_i\)`?
+    - Or alternatively, an "avoidance" matrix to control for confounder
+- Can similarity matrix be used in distance-based approaches?
+    - Seems feasible in MDMR for instance
+    - Could be less sensitive to outliers, yet to be tested
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Aliverti et al., 2020](https://doi.org/10.1093/bioinformatics/btaa189)
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
