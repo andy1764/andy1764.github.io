@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ABCD Harmonization Updates</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <script src="ABCD-Harmonization_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="ABCD-Harmonization_files/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# ABCD Harmonization Updates
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 70%}
+&lt;/style&gt;
+
+## ABCD Dataset Demographics
+- Cortical thickness values computed using 3T scans for 9897 subjects
+    - Excluded subjects without sex or scanner ID
+- Demographics stratified by scanner model shown below
+
+.small[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; GE Discovery MR750 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; GE Signa Creator &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Philips Achieva dStream &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Philips Ingenia &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Siemens Prisma &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Siemens Prisma Fit &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Number of Subjects &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2185 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 89 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 662 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 514 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2940 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3507 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age (Mean (SD)) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 119.0 (7.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 119.1 (8.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 118.3 (7.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 121.3 (6.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 119.9 (7.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 119.8 (7.8) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1123 (51.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 54 (60.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 338 (51.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 257 (50.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1573 (53.5) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1853 (52.8) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Handedness score rating &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Right-handed &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1776 (81.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 77 (86.5) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 519 (78.4) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 385 (74.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2371 (80.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2770 (79.0) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Left-handed &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 153 ( 7.0) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 5 ( 5.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 45 ( 6.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 45 ( 8.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 194 ( 6.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 272 ( 7.8) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left; padding-left: 2em;" indentlevel="1"&gt; Mixed &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 256 (11.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 7 ( 7.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 98 (14.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 84 (16.3) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 375 (12.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 465 (13.3) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Controlling for variance effects
+- Application of the heteroskedasticity model to control for covariate effects on variance&lt;sup&gt;1&lt;/sup&gt;
+- In the original ComBat model, we assume that `\(e_{ijv} \sim N(0, \sigma_v^2)\)` in
+`$$y_{ijv} = \alpha_v + \boldsymbol{x}_{ij}^T \boldsymbol{\beta}_v + \gamma_{iv} + \delta_{iv} e_{ijv}$$`
+- In our model currently called ComBat Controlled, we modify our model to incporate a log-linear relationship between the error standard deviation and the covariates
+`$$e_{ijv} \sim N(0, \sigma_{iv}^2) \hspace{20mm} \log\sigma_{iv}^2 = \zeta_v+\boldsymbol{x}_{ij}^T\eta_v$$`
+- Denote the standardized data `\(z_{ijv} = \frac{y_{ijv} - \hat{\alpha}_v + \boldsymbol{x}_{ij}^T \hat{\boldsymbol{\beta}_v}}{\hat{\sigma}_{iv}} = \frac{y_{ijv} - \hat{\alpha}_v + \boldsymbol{x}_{ij}^T \hat{\boldsymbol{\beta}_v}}{\sqrt{\exp({\hat{\zeta}_v+\boldsymbol{x}_{ij}^T\hat{\eta}_v})}}\)`
+- Then we obtain our harmonized observations as
+`$$y_{ijv}^{ComBat} = \frac{\sqrt{\exp({\hat{\zeta}_v+\boldsymbol{x}_{ij}^T\hat{\eta}_v})}}{\delta_{iv}^*} (z_{ijv} - \gamma_{iv}^*) + \hat{\alpha}_v + \boldsymbol{x}_{ij}^T \hat{\boldsymbol{\beta}}_v$$`
+
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Harvey, 1976](http://search.proquest.com/docview/214665842/abstract/EEDC756B7A34339PQ/1)
+]
+---
+
+## Controlling for covariance effects
+- Following spectral models for covariance&lt;sup&gt;1&lt;/sup&gt;, we control for covariance effects via through the PC scores `\(\xi_{ijk}\)`, which we model as
+`$$\xi_{ijk} = \mu_{ik} + \rho_{ik} \epsilon_{ijk}$$`
+where `\(\epsilon_{ijk} \sim N(0, \tau_{ik})\)` and `\(\log\tau_{iv}^2 = \omega_v+\boldsymbol{x}_{ij}^T\theta_v\)`
+- The main difference between this model and the original CovBat model is that the `\(\hat{\rho}_{ik}\)` are estimated using the variances residualized on covariates
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Boik, 2002](https://www.jstor.org/stable/4140565)
+]
+---
+
+## MVPA experiments
+- We follow the same MVPA experiment paradigm as in the CovBat paper, with 100 splits into 50% training and 50% testing data
+&lt;img src="ABCD-Harmonization_files/figure-html/unnamed-chunk-3-1.png" width="100%" /&gt;
+---
+
+## MVPA experiments
+&lt;img src="ABCD-Harmonization_files/figure-html/unnamed-chunk-4-1.png" width="100%" /&gt;
+---
+
+## MVPA experiments
+&lt;img src="ABCD-Harmonization_files/figure-html/unnamed-chunk-5-1.png" width="100%" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
