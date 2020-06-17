@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Ideas for Longitudinal CovBat</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="template/PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Ideas for Longitudinal CovBat
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 70%}
+&lt;/style&gt;
+
+## Motivation
+- Longitudinal ComBat proven to be effective for longitudinal study designs
+- CovBat recently developed to address scanner effects in covariance in cross-sectional studies
+- No method exists yet to address covariance effects in longitudinal settings
+    - Could be important in multivariate pattern analysis for longitudinal data
+    - Many datasets available include multivariate neuroimaging data longitudinally, e.g. ADNI
+
+---
+
+## Correcting covariance batch effects: CovBat
+**Step 1**: Apply ComBat then residualize out intercept and covariates to center the observations.
+
+**Step 2**: Perform principal components analysis (PCA) to obtain scores.
+$$
+`\begin{aligned}
+\Sigma &amp;= \sum_{k=1}^q \lambda_k \phi_k \phi_k^T &amp; &amp; &amp; e_{ij}^{ComBat} &amp;= \sum_{k=1}^q \xi_{ijk} \phi_k
+\end{aligned}`
+$$
+
+**Step 3**: Harmonize mean and variance of first `\(K\)` PC scores across sites.
+`$$e_{ij}^{CovBat} = \sum_{k=1}^K \xi_{ijk}^{CovBat} \phi_k + \sum_{l=K+1}^q \xi_{ijl} \phi_l$$`
+
+**Step 4**: Reintroduce intercept and covariates to obtain CovBat-adjusted observations.
+`$$y_{ijv}^{CovBat} = e_{ijv}^{CovBat} + \hat{\alpha}_v + \mathbf{x}_{ij}^T \hat{\boldsymbol{\beta}}_v$$`
+
+---
+
+## CovBat harmonizes covariance
+&lt;img src="adni_corr.png" width="70%" style="display: block; margin: auto;" /&gt;
+---
+
+## CovBat improves multivariate pattern analysis
+&lt;img src="adni_auc.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Multilevel functional principal component analysis
+- Motivated by the longitudinal Sleep Heart Health Study
+    - Functional EEG data collected on each subject at two time points
+- Assuming zero mean function, models functional observations in terms of subject-specific deviation `\(Z_i(t)\)` and subject-and-visit-specific deviation `\(W_{ij}(t)\)`
+`$$X_{ij}(t) = Z_i(t) + W_{ij}(t)$$`
+then decomposes both using the Karhunen-Loève (KL) expansion
+    - Models the overall covariance function `\(K_T(s,t)\)` as
+    `$$K_T(s,t) = K_B(s,t) + K_W(s,t)$$`
+    where `\(K_B(s,t) = \text{Cov}(X_{ij}(s), X_{ik}(t))\)`
+- By not imposing any smoothness, this acts as multilevel principal components analysis (MPCA) for multivariate observations
+
+.footnote[
+[Di et al., 2009](https://doi.org/10.1214/08-AOAS206SUPP)
+]
+---
+
+## Potential model
+- We assume a modified random intercept model
+`$$y_{ijv}(t) = \alpha_v + \boldsymbol{x}_{ij}^T \boldsymbol{\beta}_v + \eta_{ijv} + \gamma_{iv} + \delta_{iv} e_{ijv}(t)$$`
+- Using longitudinal ComBat&lt;sup&gt;1&lt;/sup&gt;, we obtain residuals as
+`$$e_{ijv}(t) = \frac{y_{ijv}(t) - \hat{\alpha}_v - \boldsymbol{x}_{ij}^T \hat{\boldsymbol{\beta}}_v - \hat{\eta}_{ijv}}{\hat{\delta}_{iv}}$$`
+- Now we assume a zero-mean MPCA model for `\(\boldsymbol{e}_{ij}(t) = (e_{ij1}(t),\ldots,e_{ijp}(t))^T\)` in terms of a subject-specific deviation `\(\boldsymbol{u}_{ij}\)` and visit-specific deviation `\(\boldsymbol{w}_{ij}(t)\)` such that `\(\boldsymbol{u}_{ij}\)` and `\(\boldsymbol{w}_{ij}(t)\)` are uncorrelated and
+$$
+`\begin{aligned}
+  \boldsymbol{e}_{ij}(t) &amp;= \boldsymbol{u}_{ij} + \boldsymbol{w}_{ij}(t) \\
+    &amp;= \sum_{k=1}^q \xi_{ijk} \boldsymbol{\phi}_k^{(1)} + \sum_{l=1}^r \zeta_{ijl}(t) \boldsymbol{\phi}_l^{(2)}
+\end{aligned}`
+$$
+    
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Beer et al., (2020)](https://doi.org/10.1101/868810)
+]
+---
+
+## Potential model
+- The model decomposes the covariance of `\(\boldsymbol{e}_{ij}(t)\)` as `\(\Sigma_T=\Sigma_B+\Sigma_W\)` such that
+`$$\Sigma_T = \sum_{k=1}^q \lambda_{k}^{(1)} \boldsymbol{\phi}_k^{(1)}\boldsymbol{\phi}_k^{{(1)}^T} + \sum_{l=1}^r \lambda_{l}^{(2)} \boldsymbol{\phi}_l^{(2)}\boldsymbol{\phi}_l^{{(2)}^T}$$`
+where `\(\lambda_{k}^{(1)} = \text{Var}(\xi_{ijk})\)` and `\(\lambda_{l}^{(2)} = \text{Var}(\zeta_{ijl}(t))\)`
+  - `\(\Sigma_T\)` is the total covariance including all time points for all subjects
+  - `\(\Sigma_B = \sum_{k=1}^q \lambda_{k}^{(1)} \boldsymbol{\phi}_k^{(1)}\boldsymbol{\phi}_k^{{(1)}^T}\)` denotes the between-subject covariance
+  - `\(\Sigma_W = \sum_{l=1}^r \lambda_{l}^{(2)} \boldsymbol{\phi}_l^{(2)}\boldsymbol{\phi}_l^{{(2)}^T}\)` denotes the within-subject covariance
+- We aim to harmonize `\(\Sigma_B\)` across sites assuming `\((\Sigma_B)_i = \sum_{k=1}^q \lambda_{ik}^{(1)} \boldsymbol{\phi}_k^{(1)}\boldsymbol{\phi}_k^{{(1)}^T}\)` for each site via
+`$$\xi_{ijk} = \mu_{ik} + \rho_{ik} \epsilon_{ijk}$$`
+and obtaining `\(\xi_{ijk}^{CovBat} = (\xi_{ijk} - \hat{\mu}_{ik})/\hat{\rho}_{ik}\)` with estimation bringing within-site mean and variance of each score to the pooled mean and variance across sites
+---
+
+## Further considerations
+- Does harmonizing `\((\Sigma_B)_i\)` across sites also harmonize visit-specific covariance?
+- Are there benefits to including an additional level? That is, `\(\boldsymbol{e}_{ij}(t) = \boldsymbol{v}_{i} + \boldsymbol{u}_{ij} + \boldsymbol{w}_{ij}(t)\)`
+- Need to identify more kinds of analyses that would be affected
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="template/macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

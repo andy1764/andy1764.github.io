@@ -48,7 +48,8 @@ Functional Connectivity CovBat [PDF](Covariance Harmonization/FC-CovBat.pdf)
 5/30: Harmonization of Functional Connectivity [Slides](Covariance Harmonization/5-30/FC-Communities.html)  
 6/3: t-SNE and Related Work (WIP) [Slides](Dimension Reduction/6-3/t-SNE-Introduction.html)  
 6/10: ABCD Harmonization Updates [Slides](Covariance Harmonization/6-10/ABCD-Harmonization.html)  
-6/10: Next Steps in FC Harmonization (WIP) [Slides](Covariance Harmonization/6-11/FC-Communities-Updates.html)
+6/10: Next Steps in FC Harmonization (WIP) [Slides](Covariance Harmonization/6-11/FC-Communities-Updates.html)  
+6/17: Longitudinal CovBat Proposal [Slides](Covariance Harmonization/6-17/Longitudinal-CovBat-Proposal.html)
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
