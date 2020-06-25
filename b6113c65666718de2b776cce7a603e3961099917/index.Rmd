@@ -12,13 +12,14 @@ PennSIVE Presentation (8/6/2019) [Slides](Covariance Harmonization/Covariance_Ha
 DBEI Summer Chalk Talk (8/28/2019) [Slides](Covariance Harmonization/Covariance_Harmonization_Chalk_Talk.html)  
 BSTA751 Presentation (12/5/2019) [Slides](Covariance Harmonization/Slides - Removal of Scanner Effects in Covariance.pdf)  
 PennSIVE Presentation: Covariance Projects (4/7/2020) [Slides](Covariance Harmonization/4-7 PennSIVE Meeting/Projects-Overview.html)  
+OHBM CovBat Poster #1249 [PDF](../OHBM/Removal-of-Scanner-Effects-in-Covariance-Improves Multivariate-Pattern-Analysis.pdf)  
 
 ### Write-Ups
 Summer Rotation 2019 Literature Review [PDF](Covariance Harmonization/Covariance_Harmonization_Review.pdf)  
 CovBat Method Write-Up [PDF](Covariance Harmonization/ComBat-with-Covariance-Effect-Write-Up.pdf)  
 Multilevel CovBat [PDF](Covariance Harmonization/Multilevel-CovBat.pdf)  
 Functional Connectivity CovBat [PDF](Covariance Harmonization/FC-CovBat.pdf)  
-OHBM CovBat Poster #1249 [PDF](../OHBM/Removal-of-Scanner-Effects-in-Covariance-Improves Multivariate-Pattern-Analysis.pdf)  
+ComBat Controlling for Variance Effects [HTML](Covariance Harmonization/6-25/ComBat-Controlled-in-ABCD.html)  
 
 ### Meetings
 9/3: Initial CovBat Simulations [Slides](Covariance Harmonization/9-3_CovBat_Simulations.html)  
