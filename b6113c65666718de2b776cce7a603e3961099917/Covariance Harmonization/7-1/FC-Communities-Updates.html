@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Next Steps in FC Harmonization (WIP)</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Next Steps in FC Harmonization (WIP)
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 70%}
+&lt;/style&gt;
+
+## Current analysis approach
+1. Form adjacency matrices by removing the diagonal and Fisher transforming off-diagonal elements
+2. Remove negative edge weights for community detection and calculation of participation coefficient and clustering coefficient
+3. Obtain site-level matrices by taking the average across subjects within each site
+4. Apply a popular modularity maximization approach for positive weighted networks&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[&lt;sup&gt;1&lt;/sup&gt; [Blondel et al., 2008](https://doi.org/10.1088%2F1742-5468%2F2008%2F10%2Fp10008)  
+]
+---
+
+## Limitations
+- Negative edges are discarded despite methods available to handle signed networks
+- Communities are detected using a single run of the Louvain algorithm
+    - Have not tested over a range of `\(\gamma\)` parameter values
+- Louvain algorithm recently superceded by Leidan algorithm
+- Modularity maximization approaches are unable to handle "off-diagonal" communities
+- Average networks fail to retain important properties
+---
+
+## Modularity in signed networks
+- A standard definition for signed modularity `\(Q(G, C)\)` where `\(G\)` is the signed graph and `\(C\)` is the community partition is
+`$$Q(G, C) = \alpha Q(G^+,C) + (1-\alpha) Q(G^-,C)$$`
+where `\(G^-\)` is the negative subgraph and `\(\alpha\)` is the relative importance, often fixed at the ratio of the number of edges between `\(G^+\)` and `\(G^-\)`
+    - Alternatively, `\(Q(G, C) = Q(G^+,C) + \frac{v^-}{v^+ + v^-} Q(G^-,C)\)` where `\(v^-\)` is the sum of weights in the negative subgraph is used in the Brain Connectivity Toolbox (BCT)&lt;sup&gt;1&lt;/sup&gt;
+- To overcome the resolution limit, alternative objectives have been proposed including the Constant Potts Model (CPM)
+`$$H(G,C) = -\sum_{i,j}(w_{ij}-\lambda)\delta(c_i,c_j)$$`
+which has been adapted to a signed version again as a weighted sum of the subgraph metrics
+
+.footnote[
+[Esmailian and Jalili, 2015](https://www.nature.com/articles/srep14339)  
+[&lt;sup&gt;1&lt;/sup&gt;Rubinov and Sporns, 2011](https://doi.org/10.1016/j.neuroimage.2011.03.069)
+]
+---
+
+## Community detection methods
+- Many competing algorithms assign communities by maximizing some objective function including Louvain&lt;sup&gt;1&lt;/sup&gt;, CPMap&lt;sup&gt;2&lt;/sup&gt;, Infomap&lt;sup&gt;3&lt;/sup&gt;, Leidan&lt;sup&gt;4&lt;/sup&gt;
+    - Most can readily be adapted to signed metrics
+- Limitations of modularity maximization approaches include inability to detect non-assortative communities and tendency to form badly connected communities
+
+.center[![:scale 50%](41467_2017_2681_Fig1_HTML.jpg)]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Blondel et al., 2008](https://www.nature.com/articles/srep14339)  
+[&lt;sup&gt;2&lt;/sup&gt;Esmailian and Jalili, 2015](https://www.nature.com/articles/srep14339)  
+[&lt;sup&gt;3&lt;/sup&gt;Rosvall and Bergstrom, 2008](https://www.nature.com/articles/srep14339)  
+[&lt;sup&gt;4&lt;/sup&gt;Traag et al., 2019](https://doi.org/10.1038/s41598-019-41695-z)
+]
+
+---
+
+## Stochastic block models
+- Provides a statistical approach to community detection
+- In simplest unweighted case, the probability `\(p_{ij}\)` of there being an edge between nodes `\(i\)` and `\(j\)` is modeled as `\(p_{ij} = \theta_{z_i z_j}\)` where `\(z_i\)` is the community assignment of node `\(i\)`
+    - Parameters `\(\theta_{z_i z_j}\)` and `\(z_i\)` are obtained as MLEs assuming independence of edges
+- Extended to weighted graphs as weighted stochastic blockmodels (WSBM) by modeling the edge weights as exponential family distributions with parameters `\(\theta_{z_i z_j}\)`&lt;sup&gt;1&lt;/sup&gt;
+    - For instance, modeling the edge weights as normal and edge probabilities as Bernoulli
+
+.center[![](41467_2017_2681_Fig2_HTML.jpg)]
+
+.footnote[
+[Betzel et al., 2018](https://doi.org/10.1038/s41467-017-02681-z)  
+[&lt;sup&gt;1&lt;/sup&gt;Aicher et al., 2013](http://arxiv.org/abs/1305.5782)
+]
+---
+
+## Proposed next steps
+.pull-left[
+### Within-site communities
+1. Retain negative edge weights then compute network metrices
+2. Obtain site-specific matrices and form signed networks using Fisher-transformed values
+    - Here, we can test both average matrices and use an ERGM
+3. Perform community detection using Louvain, Leidan, CPMap, WSBM
+    - Check over a range of tuning parameters
+4. Repeat 100 times for each and obtain consensus partitions
+5. Compare communities across sites
+]
+
+.pull-right[
+### PERMANOVA for site
+1. Perform subject-level community detection
+2. Obtain distance matrix using variation of information (VI)&lt;sup&gt;1&lt;/sup&gt;
+3. Apply PERMANOVA on the cluster distance matrix to test association with site
+]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Meilă, 2007](https://doi.org/10.1016/j.jmva.2006.11.013)
+]
+---
+class: center, middle, divider
+# PERMANOVA for site
+---
+
+## Analysis details
+- Apply signed Louvain (from BCT) 100 times and obtain consensus with `\(\tau = 0.5\)` and 100 iterations&lt;sup&gt;1&lt;/sup&gt;
+- Calculate distance matrix using VI, which is a metric on the space of partitions
+- Run PERMANOVA with 1000 permutations and report tables
+- Repeat procedure for unharmonized, FC-ComBat-adjusted, Block-ComBat-adjusted, and FC-CovBat-adjusted data
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Lancichinetti and Fortunato, 2012](https://doi.org/10.1038/srep00336)
+]
+---
+
+## Histograms of pairwise distances
+
+&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-2-1.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-2-2.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-2-3.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-2-4.png" width="25%" /&gt;
+---
+
+## PERMANOVA results
+.center[Unharmonized]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; grp &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.74 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1497.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.993 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1508.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; grp &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1506.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.994 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1515.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results
+.center[Block-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; grp &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.83 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1495.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.994 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1504.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-CovBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; grp &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1504.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1512.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Ongoing work
+- Implement signed community detection on site-level matrices
+    - Modify tuning parameter `\(\gamma\)` to produce number of communities better fitting chosen atlas
+- Compare with results from WSBM (in progress, need to further investigate modelling choices)
+- Obtain FC matrices from different atlases and rerun analyses
+- Update network metrics to consistently incorporate negative edge weight information
+- Further investigation into partial correlations, Gaussian graphical models, binary graphs
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
