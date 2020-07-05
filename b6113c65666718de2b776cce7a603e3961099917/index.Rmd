@@ -19,7 +19,7 @@ Summer Rotation 2019 Literature Review [PDF](Covariance Harmonization/Covariance
 CovBat Method Write-Up [PDF](Covariance Harmonization/ComBat-with-Covariance-Effect-Write-Up.pdf)  
 Multilevel CovBat [PDF](Covariance Harmonization/Multilevel-CovBat.pdf)  
 Functional Connectivity CovBat [PDF](Covariance Harmonization/FC-CovBat.pdf)  
-ComBat Controlling for Variance Effects [HTML](Covariance Harmonization/6-25/ComBat-Controlled-in-ABCD.html)  
+ComBat Controlling for Variance Effects [HTML](Covariance Harmonization/6-25/ComBat-Controlled-in-ABCD.html) [Pre-fix](Covariance Harmonization/6-25/ComBat-Controlled-in-ABCD-pre-fix.html)  
 
 ### Meetings
 9/3: Initial CovBat Simulations [Slides](Covariance Harmonization/9-3_CovBat_Simulations.html)  
