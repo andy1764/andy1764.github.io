@@ -55,7 +55,7 @@ class: center, middle, inverse, title-slide
 ## How does t-SNE work?
 - Given data `\(x_1, x_2, \ldots, x_n\)`, find lower-dimensional data `\(y_1, y_2, \ldots, y_n\)` that preserves important structures
 - Define probabilities that `\(x_i\)` "chooses" `\(x_j\)` as a neighbor as proportional to density of normal distribution centered on `\(x_i\)` with variance `\(\sigma_i^2\)`
-`$$p_{j|i} = \frac{\exp(-\lVert x_i-x_j\rVert^2/2\sigma_i^2)}{\sum_{k\ne l}\exp(-\lVert x_k-x_l\rVert^2/2\sigma_i^2)}$$`
+`$$p_{j|i} = \frac{\exp(-\lVert x_i-x_j\rVert^2/2\sigma_i^2)}{\sum_{k\ne i}\exp(-\lVert x_i-x_k\rVert^2/2\sigma_i^2)}$$`
     - The variances `\(\sigma_i^2\)` are chosen to maintain a perplexity value, which ensures each point has a similar number of effective neighbors
     - t-SNE works on the symmetric probabilities `\(p_{ij} = (p_{j|i} + p_{i|j})/2n\)` for computational reasons
 
@@ -66,7 +66,7 @@ class: center, middle, inverse, title-slide
 
 ## How does t-SNE work?
 - In lower-dimensional space, define probabilities for `\(y_i\)` and `\(y_j\)` as proportional to density of t-distribution with one degree of freedom
-`$$q_{ij} = \frac{(1 + \lVert y_i-y_j\rVert^2)^{-1}}{\sum_{k\ne l}(1 + \lVert y_k-y_l\rVert^2)^{-1}}$$`
+`$$q_{ij} = \frac{(1 + \lVert y_i-y_j\rVert^2)^{-1}}{\sum_{k\ne i}(1 + \lVert y_i-y_k\rVert^2)^{-1}}$$`
     - Original SNE uses Gaussian density with fixed variance but suffers from the crowding problem
 - t-SNE then chooses `\(y_i\)` that minimize the KL divergence between the joint distributions of  `\(p_{ij}\)` and `\(q_{ij}\)`
 `$$C = \sum_i\sum_j p_{ij}\log\frac{p_{ij}}{q_{ij}}$$`
