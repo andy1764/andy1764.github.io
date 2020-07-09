@@ -20,6 +20,7 @@ CovBat Method Write-Up [PDF](Covariance Harmonization/ComBat-with-Covariance-Eff
 Multilevel CovBat [PDF](Covariance Harmonization/Multilevel-CovBat.pdf)  
 Functional Connectivity CovBat [PDF](Covariance Harmonization/FC-CovBat.pdf)  
 ComBat Controlling for Variance Effects [HTML](Covariance Harmonization/6-25/ComBat-Controlled-in-ABCD.html) [Pre-fix](Covariance Harmonization/6-25/ComBat-Controlled-in-ABCD-pre-fix.html)  
+Implementing ComBat in MVPA [HTML](Covariance Harmonization/7-9/ComBat_MVPA.html)
 
 ### Meetings
 9/3: Initial CovBat Simulations [Slides](Covariance Harmonization/9-3_CovBat_Simulations.html)  
