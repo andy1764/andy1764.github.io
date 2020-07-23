@@ -54,6 +54,7 @@ Implementing ComBat in MVPA [HTML](Covariance Harmonization/7-9/ComBat_MVPA.html
 6/24: ABCD Harmonization Updates [Slides](Covariance Harmonization/6-24/ABCD-Harmonization.html) [6/10](Covariance Harmonization/6-10/ABCD-Harmonization.html)  
 7/15: Next Steps in FC Harmonization (WIP) [Slides](Covariance Harmonization/7-15/FC-Communities-Updates.html) [7/8](Covariance Harmonization/7-8/FC-Communities-Updates.html) [7/1](Covariance Harmonization/7-1/FC-Communities-Updates.html) [6/10](Covariance Harmonization/6-11/FC-Communities-Updates.html)  
 7/22: Addressing Site Effects in Communities [Slides](Covariance Harmonization/7-22/FC-Communities-Updates.html)  
+7/23: Applying ComBat in MVPA [Slides](Covariance Harmonization/7-23/ComBat-for-MVPA.html)
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
