@@ -60,6 +60,7 @@ class: center, middle, inverse, title-slide
 1. Remove scanner effects in test set without regressing out covariates, has a possible risk of removing covariate effect (Case 1)
 2. Perform harmonization without the outcome variable in both training and testing (Case 3)
 3. Treat the outcome in the machine learning model as missing in the test set and impute using imaging features and other covariates (Case 1)
+4. Learn mapping from unharmonized to harmonized data in training set then apply to testing (Case 1)
 ---
 
 ## Solution 1: Remove scanner effects without covariates
@@ -132,13 +133,18 @@ For MVPA experiments involving a clinical covariate, we can treat the outcome as
 &lt;img src="ComBat-for-MVPA_files/figure-html/unnamed-chunk-7-1.png" width="60%" style="display: block; margin: auto;" /&gt;
 ---
 
+## Solution 4: Learn harmonization mapping
+- In a similar manner as Neuroharmony, we use machine learning to identify a mapping from unharmonized to harmonized data in the training set then apply it to the test set
+- We train separate random forests models for each feature on all unharmonized features as well as scanner manufacturer
+    - Then, we get predictions for the testing set using these models
+
+&lt;img src="ComBat-for-MVPA_files/figure-html/unnamed-chunk-8-1.png" width="55%" style="display: block; margin: auto;" /&gt;
+---
+
 ## Discussion
 - These solutions remove scanner effects while reducing predictive performance for clinical variables
 - Potential other solutions include
     - Using machine learning to impute missing values
-    - Learn ComBat/CovBat mapping in the training set using machine learning and apply to testing set
-
-
 ---
 class: center, middle, divider
 # Appendix
