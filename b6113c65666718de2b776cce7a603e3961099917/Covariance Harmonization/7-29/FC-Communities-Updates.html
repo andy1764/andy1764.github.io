@@ -777,14 +777,16 @@ class: center, middle, divider
 ---
 
 ## Analysis details
-- For every subject, use 100 repetitions of signed Louvain with `\(\gamma = 4.25\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations&lt;sup&gt;1&lt;/sup&gt;
-    - Yields a median number of communities of 13
+- For every subject, use 100 repetitions of signed Louvain with `\(\gamma = 4.30\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations&lt;sup&gt;1&lt;/sup&gt;
+    - Yields a median number of communities of 14
 - Calculate distance matrix using VI, which is a metric on the space of partitions
 - Run PERMANOVA with 1000 permutations and report tables
+    - Similar to a previous paper that used normalized mutual information to test for group differences via permutation&lt;sup&gt;2&lt;/sup&gt;
 - Repeat procedure for unharmonized, FC-ComBat-adjusted, Block-ComBat-adjusted, and FC-CovBat-adjusted data
 
 .footnote[
-[&lt;sup&gt;1&lt;/sup&gt;Lancichinetti and Fortunato, 2012](https://doi.org/10.1038/srep00336)
+[&lt;sup&gt;1&lt;/sup&gt;Lancichinetti and Fortunato, 2012](https://doi.org/10.1038/srep00336)  
+[&lt;sup&gt;2&lt;/sup&gt;Alexander-Bloch et al., 2012](https://doi.org/10.1016/j.neuroimage.2011.11.035)
 ]
 ---
 
@@ -815,17 +817,17 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 33.5 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 11.18 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.17 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.009 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3710.7 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 5.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3728.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.08 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.991 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
@@ -833,7 +835,7 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3744.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3761.9 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
@@ -860,16 +862,16 @@ class: center, middle, divider
    &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 20.3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 6.76 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.34 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.77 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.33 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3708.1 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 5.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3732.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.09 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
@@ -877,7 +879,7 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3728.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3753.1 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
@@ -905,16 +907,16 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 19.5 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 6.49 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.3 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3723.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3718.3 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 5.07 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
@@ -923,7 +925,7 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3743.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3738.0 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
@@ -949,17 +951,17 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 18.6 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 6.19 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.24 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3690.2 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 5.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3716.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.06 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
@@ -967,7 +969,7 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3708.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3735.4 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
@@ -995,17 +997,17 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 15.7 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 7.84 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.53 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.008 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1887.5 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4.99 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1899.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.02 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.992 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
@@ -1013,7 +1015,7 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1903.2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1914.5 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
@@ -1039,17 +1041,17 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 9.79 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.95 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.971 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.725 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1906.94 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 5.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1926.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.09 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
@@ -1057,7 +1059,7 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1916.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1935.9 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
@@ -1085,17 +1087,17 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 9.88 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4.94 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.969 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.78 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.944 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.724 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.881 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1927.99 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 5.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1913.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.06 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
@@ -1103,7 +1105,7 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1937.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1923.07 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
@@ -1129,17 +1131,17 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 8.85 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4.43 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.884 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.883 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.998 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1893.11 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 5.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1905.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.04 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
@@ -1147,7 +1149,7 @@ class: center, middle, divider
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1901.96 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1914.8 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
@@ -1179,19 +1181,19 @@ class: center, middle, divider
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.009 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.021 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.020 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.303 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.193 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
   &lt;/tr&gt;
@@ -1513,6 +1515,1293 @@ which has been adapted to a signed version again as a weighted sum of the subgra
 
 ## Outliers for gamma = 2: 38 communities
 &lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-50-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+---
+class: center, middle, divider
+# PERMANOVA for site, gamma = 2
+---
+
+## Analysis details
+- For every subject, use 100 repetitions of signed Louvain with `\(\gamma = 3\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations&lt;sup&gt;1&lt;/sup&gt;
+    - Yields a median number of communities of 13
+- Calculate distance matrix using VI, which is a metric on the space of partitions
+- Run PERMANOVA with 1000 permutations and report tables
+- Repeat procedure for unharmonized, FC-ComBat-adjusted, Block-ComBat-adjusted, and FC-CovBat-adjusted data
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Lancichinetti and Fortunato, 2012](https://doi.org/10.1038/srep00336)
+]
+---
+
+## Histograms of pairwise distances
+
+&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-51-1.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-51-2.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-51-3.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-51-4.png" width="25%" /&gt;
+---
+
+## Number of communities by subject
+&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-52-1.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-52-2.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-52-3.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-52-4.png" width="25%" /&gt;
+---
+
+## PERMANOVA results
+.center[Unharmonized]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.92 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2438.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2457.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.66 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2462 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.35 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.994 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2476 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results
+.center[Block-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2437.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.994 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2451.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-CovBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2450.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.34 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2463.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results, CARDIA only
+.center[Unharmonized]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1243.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1253.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.68 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.008 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1252.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.994 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1259.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results, CARDIA only
+.center[Block-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.041 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1240.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.994 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1247.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-CovBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.451 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1252.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1258.64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## MDMR results
+- To assess significance of site while controlling for age and sex, we also apply multivariate distance matrix regression&lt;sup&gt;1&lt;/sup&gt;
+- We regress the same VI distance matrix on age, sex, and site and report the permutation p-values for 1000 permutations
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Site &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sex &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.footnote[[&lt;sup&gt;1&lt;/sup&gt;Zapala and Schork, 2006](https://doi.org/10.1073/pnas.0609333103)  
+]
+---
+class: center, middle, divider
+# PERMANOVA for site, gamma = 3
+---
+
+## Analysis details
+- For every subject, use 100 repetitions of signed Louvain with `\(\gamma = 3\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations&lt;sup&gt;1&lt;/sup&gt;
+    - Yields a median number of communities of 4
+- Calculate distance matrix using VI, which is a metric on the space of partitions
+- Run PERMANOVA with 1000 permutations and report tables
+- Repeat procedure for unharmonized, FC-ComBat-adjusted, Block-ComBat-adjusted, and FC-CovBat-adjusted data
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Lancichinetti and Fortunato, 2012](https://doi.org/10.1038/srep00336)
+]
+---
+
+## Histograms of pairwise distances
+
+&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-62-1.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-62-2.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-62-3.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-62-4.png" width="25%" /&gt;
+---
+
+## Number of communities by subject
+&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-63-1.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-63-2.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-63-3.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-63-4.png" width="25%" /&gt;
+---
+
+## PERMANOVA results
+.center[Unharmonized]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3010.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3034.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3014.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.994 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3032.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results
+.center[Block-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.84 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.43 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2997.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.994 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3015.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-CovBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3020.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3036.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results, CARDIA only
+.center[Unharmonized]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1532.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1545.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.002 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1554.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.994 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1564.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results, CARDIA only
+.center[Block-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.62 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.002 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1540.00 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.994 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1549.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-CovBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.22 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.264 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1553.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1561.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## MDMR results
+- To assess significance of site while controlling for age and sex, we also apply multivariate distance matrix regression&lt;sup&gt;1&lt;/sup&gt;
+- We regress the same VI distance matrix on age, sex, and site and report the permutation p-values for 1000 permutations
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Site &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sex &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.footnote[[&lt;sup&gt;1&lt;/sup&gt;Zapala and Schork, 2006](https://doi.org/10.1073/pnas.0609333103)  
+]
+---
+class: center, middle, divider
+# PERMANOVA for site, gamma = 4.25
+---
+
+## Analysis details
+- For every subject, use 100 repetitions of signed Louvain with `\(\gamma = 4.25\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations&lt;sup&gt;1&lt;/sup&gt;
+    - Yields a median number of communities of 5
+- Calculate distance matrix using VI, which is a metric on the space of partitions
+- Run PERMANOVA with 1000 permutations and report tables
+- Repeat procedure for unharmonized, FC-ComBat-adjusted, Block-ComBat-adjusted, and FC-CovBat-adjusted data
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Lancichinetti and Fortunato, 2012](https://doi.org/10.1038/srep00336)
+]
+---
+
+## Histograms of pairwise distances
+
+&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-73-1.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-73-2.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-73-3.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-73-4.png" width="25%" /&gt;
+---
+
+## Number of communities by subject
+&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-74-1.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-74-2.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-74-3.png" width="25%" /&gt;&lt;img src="FC-Communities-Updates_files/figure-html/unnamed-chunk-74-4.png" width="25%" /&gt;
+---
+
+## PERMANOVA results
+.center[Unharmonized]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.009 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3710.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.991 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3744.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.76 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.34 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3708.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.05 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3728.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results
+.center[Block-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3723.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3743.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-CovBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.23 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3690.2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3708.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results, CARDIA only
+.center[Unharmonized]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.84 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1887.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.99 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1903.2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.971 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.741 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1906.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1916.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results, CARDIA only
+.center[Block-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.88 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.969 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.719 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1927.99 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1937.87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-CovBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.85 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.43 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.884 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.993 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1893.11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1901.96 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## MDMR results
+- To assess significance of site while controlling for age and sex, we also apply multivariate distance matrix regression&lt;sup&gt;1&lt;/sup&gt;
+- We regress the same VI distance matrix on age, sex, and site and report the permutation p-values for 1000 permutations
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Site &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sex &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.028 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.304 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.footnote[[&lt;sup&gt;1&lt;/sup&gt;Zapala and Schork, 2006](https://doi.org/10.1073/pnas.0609333103)  
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
