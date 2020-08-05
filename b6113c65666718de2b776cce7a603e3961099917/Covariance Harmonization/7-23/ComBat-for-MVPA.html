@@ -133,12 +133,24 @@ For MVPA experiments involving a clinical covariate, we can treat the outcome as
 &lt;img src="ComBat-for-MVPA_files/figure-html/unnamed-chunk-7-1.png" width="60%" style="display: block; margin: auto;" /&gt;
 ---
 
+## Using random forests to impute
+- Here, we show results for a single imputation using random forests using a method called MissForest&lt;sup&gt;1&lt;/sup&gt;
+- To measure the uncertainty of the imputations, the method uses out-of-bag error rates obtained over the bootstrap samples in the random forests
+- For AD and male, the mean proportions of falsely classified are 0.25 (±0.02) and 0.2 (±0.02)
+- For age, the mean NRMSE is 0.11 (±0.004).
+
+&lt;img src="ComBat-for-MVPA_files/figure-html/unnamed-chunk-8-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+.footnote[[&lt;sup&gt;1&lt;/sup&gt;Stekhoven and Bühlmann, 2012](https://academic.oup.com/bioinformatics/article/28/1/112/219101)  
+]
+---
+
 ## Solution 4: Learn harmonization mapping
 - In a similar manner as Neuroharmony, we use machine learning to identify a mapping from unharmonized to harmonized data in the training set then apply it to the test set
 - We train separate random forests models for each feature on all unharmonized features as well as scanner manufacturer
     - Then, we get predictions for the testing set using these models
 
-&lt;img src="ComBat-for-MVPA_files/figure-html/unnamed-chunk-8-1.png" width="55%" style="display: block; margin: auto;" /&gt;
+&lt;img src="ComBat-for-MVPA_files/figure-html/unnamed-chunk-9-1.png" width="55%" style="display: block; margin: auto;" /&gt;
 ---
 
 ## Discussion
