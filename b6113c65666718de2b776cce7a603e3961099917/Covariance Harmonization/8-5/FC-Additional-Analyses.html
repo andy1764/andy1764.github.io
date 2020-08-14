@@ -50,8 +50,23 @@ class: center, middle, inverse, title-slide
 ]
 ---
 
+## Association with edge weights after rescaling
+&lt;img src="FC-Additional-Analyses_files/figure-html/unnamed-chunk-3-1.png" width="33%" /&gt;&lt;img src="FC-Additional-Analyses_files/figure-html/unnamed-chunk-3-2.png" width="33%" /&gt;&lt;img src="FC-Additional-Analyses_files/figure-html/unnamed-chunk-3-3.png" width="33%" /&gt;
+
+- Surprisingly, both dividing by within-subject mean edge weight and standardizing to variance 1 (that is, keep the mean the same but rescale using the standard deviation) do not address the high variance in the number of communities
+
+---
+
+## Association with positive edges after rescaling
+&lt;img src="FC-Additional-Analyses_files/figure-html/unnamed-chunk-4-1.png" width="33%" /&gt;&lt;img src="FC-Additional-Analyses_files/figure-html/unnamed-chunk-4-2.png" width="33%" /&gt;&lt;img src="FC-Additional-Analyses_files/figure-html/unnamed-chunk-4-3.png" width="33%" /&gt;
+
+- Higher communities are associated with a much higher proportion of positive edges
+- Unclear how to adjust this without altering the data substantially
+
+---
+
 ## Determining number of blocks for WSBM
-&lt;img src="FC-Additional-Analyses_files/figure-html/unnamed-chunk-3-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="FC-Additional-Analyses_files/figure-html/unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 - Plotted in increments of five blocks
 - Shows that there seems to be some global maximum, but difficult to pinpoint
 - Could be due to number of trials (randomized prior distribution parameters)
