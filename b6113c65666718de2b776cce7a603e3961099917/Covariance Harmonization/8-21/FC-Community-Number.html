@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Investigation of Community Numbers</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Investigation of Community Numbers
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 70%}
+&lt;/style&gt;
+
+## Introduction
+- Our analyses show promising results for harmonizing subject-level communities
+- However, we noted that the number of communities detected via modularity maximization varies greatly between subjects
+- This brief report shows two attempts to decrease the spread in community number and suggests that further investigation is warranted
+---
+
+## Modularity
+- Modularity defined as the proportions of edges within defined communities minus the expected proportion if edges were randomly distributed (keeping degree of each node fixed)&lt;sup&gt;1&lt;/sup&gt;
+`$$Q = \sum_{u\in M}\left[e_{uu}-\left(\sum_{v\in M} e_{uv}\right)^2\right]$$`
+where `\(M\)` are communities and `\(e_{uv}\)` is the proportion of all edges that connect modules `\(u\)` and `\(v\)`
+- Weighted modularity incorporates edge weight information via
+`$$Q = \frac{1}{2m} \sum \limits _{ij}{\bigg[ }w_{ij}-{\frac {k_{i}k_{j}}{2m}}{\bigg]}\delta (c_{i},c_{j})$$`
+where `\(m\)` is the sum of all edge weights, `\(w_{ij}\)` is the edge weight between nodes `\(i\)` and `\(j\)`, `\(k_i\)` is the degree of node `\(i\)`, and `\(\delta (c_{i},c_{j}) = 1\)` when nodes `\(i\)` and `\(j\)` are in the same community
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Rubinov and Sporns, 2010](https://doi.org/10.1016/j.neuroimage.2009.10.003)
+]
+---
+
+## Modularity in signed networks
+- A standard definition for signed modularity `\(Q(G, C)\)` where `\(G\)` is the signed graph and `\(C\)` is the community partition is
+`$$Q(G, C) = \alpha Q(G^+,C) + (1-\alpha) Q(G^-,C)$$`
+where `\(G^-\)` is the negative subgraph and `\(\alpha\)` is the relative importance, often fixed at the ratio of the number of edges between `\(G^+\)` and `\(G^-\)`
+    - Alternatively, `\(Q(G, C) = Q(G^+,C) + \frac{v^-}{v^+ + v^-} Q(G^-,C)\)` where `\(v^-\)` is the sum of weights in the negative subgraph and `\(v^-\)` is the sum of weights in the positive subgraph is used in the Brain Connectivity Toolbox (BCT)&lt;sup&gt;1&lt;/sup&gt;
+    
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Rubinov and Sporns, 2010](https://doi.org/10.1016/j.neuroimage.2009.10.003)
+]
+---
+
+## Mean edge weight and communities
+&lt;img src="FC-Community-Number_files/figure-html/unnamed-chunk-2-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+- Communities obtained as consensus communities over 100 repetitions of signed Louvain with `\(\gamma=4.75\)`
+    - `\(\gamma\)` chosen to yield median 14 communities
+- Can potentially address by normalizing each subject's edge weights prior to community detection
+
+---
+
+## Association with edge weights after rescaling
+&lt;img src="FC-Community-Number_files/figure-html/unnamed-chunk-3-1.png" width="33%" /&gt;&lt;img src="FC-Community-Number_files/figure-html/unnamed-chunk-3-2.png" width="33%" /&gt;&lt;img src="FC-Community-Number_files/figure-html/unnamed-chunk-3-3.png" width="33%" /&gt;
+
+- Surprisingly, both dividing by within-subject mean edge weight and standardizing to variance 1 (that is, keep the mean the same but rescale using the standard deviation) do not address the high variance in the number of communities
+- Results suggest that both fixing mean and fixing variance in edge weights are insufficient
+
+---
+
+## Association with positive edges after rescaling
+&lt;img src="FC-Community-Number_files/figure-html/unnamed-chunk-4-1.png" width="33%" /&gt;&lt;img src="FC-Community-Number_files/figure-html/unnamed-chunk-4-2.png" width="33%" /&gt;&lt;img src="FC-Community-Number_files/figure-html/unnamed-chunk-4-3.png" width="33%" /&gt;
+
+- Higher communities are associated with a much higher proportion of positive edges
+- Unclear how to adjust this without altering the data substantially
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
