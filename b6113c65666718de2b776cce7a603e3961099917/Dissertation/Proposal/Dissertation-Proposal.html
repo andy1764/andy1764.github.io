@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Novel Methods for Statistical Analysis of Covariance Structures</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <script src="Dissertation-Proposal_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="Dissertation-Proposal_files/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Novel Methods for Statistical Analysis of Covariance Structures
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 70%}
+.bottomright {
+  position: absolute;
+  top: 66%;
+  left: 61%;
+}
+&lt;/style&gt;
+---
+## About me
+.pull-left[
+- 3&lt;sup&gt;rd&lt;/sup&gt; year Ph.D. student in biostatistics
+
+- Graduated from the University of Pennsylvania in 2017 with B.A. in cognitive science and psychology
+
+- Frequent activities include badminton, tennis, hiking, and sitting around listening to music
+]
+
+![:abs 19%, 55%, 20%](images/20200706_135408.jpg)
+![:abs 20.7%, 75%, 20%](images/20200824_153842.jpg)
+![:abs 33%, 62.8%, 49%](images/20200830_182936.jpg)
+
+---
+
+## Research experiences
+.pull-left[
+**Comparing distributed analysis and meta-analysis**
+![](images/fall_rotation.png)
+]
+
+.pull-right[
+**Extending penalized CCA-like methods**
+![:scale 80%](images/spring_rotation.png)
+
+**Subtyping EHR trajectories**
+![:scale 80%](images/masters_thesis2.png)
+]
+
+---
+
+## Outline
+1. Introduction
+
+2. Addressing batch effects in the covariance of multivariate observations
+
+3. Assessing the impact of batch effects in covariance matrix observations and developing methods to mitigate these effects
+
+4. Developing novel methods for simultaneous inference on multiple data types
+
+5. Discussion
+---
+
+## Introduction
+.pull-left[
+- Need for larger samples drive growth of multi-site neuroimaging studies
+
+- Several consortia include multimodal imaging including ADNI&lt;sup&gt;1&lt;/sup&gt;, UKBB&lt;sup&gt;2&lt;/sup&gt;, and EMBARC&lt;sup&gt;3&lt;/sup&gt;
+
+- Methods for harmonization and inference in these complex study designs are still lacking
+]
+
+.pull-right[
+![](images/ADNI_challenge_biomarkers.png)
+]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Mueller et al., 2005](https://doi.org/10.1016/j.nic.2005.09.008)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;Sudlow et al., 2015](https://doi.org/10.1371/journal.pmed.1001779)
+&amp;emsp;[&lt;sup&gt;3&lt;/sup&gt;Trivedi et al., 2016](https://doi.org/10.1016/j.jpsychires.2016.03.001)
+]
+
+---
+class: center, middle, divider
+# Addressing batch effects in the covariance of multivariate observations
+
+.footnote[
+Data preprocessing handled by Joanne Beer, Nicholas Tustison, and Philip Cook]
+---
+
+## Scanner effects in neuroimaging
+- Differences driven by scanner properties have been noted in diffusion tensor imaging&lt;sup&gt;1&lt;/sup&gt;, volumetric data&lt;sup&gt;2&lt;/sup&gt;, cortical thickness&lt;sup&gt;3&lt;/sup&gt;, and functional connectivity&lt;sup&gt;4&lt;/sup&gt;
+
+- Wide variety of harmonization approaches exist, but ComBat&lt;sup&gt;5&lt;/sup&gt; remains a prominent method
+
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-2-1.png" width="100%" /&gt;
+
+.footnote[
+&lt;sup&gt;1&lt;/sup&gt;[Fortin et al., 2017](https://doi.org/10.1016/j.neuroimage.2017.08.047) 
+&amp;emsp;&lt;sup&gt;2&lt;/sup&gt;[Reig et al., 2009](https://doi.org/10.1002/hbm.20511) 
+&amp;emsp;&lt;sup&gt;3&lt;/sup&gt;[Han et al., 2006](https://doi.org/10.1016/j.neuroimage.2006.02.051) 
+&amp;emsp;&lt;sup&gt;4&lt;/sup&gt;[Yu et al., 2018](https://doi.org/10.1002/hbm.24241) 
+&amp;emsp;&lt;sup&gt;5&lt;/sup&gt;[Johnson et al., 2007](https://academic.oup.com/biostatistics/article/8/1/118/252073)  
+]
+
+---
+
+## Combatting batch effects: ComBat
+**Step 1**: Assume site effects exist in the mean and variance of multivariate observations with `\(i\)` indexing site and `\(j\)` indexing subject.
+`$$y_{ijv} = \alpha_v + \mathbf{x}_{ij}^T \boldsymbol{\beta}_v + \gamma_{iv} + \delta_{iv}e_{ijv}$$`
+**Step 2**: Obtain empirical Bayes point estimates `\(\gamma_{iv}^*\)` and `\(\delta_{iv}^*\)` by imposing a common prior across features estimated using the data.
+
+**Step 3**: Remove site effect while retaining the covariate effect.
+`$$y_{ijv}^{ComBat} = \frac{y_{ijv} - \hat{\alpha}_v - \mathbf{x}_{ij}^T \hat{\boldsymbol{\beta}}_v - \gamma_{iv}^*}{\delta_{iv}^*}+ \hat{\alpha}_v + \mathbf{x}_{ij}^T \hat{\boldsymbol{\beta}}_v$$`
+where `\(\alpha_{ijv}\)` is the intercept, `\(\boldsymbol{x}_{ij}\)` is the vector of covariates, `\(\boldsymbol{\beta}_v\)` is the vector of regression coefficients, `\(\gamma_{iv}\)` is the mean scanner effect, and `\(\delta_{iv}\)` is the variance scanner effect. The errors `\(e_{ijv}\)` are assumed to follow `\(e_{ijv} \sim N(0, \sigma_v^2)\)`
+.footnote[
+[Johnson et al., 2007](https://academic.oup.com/biostatistics/article/8/1/118/252073)  
+]
+
+---
+
+## Covariance differs across scanners after ComBat
+.center[![](images/adni_raw_corr.png)]
+---
+
+## Scanner detected after ComBat via MVPA
+.center[![:scale 50%](images/adni_auc_surprise.png)]
+---
+
+## Correcting covariance batch effects: CovBat
+**Step 1**: Apply ComBat then residualize out intercept and covariates to center the observations.
+
+**Step 2**: Perform principal components analysis (PCA) to obtain scores.
+$$
+`\begin{aligned}
+\Sigma &amp;= \sum_{k=1}^q \lambda_k \phi_k \phi_k^T &amp; \hspace{5mm} &amp; &amp; e_{ij}^{ComBat} &amp;= \sum_{k=1}^q \xi_{ijk} \phi_k
+\end{aligned}`
+$$
+where the `\(\lambda_k\)` are the eigenvalues of `\(\Sigma\)`, `\(\boldsymbol{\phi}_k\)` are the principal components and `\(\xi_{ijk}\)` are the scores.
+
+**Step 3**: Harmonize mean and variance of first `\(K\)` PC scores to obtain `\(\xi_{ijk}^{CovBat}\)` and
+`$$e_{ij}^{CovBat} = \sum_{k=1}^K \xi_{ijk}^{CovBat} \phi_k + \sum_{l=K+1}^q \xi_{ijl} \phi_l$$`
+
+**Step 4**: Reintroduce intercept and covariates to obtain CovBat-adjusted observations.
+`$$y_{ijv}^{CovBat} = e_{ijv}^{CovBat} + \hat{\alpha}_v + \mathbf{x}_{ij}^T \hat{\boldsymbol{\beta}}_v$$`
+
+---
+
+## CovBat harmonizes covariance
+.center[![:scale 70%](images/adni_corr.png)]
+---
+
+## Obscures detection of scanner
+.center[![:scale 50%](images/adni_auc.png)]
+---
+
+## Improves detection of covariates
+.center[![:scale 75%](images/adni_auc_cov.png)]
+---
+
+## Simulation design
+- Let `\(\boldsymbol{y}_{ij}\)`, `\(i = 1, 2, 3\)`, `\(j = 1, 2, \ldots, 250\)` be vectors of length 62 drawn from the following model:
+`\begin{equation*}
+\boldsymbol{y}_{ij} = \boldsymbol{\alpha} + x_{ij} \boldsymbol{\beta} + \boldsymbol{\gamma}_i + \boldsymbol{\delta}_i^T \boldsymbol{e}_{ij}
+\end{equation*}`
+where `\(\boldsymbol{\alpha}\)` is a fixed intercept, `\(\boldsymbol{\beta}\)` is the vector of mean effects, and `\(x_{ij} \stackrel{i.i.d}{\sim} \text{Bernoulli}\,(0.25)\)`
+.medium[
+- Mean site effects `\(\boldsymbol{\gamma}_i = (\gamma_{i1}, \gamma_{i2}, \ldots, \gamma_{i62})^T\)` follow `\(\gamma_{iv} \stackrel{i.i.d}{\sim} N(0, 1)\)` for `\(i = 1, 2, 3\)` and `\(v = 1, 2, \ldots, 62\)`
+- Variance site effects `\(\boldsymbol{\delta}_i = (\delta_{i1}, \delta_{i2}, \ldots, \delta_{i62})^T\)` follow `\(\delta_{1v} \stackrel{i.i.d}{\sim} \text{Inverse Gamma}\,(46, 50)\)`, `\(\delta_{2v} \stackrel{i.i.d}{\sim} \text{Inverse Gamma}\,(51, 50)\)`, and `\(\delta_{3v} \stackrel{i.i.d}{\sim} \text{Inverse Gamma}\,(56, 50)\)` for `\(v = 1, 2, \ldots, 62\)`
+- `\(\boldsymbol{e}_{ij} \sim N(\boldsymbol{0}, D_{ij}\Sigma_{ij}D_{ij})\)`
+where `\(\Sigma_{ij} = S + x_{ij}\Psi + \Omega_i\)`, `\(S\)` is the sample correlation matrix of Scanner B observations in the ADNI data, `\(\Psi\)` is a chosen predictor-driven covariance shift matrix, and `\(\Omega_i\)` are site-specific covariance shift matrices
+- `\(D_{ij} = \textbf{diag}(\boldsymbol{d}_{ij})\)` where `\(d_{ijk} = 1/\sqrt{(\Sigma_{ij})_{kk}}\)` for `\(k=1,2,\ldots,62\)`
+- We set the negative eigenvalues of `\(\Sigma_{ij}\)` equal to a small constant, `\(10^{-12}\)`.
+]
+
+
+- In the **Predictor Affects Covariance** simulation, we choose `\(\beta_i = -0.5\)` for 15 regions of interest in both the left and right hemispheres and we set `\(\Psi = -(3/4)\Omega_3\)`.
+
+- In the **Covariance Only simulation**, we fix `\(\boldsymbol{\gamma}_i = \mathbf{0}\)` and `\(\boldsymbol{\delta}_i = \mathbf{1}\)`, and `\(\boldsymbol{\beta} = \mathbf{0}\)`
+---
+
+## CovBat performs well in simulations
+.center[![:scale 50%](images/sim_auc_cov.png)]
+---
+
+## Ongoing extensions
+.bottomright[
+- Longitudinal CovBat (joint work with  
+Joanne Beer and Kristin Linn)
+
+
+- Distributed ComBat (joint work with  
+Yong Chen, Chongliang Luo, JP Fortin)
+]
+
+![:abs 50%, 37%, 25%](images/abcd_sex_auc.png)
+
+![:abs 30%, 5%, 20%](images/prisma_v_prisma_fit_small.png)
+![:abs 25%, 37%, 65%](images/prisma_prisma_fit.png)
+---
+class: center, middle, divider
+# Assessing and mitigating the impact of batch effects in covariance matrix observations
+
+.footnote[
+.left[Joint work with Danielle Bassett and Theodore Satterthwaite  
+Data provided by CBICA led by Christos Davatzikos with preprocessing by Raymond Pomponio and Dhivya Srinivasan]]
+---
+
+## Community detection in rsfMRI
+- Changes in brain subnetworks identified through resting-state fMRI associated with conditions including depression&lt;sup&gt;1&lt;/sup&gt; and Alzheimer's disease&lt;sup&gt;2&lt;/sup&gt;
+- Major impact of scanner effects found for several network properties&lt;sup&gt;3&lt;/sup&gt;, but effects on community detection have not been investigated
+
+.center[[![:scale 92%](images/8-Figure2-1.png)](https://www.semanticscholar.org/paper/A-Network-Based-Perspective-in-Alzheimer%27s-Disease%3A-Dragomir-Vrahatis/4629661519f1598c3284ad7eec5d8f2c588081d7/figure/1)]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;He et al., 2018](https://doi.org/10.1093/cercor/bhx335)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;Dragomir et al., 2019](https://doi.org/10.1109/JBHI.2018.2863202)
+&amp;emsp;[&lt;sup&gt;3&lt;/sup&gt;Yu et al., 2018](https://doi.org/10.1002/hbm.24241)
+&amp;emsp;[Figure 2 from Dragomir et al., 2019](https://doi.org/10.1109/JBHI.2018.2863202)
+]
+---
+
+## Community detection algorithms
+- Many community detection methods including the Louvain algorithm&lt;sup&gt;1&lt;/sup&gt; maximize modularity
+
+- Modularity measures the density of links inside communities compared to links between
+communities
+  `$$Q = \frac{1}{2m} \sum \limits _{ij}{\bigg[ }w_{ij}-{\frac {k_{i}k_{j}}{2m}}{\bigg]}\delta (c_{i},c_{j})$$`
+  where `\(w_{ij}\)` is the edge weight between nodes `\(i\)` and `\(j\)`, `\(k_i = \sum_j w_{ij}\)`, `\(m = \sum_{i,j} w_{ij}\)`, and `\(\delta (c_{i},c_{j}) = 1\)` if nodes `\(i\)` and `\(j\)` belong to the same community
+  
+- Modularity can be defined for signed networks as
+`$$Q_{\text{signed}} = Q^+ + \frac{m^-}{m^+ + m^-} Q^-$$` 
+where `\(Q^+\)` is the modularity in the positive subgraph and where `\(m^+\)` is the sum of weights in the negative subgraph&lt;sup&gt;2&lt;/sup&gt; 
+    
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Blondel et al., 2008](https://doi.org/10.1088/1742-5468/2008/10/P10008)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;Rubinov and Sporns, 2010](https://doi.org/10.1016/j.neuroimage.2009.10.003)
+]
+---
+
+## ComBat for functional connectivity (FC-ComBat)
+**Steps**
+1. Starting from correlation matrices, vectorize off-diagonal elements
+
+2. Fisher-transform connectivity values
+
+3. Apply ComBat and reconstruct connectivity matrices
+
+.center[[![:scale 45%](images/hbm24241-fig-0005-m.jpg)](https://onlinelibrary.wiley.com/doi/full/10.1002/hbm.24241#)]
+
+.footnote[
+[Yu et al., 2018](https://doi.org/10.1002/hbm.24241)
+]
+---
+
+## Proposed harmonization methods
+- We propose two extensions:  
+    - **FC-CovBat** to harmonize covariance of edges
+    - **Block-ComBat** to utilize prior subnetwork information
+    
+***
+**Steps**
+1. Starting from correlation matrices, vectorize off-diagonal elements
+
+2. Fisher-transform connectivity values
+
+3. Apply ComBat (FC-ComBat) or CovBat (**FC-CovBat**)
+
+4. (Optional) After ComBat, apply ComBat again within prespecified blocks (**Block-ComBat**)
+---
+
+## BLSA/CARDIA sample
+- For our analyses, we are using data from the Baltimore Longitudinal Study of Aging (BLSA) and the Coronary Artery Risk Development in Young Adults (CARDIA) study
+
+
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA 1 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA 3 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA 4 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Number of Subjects &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 357 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 57 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 139 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age (mean (SD)) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 65.42 (15.25) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50.12 (3.42) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50.30 (3.31) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50.12 (3.64) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 161 (45.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 22 (38.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 79 (42.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 55 (39.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.622 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## Assessing site effects in community detection
+**Analysis 1**: Identify representative communities for each site and compare them across sites
+
+
+--
+**Analysis 2**: Find communities for each subject and compare across subjects using distance-based methods
+
+
+--
+**Analysis 3**: Assess metrics of network organization for site effects
+
+---
+
+## Analysis 1: Within-site communities
+1. Obtain site-specific matrices as average of Fisher-transformed FC matrices&lt;sup&gt;1,2&lt;/sup&gt;
+
+2. Form fully-connected signed networks using Fisher-transformed connectivity values as edge weights
+
+3. Apply signed Louvain 100 times on each site-specific network with `\(\gamma = 4.25\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations&lt;sup&gt;3&lt;/sup&gt;
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Betzel et al., 2013](https://doi.org/10.1017/nws.2013.19)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;He et al., 2018](https://doi.org/10.1093/cercor/bhx335)
+&amp;emsp;[&lt;sup&gt;3&lt;/sup&gt;Lancichinetti and Fortunato, 2012](https://doi.org/10.1038/srep00336)
+]
+---
+
+## Signed Louvain results: Unharmonized
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-5-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean NA)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.59 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.65 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.65 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## FC-ComBat
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-7-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean 0.72)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.68 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.74 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.71 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.68 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.67 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.74 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.82 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## Block-ComBat
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-9-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean 0.69)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.69 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.65 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.68 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.67 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.65 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.69 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.68 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## FC-CovBat
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-11-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean 0.74)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.75 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.74 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.72 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.75 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.75 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.74 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.75 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.79 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## Analysis 2: Subject-level communities
+1. For every subject, use 100 repetitions of signed Louvain with `\(\gamma = 4.75\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations
+
+2. Compute distance matrix using variation of information (VI)
+
+3. Run PERMANOVA and MDMR with 1000 permutations each and report `\(p\)`-values&lt;sup&gt;1&lt;/sup&gt;
+    
+4. Repeat procedure after applying FC-ComBat, Block-ComBat, and FC-CovBat
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Alexander-Bloch et al., 2012](https://doi.org/10.1016/j.neuroimage.2011.11.035)
+]
+---
+
+## Associations with site and demographic variables
+.pull-left[
+.center[PERMANOVA for site]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All Sites &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA Only &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.56&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.88&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+--
+.pull-right[
+.center[MDMR for site, age, and sex]
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Site &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.04&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Analysis 3: Network organization metrics
+1. Form subject-level networks as in **Analysis 2**
+
+2. Calculate signed modularity for the `\(\gamma = 4.75\)` consensus communities and for the Power atlas
+
+3. Compute signed clustering coefficient
+
+4. Derive participation coefficients in positive and negative subgraphs separately
+
+5. Calculate within/between connectivities and participation coefficients for auditory subnetwork,
+previously found to be significantly associated with age&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Varangis et al. 2019](https://doi.org/10.3389/fnagi.2019.00234)
+]
+---
+
+## Network metric associations
+.center[*p*-values for age association]
+.medium[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Within &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Between &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Comm Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Atlas Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Pos Part Coeff &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Clust Coeff &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.37&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.78&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.54&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.44&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.87&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.55&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.32&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.88&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.56&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.52&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+
+--
+.center[*p*-values for site assocations]
+.medium[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Within &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Between &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Comm Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Atlas Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Pos Part Coeff &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Clust Coeff &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.25&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.76&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.33&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.13&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.69&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.46&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.99&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.69&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.14&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+class: center, middle, divider
+# Developing novel methods for simultaneous inference on multiple data types
+---
+
+## Motivation
+.pull-left[
+- Large-scale studies including the [UKBB](https://www.ukbiobank.ac.uk/) and upcoming [RURAL](https://www.theruralstudy.org/) study are increasingly collecting a wide range of data
+
+
+- Dearth of methodologies available for regression of multiple types of outcome data
+]
+.pull-right[
+[![:scale 85%](images/41586_2018_579_Fig1_HTML.webp)](https://www.nature.com/articles/s41586-018-0579-z/figures/1)
+]
+---
+
+## Motivation
+- Incorporation of multiple imaging modalities shown to improve multiple sclerosis lesion detection&lt;sup&gt;1&lt;/sup&gt; and reveal developmental patterns&lt;sup&gt;2&lt;/sup&gt;
+
+- Limited to voxel-level data and structural imaging
+
+.center[[![](images/nihms942093f2.jpg)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6030441/figure/F2/)]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Valcarcel et al., 2018](https://doi.org/10.1111/jon.12506) 
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;Vandekar et al., 2016](https://doi.org/10.1016/j.neuroimage.2016.03.002)
+]
+---
+
+## Distance-based regression methods
+- Regression using only pairwise dissimilarity information between observations `\(Y_i\)`, `\(i=1,2,\ldots,n\)`
+- Requires a dissimilarity measure `\(d\)` that can be any semimetric, which has to satisfy
+    - `\(d(Y_i, Y_j) = d(Y_j, Y_i)\)` (symmetry)
+    - `\(d(Y_i, Y_j) \geq 0\)` (nonnegativity)
+    - `\(d(Y_i, Y_j) = 0\)` if and only if `\(Y_i = Y_j\)` (identifibility)
+--
+
+
+- Permutational multivariate analysis of variance (PERMANOVA)&lt;sup&gt;1&lt;/sup&gt; tests for differences between `\(K\)` groups using within-group sum of squared distances `\(SS_W\)` and across-group sum of squared distances `\(SS_D\)` via the test statistic
+`$$F_{\text{PERMANOVA}} = \frac{SS_A/(K-1)}{SS_W/(n-K)}$$`
+- Significance tests performed either via permutations or using the asymptotic null distribution&lt;sup&gt;2&lt;/sup&gt;
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Anderson, 2001](https://doi.org/10.1111/j.1442-9993.2001.01070.pp.x)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;Shinohara, Shou, et al., 2020](https://doi.org/10.1111/biom.13123)
+]
+---
+
+## Distance-based regression methods
+&lt;!-- - Define Gower's centered matrix `\(G = (I - \mathbf{1}\mathbf{1}^T/n)D(I - \mathbf{1}\mathbf{1}^T/n)\)` and the hat matrix `\(H = X(X^TX)^{-1}X^T\)` --&gt;
+- Multivariate distance matrix regression (MDMR) tests for associations with the design matrix `\(X\)` via the pseudo-F statistic
+`$$\DeclareMathOperator{\tr}{tr} F_{\text{MDMR}} = \frac{\tr(HGH)/(m-1)}{\tr[(I-H)G(I-H)]/(n-m)}$$`
+which can be tested via permutation or through its asymptotic null distribution&lt;sup&gt;2&lt;/sup&gt;
+
+.pull-left[
+.center[
+[![:scale 80%](images/1-s2.0-S1053811914001232-gr3.jpg)](https://doi.org/10.1016/j.neuroimage.2014.02.024)  
+.small[[Fig. 3 from Shehzad et al., 2014](https://doi.org/10.1016/j.neuroimage.2014.02.024)]
+ ]
+]
+.pull-right[
+.center[
+  [![:scale 77%](images/1-s2.0-S1053811911013164-gr4.jpg)](https://doi.org/10.1016/j.neuroimage.2011.11.035)  
+  .small[[Fig. 4 from Alexander-Bloch et al., 2012](https://doi.org/10.1016/j.neuroimage.2011.11.035)]
+ ]
+]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;McArdle and Anderson, 2001](https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282001%29082%5B0290%3AFMMTCD%5D2.0.CO%3B2)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;McArtor et al., 2017](https://doi.org/10.1007/s11336-016-9527-8)
+]
+
+---
+class: center, middle, divider
+# Discussion
+---
+
+## Progress summary and next steps
+**Aim 1:** Addressing batch effects in the covariance of multivariate observations
+- Found of covariance site effects and developed a novel method to address them
+- Looking into comparison with additional methods and other potential downstream analyses
+
+
+--
+***
+**Aim 2:** Assessing the impact of batch effects in covariance matrix observations and developing methods to mitigate these effects
+- Preliminary analyses show promising results for proposed harmonization methods
+- Working on expanding breadth of network analysis plans
+
+
+--
+***
+**Aim 3:** Developing novel methods for simultaneous inference on multiple data types
+- Need to choose dataset to examine and compare data types
+- Reviewing distance matrix literature prior to methodological development
+
+---
+
+## Acknowledgements
+.pull-left[
+**Advisors**  
+Taki Shinohara  
+Haochang Shou
+
+**ADNI Preprocessing**  
+Joanne C. Beer  
+Nicholas J. Tustison  
+Philip A. Cook
+
+**BLSA/CARDIA Preprocessing**  
+Raymond Pomponio  
+Dhivya Srinivasan
+
+**Advice and Feedback on Network Analyses**  
+Theodore D. Satterthwaite  
+Danielle S. Bassett
+]
+
+.pull-right[
+**Dissertation Committee**  
+Kristin A. Linn  
+Jing Huang  
+Theodore D. Satterthwaite  
+
+And all of PennSIVE for the support!
+
+![:scale 90%](images/PennSIVE_group.jpeg)
+]
+
+---
+class: center, middle, divider
+# Questions?
+---
+class: center, middle, divider
+# Appendix
+---
+
+## ComBat controlling for variance effects
+In the original ComBat model, we assume that `\(e_{ijv} \sim N(0, \sigma_v^2)\)` in
+`$$y_{ijv} = \alpha_v + \boldsymbol{x}_{ij}^T \boldsymbol{\beta}_v + \gamma_{iv} + \delta_{iv} e_{ijv}$$`
+
+In our model currently called ComBatLS, we modify our model to incorporate a log-linear relationship between the error standard deviation and the covariates
+`$$e_{ijv} \sim N(0, \sigma_{iv}^2) \hspace{20mm} \log\sigma_{iv} = \zeta_v+\boldsymbol{x}_{ij}^T\eta_v$$`
+
+Denote the standardized data `\(z_{ijv} = \frac{y_{ijv} - \hat{\alpha}_v + \boldsymbol{x}_{ij}^T \hat{\boldsymbol{\beta}_v}}{\hat{\sigma}_{iv}} = \frac{y_{ijv} - \hat{\alpha}_v + \boldsymbol{x}_{ij}^T \hat{\boldsymbol{\beta}_v}}{\sqrt{\exp({\hat{\zeta}_v+\boldsymbol{x}_{ij}^T\hat{\eta}_v})}}\)`. Then we obtain our harmonized observations as
+`$$y_{ijv}^{ComBat} = \frac{\sqrt{\exp({\hat{\zeta}_v+\boldsymbol{x}_{ij}^T\hat{\eta}_v})}}{\delta_{iv}^*} (z_{ijv} - \gamma_{iv}^*) + \hat{\alpha}_v + \boldsymbol{x}_{ij}^T \hat{\boldsymbol{\beta}}_v$$`
+---
+
+## Correlation Permutation Test
+- To test our hypothesis that correlation between observations differs across scanner model, we design the following permutation test:
+    1. Shuffle scanner model and scanner ID while keeping subjects within the same site
+    2. Compute correlation matrices within each scanner ID
+    3. Find average pairwise distance between correlation matrices of different scanner models
+    4. Repeat steps 1-3 one thousand times
+    5. Compare the true average pairwise distance against the permutation values
+
+
+- This test accounts for the sample size within each scanner ID by keeping it fixed across permutations
+- It also isolates scanner effects from site effects by not allowing subjects to change site in permutations
+---
+
+## Multilevel functional principal component analysis
+- Motivated by the longitudinal Sleep Heart Health Study
+    - Functional EEG data collected on each subject at two time points
+- Assuming zero mean function, models functional observations in terms of subject-specific deviation `\(Z_i(t)\)` and subject-and-visit-specific deviation `\(W_{ij}(t)\)`
+`$$X_{ij}(t) = Z_i(t) + W_{ij}(t)$$`
+then decomposes both using the Karhunen-Loève (KL) expansion
+    - Models the overall covariance function `\(K_T(s,t)\)` as
+    `$$K_T(s,t) = K_B(s,t) + K_W(s,t)$$`
+    where `\(K_B(s,t) = \text{Cov}(X_{ij}(s), X_{ik}(t))\)`
+- By not imposing any smoothness, this acts as multilevel principal components analysis (MPCA) for multivariate observations
+
+.footnote[
+[Di et al., 2009](https://doi.org/10.1214/08-AOAS206SUPP)
+]
+---
+
+## Longitudinal CovBat
+- We assume a modified random intercept model
+`$$y_{ijv}(t) = \alpha_v + \boldsymbol{x}_{ij}^T \boldsymbol{\beta}_v + \eta_{ijv} + \gamma_{iv} + \delta_{iv} e_{ijv}(t)$$`
+- Using longitudinal ComBat&lt;sup&gt;1&lt;/sup&gt;, we obtain residuals as
+`$$e_{ijv}(t) = \frac{y_{ijv}(t) - \hat{\alpha}_v - \boldsymbol{x}_{ij}^T \hat{\boldsymbol{\beta}}_v - \hat{\eta}_{ijv}}{\hat{\delta}_{iv}}$$`
+- Now we assume a zero-mean MPCA model for `\(\boldsymbol{e}_{ij}(t) = (e_{ij1}(t),\ldots,e_{ijp}(t))^T\)` in terms of a subject-specific deviation `\(\boldsymbol{u}_{ij}\)` and visit-specific deviation `\(\boldsymbol{w}_{ij}(t)\)` such that `\(\boldsymbol{u}_{ij}\)` and `\(\boldsymbol{w}_{ij}(t)\)` are uncorrelated and
+$$
+`\begin{aligned}
+  \boldsymbol{e}_{ij}(t) &amp;= \boldsymbol{u}_{ij} + \boldsymbol{w}_{ij}(t) \\
+    &amp;= \sum_{k=1}^q \xi_{ijk} \boldsymbol{\phi}_k^{(1)} + \sum_{l=1}^r \zeta_{ijl}(t) \boldsymbol{\phi}_l^{(2)}
+\end{aligned}`
+$$
+    
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Beer et al., (2020)](https://doi.org/10.1101/868810)
+]
+---
+
+## Longitudinal CovBat
+- The model decomposes the covariance of `\(\boldsymbol{e}_{ij}(t)\)` as `\(\Sigma_T=\Sigma_B+\Sigma_W\)` such that
+`$$\Sigma_T = \sum_{k=1}^q \lambda_{k}^{(1)} \boldsymbol{\phi}_k^{(1)}\boldsymbol{\phi}_k^{{(1)}^T} + \sum_{l=1}^r \lambda_{l}^{(2)} \boldsymbol{\phi}_l^{(2)}\boldsymbol{\phi}_l^{{(2)}^T}$$`
+where `\(\lambda_{k}^{(1)} = \text{Var}(\xi_{ijk})\)` and `\(\lambda_{l}^{(2)} = \text{Var}(\zeta_{ijl}(t))\)`
+  - `\(\Sigma_T\)` is the total covariance including all time points for all subjects
+  - `\(\Sigma_B = \sum_{k=1}^q \lambda_{k}^{(1)} \boldsymbol{\phi}_k^{(1)}\boldsymbol{\phi}_k^{{(1)}^T}\)` denotes the between-subject covariance
+  - `\(\Sigma_W = \sum_{l=1}^r \lambda_{l}^{(2)} \boldsymbol{\phi}_l^{(2)}\boldsymbol{\phi}_l^{{(2)}^T}\)` denotes the within-subject covariance
+- We aim to harmonize `\(\Sigma_B\)` across sites assuming `\((\Sigma_B)_i = \sum_{k=1}^q \lambda_{ik}^{(1)} \boldsymbol{\phi}_k^{(1)}\boldsymbol{\phi}_k^{{(1)}^T}\)` for each site via
+`$$\xi_{ijk} = \mu_{ik} + \rho_{ik} \epsilon_{ijk}$$`
+and obtaining `\(\xi_{ijk}^{CovBat} = (\xi_{ijk} - \hat{\mu}_{ik})/\hat{\rho}_{ik}\)` with estimation bringing within-site mean and variance of each score to the pooled mean and variance across sites
+---
+
+## Participation coefficient
+- Participation coefficient measures how connected a node is to other communities
+    - Defined for node `\(i\)` as
+    `$$PC_i = 1 - \sum_{m\in M}\left(\frac{k_{iu}}{k_i}\right)^2$$`
+    where `\(k_{iu}\)` is the number of edges between node `\(i\)` and nodes in community `\(u\)` and `\(k_i\)` is the degree. Weighted variant uses edge weights in calculating `\(k_{iu}\)` and `\(k_i\)` instead.
+    - Close to 1 if edges are distributed across many communities, equal to 0 if all edges are within
+- Not aware of any generalization to signed networks
+    - Often computed separately in positive and negative subgraphs
+---
+
+## Clustering coefficient
+- Sometimes used interchangeably with transitivity, but latter only defined for whole graph
+- Measures the tendency for nodes to cluster together, defined loosely as
+`$$C = \frac{\text{number of closed triplets}}{\text{number of triplets}}$$`
+- Several extensions proposed for positive weighted graphs and signed graphs&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[&lt;sup&gt;1&lt;/sup&gt;[De Meo et al., 2014](https://doi.org/10.1109/ISDA.2011.6121636)  
+]
+---
+
+## Stochastic block models
+- Provides a statistical approach to community detection
+- In simplest unweighted case, the probability `\(p_{ij}\)` of there being an edge between nodes `\(i\)` and `\(j\)` is modeled as `\(p_{ij} = \theta_{z_i z_j}\)` where `\(z_i\)` is the community assignment of node `\(i\)`
+    - Parameters `\(\theta_{z_i z_j}\)` and `\(z_i\)` are obtained as MLEs assuming independence of edges
+- Extended to weighted graphs as weighted stochastic blockmodels (WSBM) by modeling the edge weights as exponential family distributions with parameters `\(\theta_{z_i z_j}\)`&lt;sup&gt;1&lt;/sup&gt;
+    - For instance, modeling the edge weights as normal and edge existence as Bernoulli
+
+.center[![](images/41467_2017_2681_Fig2_HTML.jpg)]
+
+.footnote[
+[Betzel et al., 2018](https://doi.org/10.1038/s41467-017-02681-z)  
+[&lt;sup&gt;1&lt;/sup&gt;Aicher et al., 2013](http://arxiv.org/abs/1305.5782)
+]
+---
+
+## WSBM considerations
+- Flexible choice of edge weight distribution, commonly assumed to be normal
+- Not imposing any edge existence distribution since graphs are fully connected
+- Log-evidence used as criteria for model selection, claimed to penalize number of parameters&lt;sup&gt;1&lt;/sup&gt;
+- Following recent paper&lt;sup&gt;2&lt;/sup&gt;, fit over multiple block numbers `\(K\)` to average FC matrix across all subjects
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-17-1.png" width="40%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Aicher et al., 2015](https://www.nature.com/articles/srep14339)  
+[&lt;sup&gt;2&lt;/sup&gt;Faskowitz et al., 2018](https://doi.org/10.1038/s41598-018-31202-1)
+]
+---
+
+## WSBM results (K=14): Unharmonized
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-18-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean NA)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.41 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.29 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.32 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.42 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.34 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## FC-ComBat
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-20-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean 0.43)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.40 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.52 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.46 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## Block-ComBat
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-22-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean 0.46)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.46 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.47 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.40 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## FC-CovBat
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-24-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean 0.51)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.44 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.39 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.63 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.44 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.39 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## WSBM results (K=7): Unharmonized
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-26-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean 0.41)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.35 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.47 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.45 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.35 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.37 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## FC-ComBat
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-28-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean 0.53)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.57 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.58 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.49 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.51 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.49 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## Block-ComBat
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-30-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean 0.52)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.61 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.51 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.45 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.54 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.61 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## FC-CovBat
+.pull-left[
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-32-1.png" width="100%" /&gt;
+]
+.pull-right[
+.center[Adjusted Rand index (mean 0.54)]
+.small[
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CARDIA_4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BLSA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.46 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.55 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.59 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; CARDIA_4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+]
+---
+
+## Histograms of pairwise distances
+
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-34-1.png" width="25%" /&gt;&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-34-2.png" width="25%" /&gt;&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-34-3.png" width="25%" /&gt;&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-34-4.png" width="25%" /&gt;
+---
+
+## Number of communities by subject
+&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-35-1.png" width="25%" /&gt;&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-35-2.png" width="25%" /&gt;&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-35-3.png" width="25%" /&gt;&lt;img src="Dissertation-Proposal_files/figure-html/unnamed-chunk-35-4.png" width="25%" /&gt;
+---
+
+## PERMANOVA results
+.center[Unharmonized]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.91 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.009 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4046.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.991 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4082.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.42 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.35 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4041.2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.51 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4063.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results
+.center[Block-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7.07 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4049.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4071.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-CovBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.002 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 734 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4049.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 737 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4069.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results, CARDIA only
+.center[Unharmonized]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.57 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.008 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2073.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.48 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.992 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2090.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.987 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.565 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2091.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.53 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2102.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## PERMANOVA results, CARDIA only
+.center[Block-ComBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.882 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2092.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.54 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.995 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2102.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.center[FC-CovBat]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Df &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SumsOfSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MeanSqs &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; F.Model &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; R2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pr(&amp;gt;F) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Site &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.43 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.849 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.004 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.999 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Residuals &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 378 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2099.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.55 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.996 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 380 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2109.14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## Parametric covariance regression methods
+- For each subject `\(i = 1,2,\ldots,n\)`, let `\(\boldsymbol{y}_{it}\)` be `\(p\)`-dimensional observations over time points `\(t = 1,2,\ldots, T_i\)` and `\(z_{itk} = \boldsymbol{\gamma}_k^T \boldsymbol{y}_{it}\)`, `\(k=1,2,\ldots,q\)` where `\(q\leq p\)`
+- We assume that `\(\boldsymbol{y}_{it}\)` are independent and identically distributed random samples from a multivariate normal distribution with mean zero and covariance matrix `\(\Sigma_i\)` that may depend on covariates `\(\boldsymbol{x}_i\)`
+
+--
+- Extending [Harvey (1976)](http://search.proquest.com/docview/214665842/abstract/EEDC756B7A34339PQ/1), we model dependence of `\(\Sigma_i\)` on `\(\boldsymbol{x}_i\)` via a log-linear model on the variance of the scores such that
+    `$$\log(Var(z_{itk})) = \log(\boldsymbol{\gamma}_k^T \Sigma_i \boldsymbol{\gamma}_k) = \boldsymbol{x}_i^T \boldsymbol{\beta}_k$$`
+    - If we follow the CovBat model and estimate `\(\boldsymbol{\gamma}_k\)` as the first `\(q\)` principal component directions, we have a special case of [Boik (2002)](https://www.jstor.org/stable/4140565)
+    - Estimating `\(\boldsymbol{\gamma}_k\)` as common principal components&lt;sup&gt;1&lt;/sup&gt; has been investigated by [Zhao et al. (2019)](https://doi.org/10.1093/biostatistics/kxz057) who derived several good asymptotic properties
+    - [Zhao et al. (2019)](https://doi.org/10.1093/biostatistics/kxz057) propose obtaining directions most related to covariates using a novel optimization procedure
+    
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Flury (1984)](https://doi.org/10.2307/2288721)
+]
+---
+
+## Additional methods and limitations
+- Other covariance regression methods have been proposed to model the log-transformed covariance matrices&lt;sup&gt;1&lt;/sup&gt; or Cholesky decomposition&lt;sup&gt;2&lt;/sup&gt;
+    - Alternative methods model covariance effects on covariates&lt;sup&gt;3&lt;/sup&gt; or similarity matrices&lt;sup&gt;4&lt;/sup&gt;
+- All methods assume that covariance effects are captured by limited structures
+- Only operate on covariance matrices and not derived objects such as graphs or community structures
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Chiu et al. (1996)](http://search.proquest.com/docview/274644068/abstract/164DE538AC8C4160PQ/1)  
+[&lt;sup&gt;2&lt;/sup&gt;Pan and Mackenzie (2003)](https://doi.org/10.1093/biomet/90.1.239)  
+[&lt;sup&gt;3&lt;/sup&gt;Hoff and Niu (2012)](https://www.jstor.org/stable/24310032)  
+[&lt;sup&gt;4&lt;/sup&gt;Zou et al. (2017)](https://doi.org/10.1080/01621459.2015.1131699)
+]
+---
+
+## Choice of dissimilarity measure
+.pull-left[
+- Innumerous dissimilarity measures exist for vectors, positive definite matrices&lt;sup&gt;1&lt;/sup&gt;, clusterings&lt;sup&gt;2&lt;/sup&gt;, and other data objects
+- [Shehzad et al. (2014)](https://doi.org/10.1016/j.neuroimage.2014.02.024) test several distance measures for functional connectivity analyses
+]
+.pull-right[.center[
+&lt;img src="images/shehzad_supp_fig_10.png" width="75%" /&gt;
+]
+]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Dryden et al. (2009)](https://doi.org/10.1214/09-AOAS249)  
+[&lt;sup&gt;2&lt;/sup&gt;Wagner and Wagner (2007)](http://staff.ustc.edu.cn/~zwp/teach/MVA/cluster_validation.pdf)
+]
+---
+
+## Comparing dissimilarity matrices
+- Mantel test for comparing two dissimilarity matrices&lt;sup&gt;1&lt;/sup&gt; is widely used in ecology
+    - Computes correlation between lower-triangular elements of each matrix and assesses significance using permutations
+- Extended to handle multiple explanatory matrices&lt;sup&gt;2&lt;/sup&gt;
+
+.center[[![:scale 60%](images/RSA_2014.png)](https://users.aalto.fi/~eglerean/permutations.html)]
+
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Mantel, 1967](https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282001%29082%5B0290%3AFMMTCD%5D2.0.CO%3B2)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;Lichstein, 2007](https://doi.org/10.1007/s11336-016-9527-8)
+]
+---
+
+## Combining dissimilarity matrices
+- Research in pattern recognition has found benefits in classification performance by integrating multiple dissimilarity matrices
+
+- One approach is to combine dissimilarity matrices `\(D_1, D_2,\ldots, D_r\)` via a weighted sum&lt;sup&gt;1&lt;/sup&gt;
+`$$D_{\text{sum}}=\sum_{i=1}^r w_iD_i$$`
+
+- Incorporating correlations among dissimilarity metrics may require extensions of hypothesis testing in multivariate multiple linear regression
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Ibba et al., 2010](https://doi.org/10.1109/ICPR.2010.820)
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

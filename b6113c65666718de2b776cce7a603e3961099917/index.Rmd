@@ -7,6 +7,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Dissertation
+Candidacy Exam (9/3/2020) [Slides](Dissertation/Proposal/Dissertation-Proposal.html)  
+
 # Covariance Harmonization
 PennSIVE Presentation (8/6/2019) [Slides](Covariance Harmonization/Covariance_Harmonization_PennSIVE_Presentation.html)  
 DBEI Summer Chalk Talk (8/28/2019) [Slides](Covariance Harmonization/Covariance_Harmonization_Chalk_Talk.html)  
