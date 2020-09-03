@@ -88,7 +88,7 @@ class: center, middle, inverse, title-slide
 .pull-left[
 - Need for larger samples drive growth of multi-site neuroimaging studies
 
-- Several consortia include multimodal imaging including the Alzheimer's Disease Neuroimaging Initiative (ADNI)&lt;sup&gt;1&lt;/sup&gt; and UK Biobank (UKBB)&lt;sup&gt;2&lt;/sup&gt;
+- Several consortia collect multimodal imaging including the Alzheimer's Disease Neuroimaging Initiative (ADNI)&lt;sup&gt;1&lt;/sup&gt; and UK Biobank (UKBB)&lt;sup&gt;2&lt;/sup&gt;
 
 - Researchers increasingly employ multivariate pattern analyses (MVPA), which use machine learning to analyze large sets of features
 
@@ -378,7 +378,7 @@ Data provided by CBICA led by Christos Davatzikos with preprocessing by Raymond 
 ]
 ---
 
-## Assessing site effects in community detection
+## Assessing scanner effects in community detection
 &lt;!-- **Analysis 1**: Identify representative communities for each site and compare them across sites --&gt;
 
 
@@ -389,10 +389,10 @@ Data provided by CBICA led by Christos Davatzikos with preprocessing by Raymond 
 &lt;!-- -- --&gt;
 &lt;!-- **Analysis 3**: Assess metrics of network organization for site effects --&gt;
 
-We assess the site differences in community measures on three scales:
+We assess the scanner differences in community measures on three scales:
 
 --
-1. Concordance of population-average communities between sites
+1. Concordance of population-average communities between scanners
 
 
 --
@@ -404,14 +404,14 @@ We assess the site differences in community measures on three scales:
 
 ---
 
-## Analysis 1: Site-average communities
-1. Obtain site-average matrices as average of Fisher-transformed FC matrices&lt;sup&gt;1,2&lt;/sup&gt;
+## Analysis 1: Site-level communities
+1. Obtain scanner-level matrices as average of Fisher-transformed FC matrices&lt;sup&gt;1,2&lt;/sup&gt;
 
 2. Form fully-connected signed networks using Fisher-transformed connectivity values as edge weights
 
-3. Apply signed Louvain 100 times on each site-specific network with `\(\gamma = 4.25\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations&lt;sup&gt;3&lt;/sup&gt;
+3. Apply signed Louvain 100 times on each scanner-level network with `\(\gamma = 4.25\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations&lt;sup&gt;3&lt;/sup&gt;
 
-4. Compare site-level communities visually and using adjusted Rand index (ARI)
+4. Compare scanner-level communities visually and using adjusted Rand index (ARI)
 
 .footnote[
 [&lt;sup&gt;1&lt;/sup&gt;Betzel et al., 2013](https://doi.org/10.1017/nws.2013.19)
@@ -420,7 +420,7 @@ We assess the site differences in community measures on three scales:
 ]
 ---
 
-## Site-average communities results
+## Scanner-level communities results
 
 
 
@@ -443,12 +443,12 @@ We assess the site differences in community measures on three scales:
 
 ## Associations with site and demographic variables
 .pull-left[
-.center[PERMANOVA *p*-values for site]
+.center[PERMANOVA *p*-values for scanner]
 &lt;table&gt;
  &lt;thead&gt;
   &lt;tr&gt;
    &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; All Sites &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All Scanners &lt;/th&gt;
    &lt;th style="text-align:left;"&gt; CARDIA Only &lt;/th&gt;
   &lt;/tr&gt;
  &lt;/thead&gt;
@@ -478,13 +478,13 @@ We assess the site differences in community measures on three scales:
 ]
 --
 .pull-right[
-.center[MDMR *p*-values for site, age, and sex]
+.center[MDMR *p*-values for scanner, age, and sex]
 
 &lt;table&gt;
  &lt;thead&gt;
   &lt;tr&gt;
    &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Site &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Scanner &lt;/th&gt;
    &lt;th style="text-align:left;"&gt; Age &lt;/th&gt;
    &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
   &lt;/tr&gt;
@@ -594,7 +594,7 @@ previously found to be significantly associated with age&lt;sup&gt;1&lt;/sup&gt;
 
 
 --
-.center[*p*-values for site assocations]
+.center[*p*-values for scanner assocations]
 .medium[
 &lt;table&gt;
  &lt;thead&gt;
