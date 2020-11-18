@@ -59,7 +59,9 @@ Implementing ComBat in MVPA [HTML](Covariance Harmonization/7-9/ComBat_MVPA.html
 7/23: Applying ComBat in MVPA [Slides](Covariance Harmonization/7-23/ComBat-for-MVPA.html)  
 8/5: Additional Investigations for FC Harmonization [Slides](Covariance Harmonization/8-5/FC-Additional-Analyses.html)  
 8/19: Addressing Site Effects in Communities [Slides](Covariance Harmonization/8-19/FC-Communities-Updates.html) [7/29](Covariance Harmonization/7-29/FC-Communities-Updates.html) [7/22](Covariance Harmonization/7-22/FC-Communities-Updates.html)  
-8/21: Investigating Number of Communities [Slides](Covariance Harmonization/8-21/FC-Community-Number.html)
+8/21: Investigating Number of Communities [Slides](Covariance Harmonization/8-21/FC-Community-Number.html)  
+11/11: FC Harmonization Follow-Up Analyses [Slides](Covariance Harmonization/11-11-20/FC-Harmonization-Investigations.html)  
+11/18: Multiple MDMR Initial Proposal [Slides](Multiple MDMR/11-18-20/Multiple-MDMR-Proposal.html)
 
 # Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
