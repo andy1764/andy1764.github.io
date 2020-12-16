@@ -1,0 +1,15 @@
+base
+magrittr
+MDMR
+permute
+lattice
+vegan
+carData
+car
+MASS
+ggplot2
+patchwork
+mvtnorm
+Matrix
+reshape2
+pals
