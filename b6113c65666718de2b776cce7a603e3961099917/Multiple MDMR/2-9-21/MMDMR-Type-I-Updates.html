@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>MMDMR Type I Error and Model Selection</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# MMDMR Type I Error and Model Selection
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 70%}
+.tiny{font-size: 60%}
+.bottomright {
+  position: absolute;
+  top: 66%;
+  left: 61%;
+}
+&lt;/style&gt;
+
+## Multiple MDMR (working title)
+Let `\(D_1, D_2, \ldots, D_m\)` be `\(n \times n\)` distance matrices obtained on the same subjects and `\(X\)` be a full-rank `\(n \times p\)` design matrix
+
+
+1. First, use MDS to obtain `\(m\)` sets of coordinates `\(Z_1, Z_2, \ldots, Z_m\)`
+2. Then concatenate these into an `\(n \times mn\)` matrix `\(Z = \begin{bmatrix} Z_1 &amp; Z_2 &amp; \cdots &amp; Z_m \end{bmatrix}\)`
+3. We then regress `\(Z\)` on `\(X\)` using multivariate multiple regression (MMR)
+4. Inference can be achieved through the sums of squares and cross products (SSCP) error `\(\text{SSCP}_E = Z^T (I-H) Z\)` and regression
+`$$\text{SSCP}_R = Z^T H Z = \begin{bmatrix} 
+Z_1^T H Z_1 &amp; Z_1^T H Z_2 &amp; \cdots &amp; Z_1^T H Z_m\\
+Z_2^T H Z_1 &amp; Z_2^T H Z_2 &amp; \cdots &amp; Z_2^T H Z_m\\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\
+Z_m^T H Z_1 &amp; Z_m^T H Z_2 &amp; \cdots &amp; Z_m^T H Z_m\\
+\end{bmatrix}$$`
+5. Several test statistics including Pillai's trace are based on these SSCP matrices&lt;sup&gt;1&lt;/sup&gt; and can be evaluated using permutation testing or possibly through `\(F\)` approximations (requires derivation)
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Lecture notes by Helwig, 2017](http://users.stat.umn.edu/~helwig/notes/mvlr-Notes.pdf)
+]
+---
+
+## High-dimensional MMR
+- For high dimensional settings where `\(\hat{E}\)` is not necessarily invertible, many solutions have been proposed and generally fall into four major categories:
+
+
+- **Alternative test statistics**
+    - Dempster's trace&lt;sup&gt;1&lt;/sup&gt;: `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H})/\tr(\hat{E})\)`
+    - Schott's test statistic&lt;sup&gt;2&lt;/sup&gt;: `\(\DeclareMathOperator{\tr}{tr} \sqrt{n-1} [\tr(\hat{H})/p - \tr(\hat{E})/(n-p-1)]\)`
+- **PCA regression**&lt;sup&gt;3&lt;/sup&gt;
+- **Generalized inverse**&lt;sup&gt;4&lt;/sup&gt;
+    - Take Moore-Penrose inverse instead of matrix inverse
+- **Regularization**
+    - Both ridge&lt;sup&gt;5&lt;/sup&gt; and LASSO&lt;sup&gt;6&lt;/sup&gt; have been used to obtain regularized estimates `\(\tilde{E}\)`
+    
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Fujikoshi et al., 2004](https://doi.org/10.14490/jjss.34.19)
+&amp;emsp; [&lt;sup&gt;2&lt;/sup&gt;Schott, 2007](https://doi.org/10.1016/j.jmva.2006.11.007)
+&amp;emsp; [&lt;sup&gt;3&lt;/sup&gt;Tomfohr et al., 2005](https://doi.org/10.1186/1471-2105-6-225)
+&amp;emsp; [&lt;sup&gt;4&lt;/sup&gt;Srivastava and Fujikoshi, 2006](https://doi.org/10.1016/j.jmva.2005.08.010)
+&amp;emsp; [&lt;sup&gt;5&lt;/sup&gt;Warton, 2008](https://doi.org/10.1198/016214508000000021)
+&amp;emsp; [&lt;sup&gt;6&lt;/sup&gt;Ullah and Jones, 2015](https://doi.org/10.1109/CVPR.2005.445)
+]
+---
+class: center, middle, divider
+# Dempster's trace
+---
+## Dempster's trace
+- Similar in spirit to the original MDMR method
+`$$\DeclareMathOperator{\tr}{tr} F_{\text{MDMR}} = \frac{\tr(Z_1^THZ_1)}{\tr[Z_1^T(I-H)Z_1]}$$`
+- Applying Dempster's trace to this regression setting yields a Psuedo-F statistic
+`$$\DeclareMathOperator{\tr}{tr} F_{\text{D}} = \frac{\tr(Z^THZ)}{\tr[Z^T(I-H)Z]} = \frac{\sum_{j=1}^m \tr(Z_j^THZ_j)}{\sum_{j=1}^m \tr[Z_j^T(I-H)Z_j]}$$`
+---
+
+## Asymptotic property investigation
+- McArtor et al. (2017) derived the asymptotic null distribution for `\(F_{\text{MDMR}}\)` in several steps:
+    1. Eigendecomposed `\(G = \sum_{k=1}^n \lambda_k \phi_k\phi_k^T\)` and noted that `\(\phi_k\)` are "asymptotically normally distributed because they are linear combinations of the elements of `\(G\)`, which are *iid* if the rows of `\(Y\)` are *iid*"
+        - This result has not been validated in any other papers
+        - Li et al. (2019) prove that the MDS points are asymptotically normally distributed for Euclidean distances under certain error models (unpublished results)
+    2. Regressed the `\(k\)` eigenvectors (treating each of the `\(n\)` elements as samples) on `\(X\)` to yield the fitted values `\(u_k = H\phi_k\)` and residuals `\(r_k = (I-H)\phi_k\)`
+    3. Rewrote the test statistic as
+    `$$F_{\text{MDMR}} = \frac{\tr(HGH)}{\tr[(I-H)G(I-H)]}=\frac{\sum_{k=1}^n \lambda_k u_k^T u_k}{\sum_{k=1}^n \lambda_k r_k^T r_k}$$`
+    4. Since `\(u_k^T u_k \xrightarrow{d} \chi^2_p\)` and `\(r_k^T r_k \xrightarrow{d} \chi^2_{n-p-1}\)` and all `\(u_k\)` and `\(r_k\)` are pairwise independent, `\(F_{\text{MDMR}}\)` is "asymptotically distributed as a weighted sum of `\(n\)` independent `\(\chi^2(p)\)` variables divided by a weighted sum of n independent `\(\chi^2(n-p-1)\)` variables"
+
+
+.footnote[
+[McArtor et al., 2017](https://doi.org/10.1007/s11336-016-9527-8) &amp;emsp;
+[Li et al., 2019](http://arxiv.org/abs/1804.00631)
+]
+---
+
+## Dempster's trace challenges
+- The test statistic and asymptotic distribution both depend on eigenvalues of each dissimilarity matrix `\(G_j\)` and can be dominated by matrices with a larger trace
+    - Still remains an open question of how to optimally rescale these matrices
+- Several possible solutions
+    1. Divide each `\(G_j\)` by their top eigenvalue `\(\lambda_{j1}\)`
+    2. Scale by the sum of eigenvalues `\(\DeclareMathOperator{\tr}{tr} \tr G_j\)`
+    3. Set the sample distance variance `\(V = \frac{1}{n^2} \sum_{k,l} G_{k,l}^2\)` of each `\(G_j\)` equal to 1
+    
+    
+--
+
+- Asymptotically, we now have chi-squared random variables that are not necessarily independent of one another
+    - Sum of weighted dependent `\(\chi^2\)` has been investigated with some approximations derived&lt;sup&gt;1&lt;/sup&gt;
+    - Also depends on the relative magnitude of eigenvalues from each `\(G_j\)`
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Chuang and Shih, 2012](https://doi.org/10.1016/j.jspi.2011.08.004)
+]
+---
+
+## Proposed test statistics
+- Denote `\(\hat{E} = Z(I-H)Z\)` as the SSCP error matrix and `\(\hat{H}\)` as the hypothesis SSCP matrix
+- After applying PCA to obtain the `\(n \times (n-p-1)\)` score matrix, denote `\(\hat{E}_{PC}\)` and `\(\hat{H}_{PC}\)` the associated SSCP error matrix and hypothesis SSCP matrix
+    - PCA is applied after dividing the Gower's matrices `\(G_1, G_2, \ldots, G_m\)` by their top eigenvalue&lt;sup&gt;1&lt;/sup&gt;
+
+
+| Statistic            | Equation
+|:---------------------|----------
+| Psuedo-F (Dempster's)| `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H})/\tr(\hat{E})\)`
+| Top PCs              | `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H}_{PC}(\hat{E}_{PC}+\hat{H}_{PC})^{-1})\)`
+| Generalized inverse  | `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H}(\hat{E}+\hat{H})^+)\)`
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Abdi et al., 2005](https://doi.org/10.1109/CVPR.2005.445)
+]
+
+---
+class: center, middle, divider
+# Simulation results
+---
+
+## Proposed simulation settings
+- Let `\(n\)` be the number of subjects, `\(m\)` be the number of feature sets, and `\(q_j\)` be the number of features within each set indexed by `\(j\)`
+    - We generate separate feature sets via `\(Y_j \sim N(0, \Sigma_j)\)`, where `\(\Sigma_j\)` may vary to simulate feature sets with different scales and covariance structures
+    - Simple continuous and binary covariates can induce mean/variance shifts
+    
+    
+- Potential simulation settings could vary across the following
+    - Magnitude of covariate-induced shifts in mean/variance
+    - Differences in variability within feature sets
+    - Dependence among feature sets (possibly not as important)
+    
+    
+- We now compare three methods
+    - Traditional MMR (for `\(nq \leq n-2\)`)
+    - Separate MDMRs
+    - Psuedo-F statistic (Dempster's trace)
+        - With various scaling options
+---
+
+## Previous simulation settings
+- Let `\(n\)` be the number of subjects, `\(m\)` be the number of feature sets, and `\(q\)` be the number of features within each set
+    - To generate separate feature sets with dependencies, we simulate `\(m\times q\)` dimensional features `\(Y \sim N(0, \Sigma)\)`, then split them evenly into `\(Y_1, Y_2, \ldots, Y_m\)`
+    - A simple binary covariate `\(x \sim \text{Bernoulli}\,(1/2)\)` induces shifts along PC axes of `\(\Sigma\)`, `\(\sum_{k \in K} \gamma\boldsymbol{\phi}_k\)`, where `\(K\)` is selected depending on the setting
+--
+
+
+- For each simulation settings, we conduct 1000 simulations
+    - `\(999\)` permutations to compute `\(p\)`-values
+    - `\(\rho = 0.25, 0.75\)`: low or high correlation of `\(\Sigma\)`
+    - AR(1) or between correlations, other structures for `\(\Sigma\)`
+    - `\(m = 2, 3, 10\)`: varying number of feature sets
+    - `\(q = 5, 10, 15, 20, 25, 50, 100, 200\)`: potentially high dimensional features
+--
+- **Simple effects**
+    - `\(K = 1\)` and `\(\gamma = 3\)`
+    - 25% of PCs and `\(\gamma = 0.7\)`
+- **Complex effects**
+    - 50% of PCs and `\(\gamma = 0.5\)`
+    - `\(K = mq\)` and `\(\gamma = 0.15\)`
+---
+
+## 2 Feature sets, type I error
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## 2 Feature sets, exchangeable correlation
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## 2 Feature sets, exchangeable correlation
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## 2 Feature sets, other structures
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-5-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## 2 Feature sets, other structures
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## 3 Feature sets, exchangeable correlation
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## 3 Feature sets, exchangeable correlation
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-8-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## 3 Feature sets, other structures
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-9-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## 3 Feature sets, other structures
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## 10 Feature sets, exchangeable correlation
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-11-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## 10 Feature sets, exchangeable correlation
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-12-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle, divider
+# Real data examples
+---
+
+## Philadelphia Neurodevelopmental Cohort connectivity sample
+- Sample of 727 youths aged 8 to 23 years with structural connectivity (SC) measurements and functional connectivity (FC) measurements
+- Repeatedly subsampled subjects from the full PNC sample
+- Each connectivity observation contains 79800 distinct elements
+
+.center[
+[![:scale 40%](images/F3.large.jpg)](https://www.pnas.org/content/117/1/771.full#sec-9)  
+.small[[Fig. 3 from Baum et al., 2020](https://doi.org/10.1073/pnas.1912034117)]
+]
+
+.footnote[
+Data provided by Ted Satterthwaite and Azeez Adebimpe
+]
+---
+
+## Testing association with age
+- In each model, we control for relevant quality metrics and sex
+
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Testing association with sex
+- In each model, we control for relevant quality metrics and age
+
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-14-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+---
+
+## Psuedo type I error evaluation
+- For each analysis, we do not expect associations with irrelevant quality metrics
+    - e.g. regressing n-back FC and SC on rsfMRI scan motion
+
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-15-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+---
+
+## PNC cortical thickness and sulcal depth
+- Sample of 912 youths aged 8 to 22 years with cortical thickness and sulcal depth measurements on 20486 ROIs (10243 in each hemisphere)
+
+- Correlation among these features across subjects is lower than expected
+
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-16-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+Data provided by Ted Satterthwaite and Sarah Weinstein
+]
+---
+
+## Cortical thickness and sulcal depth power test
+- We regress on age and sex while controlling for the other
+
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-17-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle, divider
+# Model selection ideas
+---
+
+## Potential data-driven approaches
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Cai and Jiang, 2011](https://doi.org/10.1214/11-AOS879)
+&amp;emsp; [&lt;sup&gt;2&lt;/sup&gt;Lan et al., 2015](https://doi.org/10.1080/07350015.2014.923317)
+]
+
+- To decide on Dempster's trace versus PC test statistics, could use existing tests for diagonality&lt;sup&gt;1,2&lt;/sup&gt;
+    - Initial trials suggest that these tests are too sensitive due to independence of MDS axes
+
+
+--
+- In other methods, number of PCs often selected via inspection of the scree plot
+- Could design a simple metric such as variation explained per additional parameter
+- Methods repeatedly testing each additional PC may suffer from multiple comparisons issues
+---
+
+## Low correlation simulation
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-18-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+---
+
+## AR(1) simulation
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+---
+
+## PNC nback FC and SC
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-20-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+---
+
+## PNC cortical thickness and sulcal depth
+&lt;img src="MMDMR-Type-I-Updates_files/figure-html/unnamed-chunk-21-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

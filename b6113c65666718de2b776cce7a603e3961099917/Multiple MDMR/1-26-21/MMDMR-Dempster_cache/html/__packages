@@ -1,0 +1,16 @@
+base
+magrittr
+mvtnorm
+MASS
+Matrix
+MDMR
+ggplot2
+reshape2
+data.table
+patchwork
+parallelDist
+freesurferformats
+qdapDictionaries
+qdapRegex
+qdapTools
+RColorBrewer

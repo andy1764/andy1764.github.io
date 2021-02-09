@@ -1,0 +1,388 @@
+---
+title: "Multiple MDMR: Test statistic investigation <html><div style='float:center'></div><hr color='#82bbdc' size=2em width=100%></html>"
+pagetitle: "Multiple MDMR: Test statistic investigation"
+author:
+  - Andrew Chen
+  - Advised by Haochang Shou and Taki Shinohara
+output:
+  xaringan::moon_reader:
+    css: ["PennSIVE-theme-wide.css"]
+    nature:
+      ratio: "16:9"
+      beforeInit: "macros.js"
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
+header_includes:
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  dev = "png",
+  fig.retina = 2,
+  # dev.args=list(bg="transparent"), # transparent plot backgrounds
+  fig.height = 7,
+  fig.width = 7,
+  out.width = "100%",
+  cache = FALSE,
+  warning = FALSE,
+  message = FALSE
+)
+
+options("kableExtra.html.bsTable" = T)
+options(knitr.kable.NA = '',
+        digits = 3)
+
+library(ggplot2)
+library(patchwork)
+library(MDMR)
+library(reshape2)
+
+load("results/explore_dists.Rdata")
+load("results/sim_plots.Rdata")
+plots_high <- plots$`25_high_corr`
+plots_low <- plots$`25_low_corr`
+
+fc_mdmr_p <- cbind(print(fc_mdmr_25), print(fc_mdmr))
+sc_mdmr_p <- cbind(print(sc_mdmr_25), print(sc_mdmr))
+```
+
+```{r plot_fx, include=FALSE, cache=FALSE}
+wong_colors <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+plot_mat <- function(cov, lims = c(-max(abs(cov_melt$value)), max(abs(cov_melt$value)))) {
+  cov_melt <- melt(cov)
+  ggplot(data = cov_melt, aes(x=Var1, y=Var2, fill=value)) + 
+    geom_tile() + 
+    scale_fill_gradientn(
+      colours = c(wong_colors[6], "white", wong_colors[5]), 
+      limits = lims) +
+    labs(fill = "") + 
+    theme_classic() +
+    theme(axis.line = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank())
+}
+
+gghist <- function(input) {
+  df <- data.frame(x = c(input))
+  ggplot(df, aes(x = x)) + geom_histogram(color = "black", fill = "white") + theme_minimal()
+}
+```
+
+```{css}
+.medium{font-size: 85%}
+.small{font-size: 70%}
+.tiny{font-size: 60%}
+.bottomright {
+  position: absolute;
+  top: 66%;
+  left: 61%;
+}
+```
+
+## Multiple MDMR (working title)
+Let $D_1, D_2, \ldots, D_m$ be $n \times n$ distance matrices obtained on the same subjects and $X$ be a full-rank $n \times p$ design matrix
+
+
+1. First, use MDS to obtain $m$ sets of coordinates $Z_1, Z_2, \ldots, Z_m$
+2. Then concatenate these into an $n \times mn$ matrix $Z = \begin{bmatrix} Z_1 & Z_2 & \cdots & Z_m \end{bmatrix}$
+3. We then regress $Z$ on $X$ using multivariate multiple regression (MMR)
+4. Inference can be achieved through the sums of squares and cross products (SSCP) error $\text{SSCP}_E = Z^T (I-H) Z$ and regression
+$$\text{SSCP}_R = Z^T H Z = \begin{bmatrix} 
+Z_1^T H Z_1 & Z_1^T H Z_2 & \cdots & Z_1^T H Z_m\\
+Z_2^T H Z_1 & Z_2^T H Z_2 & \cdots & Z_2^T H Z_m\\
+\vdots & \vdots & \ddots & \vdots\\
+Z_m^T H Z_1 & Z_m^T H Z_2 & \cdots & Z_m^T H Z_m\\
+\end{bmatrix}$$
+5. Several test statistics including Pillai's trace are based on these SSCP matrices<sup>1</sup> and can be evaluated using permutation testing or possibly through $F$ approximations (requires derivation)
+
+.footnote[
+[<sup>1</sup>Lecture notes by Helwig, 2017](http://users.stat.umn.edu/~helwig/notes/mvlr-Notes.pdf)
+]
+---
+
+## Issue with current formulation
+.footnote[
+[<sup>1</sup>Abdi et al., 2005](https://doi.org/10.1109/CVPR.2005.445)
+]
+
+- Denote $\hat{E}$ as the SSCP error matrix and $\hat{H}$ as the hypothesis SSCP matrix. In classical MMR, the standard test statistics are:  
+    - Wilk's lambda: $\lvert \hat{E} \rvert/\lvert \hat{E} + \hat{H} \rvert$
+    - Pillai's trace: $\DeclareMathOperator{\tr}{tr} \tr(\hat{H}(\hat{E}+\hat{H})^{-1})$
+    - Lawley-Hotelling trace: $\DeclareMathOperator{\tr}{tr} \tr(\hat{H}\hat{E}^{-1})$
+    
+
+- If the error df is less than the number of MDS axes $n-p-1 < nm$, $\hat{E}$ is not full-rank and standard test statistics cannot be calculated
+---
+
+## High-dimensional MMR
+- For high dimensional settings where $\hat{E}$ is not necessarily invertible, many solutions have been proposed and generally fall into four major categories:
+
+
+- **Alternative test statistics**
+    - Dempster's trace<sup>1</sup>: $\DeclareMathOperator{\tr}{tr} \tr(\hat{H})/\tr(\hat{E})$
+    - Schott's test statistic<sup>2</sup>: $\DeclareMathOperator{\tr}{tr} \sqrt{n-1} [\tr(\hat{H})/p - \tr(\hat{E})/(n-p-1)]$
+- **PCA regression**<sup>3</sup>
+- **Generalized inverse**<sup>4</sup>
+    - Take Moore-Penrose inverse instead of matrix inverse
+- **Regularization**
+    - Both ridge<sup>5</sup> and LASSO<sup>6</sup> have been used to obtain regularized estimates $\tilde{E}$
+    
+.footnote[
+[<sup>1</sup>Fujikoshi et al., 2004](https://doi.org/10.14490/jjss.34.19)
+&emsp; [<sup>2</sup>Schott, 2007](https://doi.org/10.1016/j.jmva.2006.11.007)
+&emsp; [<sup>3</sup>Tomfohr et al., 2005](https://doi.org/10.1186/1471-2105-6-225)
+&emsp; [<sup>4</sup>Srivastava and Fujikoshi, 2006](https://doi.org/10.1016/j.jmva.2005.08.010)
+&emsp; [<sup>5</sup>Warton, 2008](https://doi.org/10.1198/016214508000000021)
+&emsp; [<sup>6</sup>Ullah and Jones, 2015](https://doi.org/10.1109/CVPR.2005.445)
+]
+---
+.center[
+![:scale 58%](images/anzs12126-fig-0003-m.jpg)  
+.small[Fig. 2, AR(1) covariance structure, $n = 20$]
+]
+
+.footnote[
+[Ullah and Jones, 2015](https://doi.org/10.1111/anzs.12126)
+]
+---
+.center[
+![:scale 58%](images/anzs12126-fig-0002-m.jpg)  
+.small[Fig. 3, exchangable covariance structure, $n = 20$]
+]
+
+.footnote[
+[Ullah and Jones, 2015](https://doi.org/10.1111/anzs.12126)
+]
+---
+
+## Proposed test statistics
+- Denote $\hat{E} = Z(I-H)Z$ as the SSCP error matrix and $\hat{H}$ as the hypothesis SSCP matrix
+- After applying PCA to obtain the $n \times (n-p-1)$ score matrix, denote $\hat{E}_{PC}$ and $\hat{H}_{PC}$ the associated SSCP error matrix and hypothesis SSCP matrix
+    - PCA is applied after dividing the Gower's matrices $G_1, G_2, \ldots, G_m$ by their top eigenvalue<sup>1</sup>
+
+
+| Statistic            | Equation
+|:---------------------|----------
+| Psuedo-F (Dempster's)| $\DeclareMathOperator{\tr}{tr} \tr(\hat{H})/\tr(\hat{E})$
+| Top PCs              | $\DeclareMathOperator{\tr}{tr} \tr(\hat{H}_{PC}(\hat{E}_{PC}+\hat{H}_{PC})^{-1})$
+| Generalized inverse  | $\DeclareMathOperator{\tr}{tr} \tr(\hat{H}(\hat{E}+\hat{H})^+)$
+
+.footnote[
+[<sup>1</sup>Abdi et al., 2005](https://doi.org/10.1109/CVPR.2005.445)
+]
+---
+
+## Simulation design
+.footnote[
+[<sup>1</sup>Warton, 2008](https://doi.org/10.1198/016214508000000021)
+&emsp; [<sup>2</sup>Ullah and Jones, 2015](https://doi.org/10.1109/CVPR.2005.445)
+]
+
+- Following previous simulations<sup>1,2</sup>, we generate data from multivariate normal (MVN) distributions with exchangeable correlation structures $\Sigma$
+    - Covariate effect simulated by shift in PC directions
+
+
+- We start by comparing five methods
+    - Traditional MMR (for $nq \leq n-2$)
+    - Separate MDMRs
+    - Psuedo-F statistic (Dempster's trace)
+    - Pillai's trace using top PCs
+    - Pillai's trace using generalized inverse
+    
+
+- We hypothesize that simultaneous multiple MDMR test statistics should outperform in settings with higher correlation between feature sets
+    - Separate MDMRs likely perform similar or better in lower correlation settings
+- In lower-dimensional settings, traditional MMR would likely have reasonably high power
+---
+
+## Simulation settings
+- Let $n$ be the number of subjects, $m$ be the number of feature sets, and $q$ be the number of features within each set
+    - To generate separate feature sets with dependencies, we simulate $m\times q$ dimensional features $Y \sim N(0, \Sigma)$, then split them evenly into $Y_1, Y_2, \ldots, Y_m$
+    - A simple binary covariate $x \sim \text{Bernoulli}\,(1/2)$ induces shifts along PC axes of $\Sigma$, $\sum_{k \in K} \gamma\boldsymbol{\phi}_k$, where $K$ is selected depending on the setting
+--
+
+
+- For each simulation settings, we conduct 1000 simulations
+    - $999$ permutations to compute $p$-values
+    - $\rho = 0.25, 0.75$: low or high correlation of $\Sigma$
+    - $m = 2, 3, 5, 10$: varying number of feature sets
+    - $q = 5, 10, 50, 100$: potentially high dimensional features
+--
+- **Simple effects**
+    - $K = 1$ and $\gamma = 3$
+    - $K = 2$ and $\gamma = 1.5$
+- **Complex effects**
+    - $K = 5$ and $\gamma = 0.6$
+    - $K = 10$ and $\gamma = 0.5$
+    - $K = mq$ and $\gamma = 0.15$
+---
+
+## 2 Feature sets, Simple effect
+```{r, fig.width=10, fig.height=6.5, fig.align="center", out.width="80%"}
+(plots_low$`2_1` + labs(title = "Low Correlation, First PC") + 
+   plots_high$`2_1` + labs(title = "High Correlation, First PC")) /
+  (plots_low$`2_2` + labs(title = "Low Correlation, First 2 PCs") +
+     plots_high$`2_2` + labs(title = "High Correlation, First 2 PCs")) /
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+---
+
+## 2 Feature sets, Complex effect
+```{r, fig.width=10, fig.height=6.5, fig.align="center", out.width="80%"}
+  (plots_low$`2_5` + labs(title = "Low Correlation, First 5 PCs") +
+     plots_high$`2_5` + labs(title = "High Correlation, First 5 PCs")) /
+  (plots_low$`2_10` + labs(title = "Low Correlation, First 10 PCs") +
+     plots_high$`2_10` + labs(title = "High Correlation, First 10 PCs")) /
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+---
+
+## 2 Feature sets, All PCs
+```{r, fig.width=10, fig.height=6.5, fig.align="center", out.width="80%"}
+  (plots_low$`2_all` + labs(title = "Low Correlation, All PCs") +
+     plots_high$`2_all` + labs(title = "High Correlation, All PCs")) +
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+---
+
+## 3 Feature sets, Simple effect
+```{r, fig.width=10, fig.height=6.5, fig.align="center", out.width="80%"}
+(plots_low$`3_1` + labs(title = "Low Correlation, First PC") + 
+   plots_high$`3_1` + labs(title = "High Correlation, First PC")) /
+    (plots_low$`3_2` + labs(title = "Low Correlation, First 2 PCs") +
+     plots_high$`3_2` + labs(title = "High Correlation, First 2 PCs")) /
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+---
+
+## 3 Feature sets, Complex effect
+```{r, fig.width=10, fig.height=6.5, fig.align="center", out.width="80%"}
+  (plots_low$`3_5` + labs(title = "Low Correlation, First 5 PCs") +
+     plots_high$`3_5` + labs(title = "High Correlation, First 5 PCs")) /
+  (plots_low$`3_10` + labs(title = "Low Correlation, First 10 PCs") +
+     plots_high$`3_10` + labs(title = "High Correlation, First 10 PCs")) +
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+---
+
+## 3 Feature sets, All PCs
+```{r, fig.width=10, fig.height=6.5, fig.align="center", out.width="80%"}
+  (plots_low$`3_all` + labs(title = "Low Correlation, All PCs") +
+     plots_high$`3_all` + labs(title = "High Correlation, All PCs")) + 
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+---
+class: center, middle, divider
+# Proposed real data examples
+---
+
+## Philadelphia Neurodevelopmental Cohort connectivity sample
+- Sample of 727 youths aged 8 to 23 years with structural connectivity (SC) measurements and functional connectivity (FC) measurements
+- Analyzed in recent work on structure-function coupling which identified connections with age, controlling for sex and motion
+&nbsp;
+
+.center[
+[![:scale 40%](images/F3.large.jpg)](https://www.pnas.org/content/117/1/771.full#sec-9)  
+.small[[Fig. 3 from Baum et al., 2020](https://doi.org/10.1073/pnas.1912034117)]
+]
+
+.footnote[
+Data provided by Ted Satterthwaite and Azeez Adebimpe
+]
+---
+
+## Initial MDMR power tests
+- Repeatedly subsampled subjects from the full PNC sample
+- Each connectivity observation contains 79800 distinct elements
+
+.center[Structural connectivity MDMR]
+```{r, message = FALSE, fig.align="center", out.width = "80%", fig.width = 10, fig.height = 4}
+load("results/coupling_plots.Rdata")
+
+plots$`m=2` + labs(title = "n-backFC and SC") + 
+  plots$`m=4` + labs(title = "n-backFC and rsFC") + 
+  plots$`m=3` + labs(title = "n-backFC, rsFC, and SC") +
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+---
+
+## Exploring MDS axes
+```{r, message = FALSE, fig.align="center", out.width = "60%", fig.width = 5, fig.height = 4}
+load("results/coupling_sample_50.Rdata")
+n <- 50
+corl <- cor(res[[3]]$E)
+limnod <- max(abs(corl - diag(diag(corl))))
+
+plot_mat(corl)
+```
+---
+
+## Exploring MDS axes
+```{r, message = FALSE, fig.align="center", out.width = "80%", fig.width = 9, fig.height = 3}
+plot_mat(corl[1:n, (n+1):(2*n)], lims = c(-limnod, limnod)) + labs(title = "n-backFC and SC") + 
+  plot_mat(corl[1:n, (2*n+1):(3*n)], lims = c(-limnod, limnod)) + labs(title = "n-backFC and rsFC") + 
+  plot_mat(corl[(n+1):(2*n), (2*n+1):(3*n)], lims = c(-limnod, limnod)) + labs(title = "rsFC and SC") +
+  plot_layout(guides = "collect") & theme(legend.position = 'right')
+
+gghist(corl[1:n, (n+1):(2*n)]) + labs(title = "n-backFC and SC") + 
+  gghist(corl[1:n, (2*n+1):(3*n)]) + labs(title = "n-backFC and rsFC") + 
+  gghist(corl[(n+1):(2*n), (2*n+1):(3*n)]) + labs(title = "rsFC and SC") +
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+---
+
+## PNC cortical thickness and sulcal depth
+- Sample of 912 youths aged 8 to 22 years with cortical thickness and sulcal depth measurements on 20486 ROIs (10243 in each hemisphere)
+
+- We expect high correlation between these features; checking correlation between features within each subject yields the following histogram
+
+```{r, message = FALSE, fig.align="center", out.width = "35%", fig.width = 5, fig.height = 4}
+load("results/cort_sulc_subj_corr.Rdata")
+
+gghist(subj_corr) + 
+  labs(title = "Cortical thickness and sulcal depth", x = "Correlation", y = "") + 
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+
+.footnote[
+Data provided by Ted Satterthwaite and Sarah Weinstein
+]
+---
+
+## Initial MDMR power tests
+- Repeatedly subsampled subjects from the full PNC sample
+
+.center[Structural connectivity MDMR]
+```{r, message = FALSE, fig.align="center", out.width = "60%", fig.width = 5, fig.height = 4}
+load("results/cort_sulc_plots.Rdata")
+
+plots +
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+---
+
+## Exploring MDS axes
+```{r, message = FALSE, fig.align="center", out.width = "60%", fig.width = 5, fig.height = 4}
+load("results/cort_sulc_sample_50.Rdata")
+n <- 50
+corl <- cor(res$E)
+limnod <- max(abs(corl - diag(diag(corl))))
+
+plot_mat(corl)
+```
+---
+
+## Exploring MDS axes
+```{r, message = FALSE, fig.align="center", out.width = "30%", fig.width = 4, fig.height = 3}
+plot_mat(corl[1:n, (n+1):(2*n)], lims = c(-limnod, limnod)) + labs(title = "Cortical thickness and sulcal depth") +
+  plot_layout(guides = "collect") & theme(legend.position = 'right')
+
+gghist(corl[1:n, (n+1):(2*n)]) + labs(title = "Cortical thickness and sulcal depth") + 
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+````

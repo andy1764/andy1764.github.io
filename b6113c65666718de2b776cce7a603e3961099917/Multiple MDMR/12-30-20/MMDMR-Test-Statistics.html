@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Multiple MDMR: Potential test statistics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Multiple MDMR: Potential test statistics
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 70%}
+.tiny{font-size: 60%}
+.bottomright {
+  position: absolute;
+  top: 66%;
+  left: 61%;
+}
+&lt;/style&gt;
+
+## Multiple MDMR (working title)
+Let `\(D_1, D_2, \ldots, D_m\)` be `\(n \times n\)` distance matrices obtained on the same subjects and `\(X\)` be a full-rank `\(n \times p\)` design matrix
+
+
+1. First, use MDS to obtain `\(m\)` sets of coordinates `\(Z_1, Z_2, \ldots, Z_m\)`
+2. Then concatenate these into an `\(n \times mn\)` matrix `\(Z = \begin{bmatrix} Z_1 &amp; Z_2 &amp; \cdots &amp; Z_m \end{bmatrix}\)`
+3. We then regress `\(Z\)` on `\(X\)` using multivariate multiple regression (MMR)
+4. Inference can be achieved through the sums of squares and cross products (SSCP) error `\(\text{SSCP}_E = Z^T (I-H) Z\)` and regression
+`$$\text{SSCP}_R = Z^T H Z = \begin{bmatrix} 
+Z_1^T H Z_1 &amp; Z_1^T H Z_2 &amp; \cdots &amp; Z_1^T H Z_m\\
+Z_2^T H Z_1 &amp; Z_2^T H Z_2 &amp; \cdots &amp; Z_2^T H Z_m\\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\
+Z_m^T H Z_1 &amp; Z_m^T H Z_2 &amp; \cdots &amp; Z_m^T H Z_m\\
+\end{bmatrix}$$`
+5. Several test statistics including Pillai's trace are based on these SSCP matrices&lt;sup&gt;1&lt;/sup&gt; and can be evaluated using permutation testing or possibly through `\(F\)` approximations (requires derivation)
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Lecture notes by Helwig, 2017](http://users.stat.umn.edu/~helwig/notes/mvlr-Notes.pdf)
+]
+---
+
+## Issue with current formulation
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Abdi et al., 2005](https://doi.org/10.1109/CVPR.2005.445)
+]
+
+- Denote `\(\hat{E}\)` as the SSCP error matrix and `\(\hat{H}\)` as the hypothesis SSCP matrix. In classical MMR, the standard test statistics are:  
+    - Wilk's lambda: `\(\lvert \hat{E} \rvert/\lvert \hat{E} + \hat{H} \rvert\)`
+    - Pillai's trace: `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H}(\hat{E}+\hat{H})^{-1})\)`
+    - Lawley-Hotelling trace: `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H}\hat{E}^{-1})\)`
+    
+
+- If the error df is less than the number of MDS axes `\(n-p-1 &lt; nm\)`, `\(\hat{E}\)` is not full-rank and standard test statistics cannot be calculated
+
+--
+
+
+- We will explore several potential solutions
+    1. Discard lower `\(q\)` MDS axes from each of the `\(m\)` sets of MDS axes to yield `\((n-q)m\)` total axes
+--
+    2. Find common axes via PCA and keep the top `\(n-p-1\)` axes
+        - Similar to how DISTATIS computes a compromise matrix from multiple distance matrices&lt;sup&gt;1&lt;/sup&gt;
+--
+    3. Analogous to MDMR, ignore certain sums of cross products (e.g. replace `\(Z_1^T H Z_1\)` with `\(\DeclareMathOperator{\tr}{tr} \tr(Z_1^T H Z_1)\)` and `\(Z_1^T H Z_2\)` with a chosen summary measure)
+
+---
+
+## High-dimensional MMR
+- For high dimensional settings where `\(\hat{E}\)` is not necessarily invertible, many solutions have been proposed and generally fall into four major categories:
+
+
+- **Alternative test statistics**
+    - Dempster's trace&lt;sup&gt;1&lt;/sup&gt;: `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H})/\tr(\hat{E})\)`
+    - Schott's test statistic&lt;sup&gt;2&lt;/sup&gt;: `\(\DeclareMathOperator{\tr}{tr} \sqrt{n-1} [\tr(\hat{H})/p - \tr(\hat{E})/(n-p-1)]\)`
+- **PCA regression**&lt;sup&gt;3&lt;/sup&gt;
+- **Generalized inverse**&lt;sup&gt;4&lt;/sup&gt;
+    - Take Moore-Penrose inverse instead of matrix inverse
+- **Regularization**
+    - Both ridge&lt;sup&gt;5&lt;/sup&gt; and LASSO&lt;sup&gt;6&lt;/sup&gt; have been used to obtain regularized estimates `\(\tilde{E}\)`
+    
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Fujikoshi et al., 2004](https://doi.org/10.14490/jjss.34.19)
+&amp;emsp; [&lt;sup&gt;2&lt;/sup&gt;Schott, 2007](https://doi.org/10.1016/j.jmva.2006.11.007)
+&amp;emsp; [&lt;sup&gt;3&lt;/sup&gt;Tomfohr et al., 2005](https://doi.org/10.1186/1471-2105-6-225)
+&amp;emsp; [&lt;sup&gt;4&lt;/sup&gt;Srivastava and Fujikoshi, 2006](https://doi.org/10.1016/j.jmva.2005.08.010)
+&amp;emsp; [&lt;sup&gt;5&lt;/sup&gt;Warton, 2008](https://doi.org/10.1198/016214508000000021)
+&amp;emsp; [&lt;sup&gt;6&lt;/sup&gt;Ullah and Jones, 2015](https://doi.org/10.1109/CVPR.2005.445)
+]
+---
+.center[
+![:scale 58%](images/anzs12126-fig-0003-m.jpg)  
+.small[Fig. 2, AR(1) covariance structure, `\(n = 20\)`]
+]
+
+.footnote[
+[Ullah and Jones, 2015](https://doi.org/10.1111/anzs.12126)
+]
+---
+.center[
+![:scale 58%](images/anzs12126-fig-0002-m.jpg)  
+.small[Fig. 3, exchangable covariance structure, `\(n = 20\)`]
+]
+
+.footnote[
+[Ullah and Jones, 2015](https://doi.org/10.1111/anzs.12126)
+]
+---
+
+## Proposed test statistics
+- Denote `\(\hat{E} = Z(I-H)Z\)` as the SSCP error matrix and `\(\hat{H}\)` as the hypothesis SSCP matrix
+- After applying PCA to obtain the `\(n \times (n-p-1)\)` score matrix, denote `\(\hat{E}_{PC}\)` and `\(\hat{H}_{PC}\)` the associated SSCP error matrix and hypothesis SSCP matrix
+    - PCA is applied after dividing the Gower's matrices `\(G_1, G_2, \ldots, G_m\)` by their top eigenvalue&lt;sup&gt;1&lt;/sup&gt;
+
+
+| Statistic            | Equation
+|:---------------------|----------
+| Psuedo-F (Dempster's)| `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H})/\tr(\hat{E})\)`
+| Top PCs              | `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H}_{PC}(\hat{E}_{PC}+\hat{H}_{PC})^{-1})\)`
+| Generalized inverse  | `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H}(\hat{E}+\hat{H})^+)\)`
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Abdi et al., 2005](https://doi.org/10.1109/CVPR.2005.445)
+]
+---
+
+## Simulation design
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Warton, 2008](https://doi.org/10.1198/016214508000000021)
+&amp;emsp; [&lt;sup&gt;2&lt;/sup&gt;Ullah and Jones, 2015](https://doi.org/10.1109/CVPR.2005.445)
+]
+
+- Following previous simulations&lt;sup&gt;1,2&lt;/sup&gt;, we generate data from multivariate normal (MVN) distributions with exchangeable correlation structures `\(\Sigma\)`
+    - Covariate effect simulated by shift in PC directions
+
+
+- We start by comparing four methods
+    - Traditional MMR (for `\(nq \leq n-2\)`)
+    - Separate MDMRs
+    - Psuedo-F statistic (Dempster's trace)
+    - Pillai's trace using top PCs
+    - Pillai's trace using generalized inverse
+    
+
+- We hypothesize that simultaneous multiple MDMR test statistics should outperform in settings with higher correlation between feature sets
+    - Separate MDMRs likely perform similar or better in lower correlation settings
+- In lower-dimensional settings, traditional MMR would likely have reasonably high power
+---
+
+## Simulation settings
+- Let `\(n\)` be the number of subjects, `\(m\)` be the number of feature sets, and `\(q\)` be the number of features within each set
+    - To generate separate feature sets with dependencies, we simulate `\(m\times q\)` dimensional features `\(Y \sim N(0, \Sigma)\)`, then split them evenly into `\(Y_1, Y_2, \ldots, Y_m\)`
+    - A simple binary covariate `\(x \sim \text{Bernoulli}\,(1/2)\)` induces shifts along PC axes of `\(\Sigma\)`, `\(\sum_{k \in K} \gamma\boldsymbol{\phi}_k\)`, where `\(K\)` is selected depending on the setting
+--
+
+
+- We fix the following:
+    - `\(1000\)` simulations per setting
+    - `\(999\)` permutations to compute `\(p\)`-values
+    - `\(n = 25\)`: small sample size
+    - `\(\gamma = 3\)` for first PC shift, `\(\gamma = 1/2\)` for all PC shift
+- We vary the following parameters:
+    - `\(\rho = 0.25, 0.75\)`: low or high correlation of `\(\Sigma\)`
+    - `\(K\)`: selected PC axes shifted by `\(\gamma\)`
+    - `\(m = 2, 3, 5, 10\)`: varying number of feature sets
+    - `\(q = 5, 10, 50, 100\)`: potentially high dimensional features
+---
+
+## `\(m = 2\)` results
+&lt;img src="MMDMR-Test-Statistics_files/figure-html/unnamed-chunk-2-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## `\(m = 3\)` results
+&lt;img src="MMDMR-Test-Statistics_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## `\(m = 5\)` results
+&lt;img src="MMDMR-Test-Statistics_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+class: center, middle, divider
+# Proposed real data example
+---
+
+## Philadelphia Neurodevelopmental Cohort sample
+- Sample of 727 youths aged 8 to 23 years with structural connectivity (SC) measurements and functional connectivity (FC) measurements (during an *n*-back working memory task)
+
+- Analyzed in recent work on structure-function coupling which identified connections with age, controlling for sex and motion
+&amp;nbsp;
+
+.center[
+[![:scale 40%](images/F3.large.jpg)](https://www.pnas.org/content/117/1/771.full#sec-9)  
+.small[[Fig. 3 from Baum et al., 2020](https://doi.org/10.1073/pnas.1912034117)]
+]
+
+.footnote[
+Data provided by Ted Satterthwaite and Azeez Adebimpe
+]
+---
+
+## Distances exploration
+&lt;img src="MMDMR-Test-Statistics_files/figure-html/unnamed-chunk-5-1.png" width="100%" /&gt;
+
+- Mantel test suggests no significant correlation between the distance matrices `\((p = 0.54)\)`
+---
+
+## Initial MDMR power tests
+- Repeatedly subsampled subjects from the full PNC sample
+- Each connectivity observation contains 79800 distinct elements
+
+.center[Structural connectivity MDMR]
+&lt;img src="MMDMR-Test-Statistics_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

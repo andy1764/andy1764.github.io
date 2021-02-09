@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Developing novel methods for simultaneous inference on multiple data types</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <link rel="stylesheet" href="PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Developing novel methods for simultaneous inference on multiple data types
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 70%}
+.tiny{font-size: 60%}
+.bottomright {
+  position: absolute;
+  top: 66%;
+  left: 61%;
+}
+&lt;/style&gt;
+
+## Motivation
+.pull-left[
+- Large-scale studies including the [UKBB](https://www.ukbiobank.ac.uk/)&lt;sup&gt;1&lt;/sup&gt; and upcoming [RURAL (Risk Underlying Rural Areas Longitudinal) Cohort Study](https://www.theruralstudy.org/) are increasingly collecting a wide range of data
+
+
+- Dearth of methodologies available for regression of multiple types of outcome data
+]
+.pull-right[
+[![:scale 85%](images/41586_2018_579_Fig1_HTML.webp)](https://www.nature.com/articles/s41586-018-0579-z/figures/1)
+]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Sudlow et al., 2015](https://doi.org/10.1371/journal.pmed.1001779)
+]
+---
+
+## Motivation
+- Incorporation of multiple imaging modalities shown to improve multiple sclerosis lesion detection&lt;sup&gt;1&lt;/sup&gt; and reveal developmental patterns&lt;sup&gt;2&lt;/sup&gt;
+
+- Limited to voxel-level data and structural imaging
+
+.center[[![](images/nihms942093f2.jpg)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6030441/figure/F2/)]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Valcarcel et al., 2018](https://doi.org/10.1111/jon.12506) 
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;Vandekar et al., 2016](https://doi.org/10.1016/j.neuroimage.2016.03.002)
+]
+---
+
+## Distance-based regression methods
+- Regression using only pairwise dissimilarity information between observations `\(y_i\)`, `\(i=1,2,\ldots,n\)`
+- Requires a dissimilarity measure `\(d\)` that can be any semimetric, which has to satisfy
+    - `\(d(y_i, y_j) = d(y_j, y_i)\)` (symmetry)
+    - `\(d(y_i, y_j) \geq 0\)` (nonnegativity)
+    - `\(d(y_i, y_j) = 0\)` if and only if `\(y_i = y_j\)` (identifibility)
+--
+
+
+- Permutational multivariate analysis of variance (PERMANOVA)&lt;sup&gt;1&lt;/sup&gt; tests for differences between `\(K\)` groups using within-group sum of squared distances `\(SS_W\)` and across-group sum of squared distances `\(SS_A\)` via the test statistic
+`$$F_{\text{PERMANOVA}} = \frac{SS_A/(K-1)}{SS_W/(n-K)}$$`
+- Significance tests performed either via permutations or using the asymptotic null distribution&lt;sup&gt;2&lt;/sup&gt;
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Anderson, 2001](https://doi.org/10.1111/j.1442-9993.2001.01070.pp.x)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;Shinohara, Shou, et al., 2020](https://doi.org/10.1111/biom.13123)
+]
+---
+
+## Distance-based regression methods
+- Multivariate distance matrix regression (MDMR) tests for associations with an `\(n\times p\)` design matrix `\(X\)` via the pseudo-F statistic
+`$$\DeclareMathOperator{\tr}{tr} F_{\text{MDMR}} = \frac{\tr(HGH)/(p-1)}{\tr[(I-H)G(I-H)]/(n-p)}$$`
+which can be tested via permutation or through its asymptotic null distribution&lt;sup&gt;2&lt;/sup&gt;
+
+.pull-left[
+.center[
+[![:scale 80%](images/1-s2.0-S1053811914001232-gr3.jpg)](https://doi.org/10.1016/j.neuroimage.2014.02.024)  
+.small[[Fig. 3 from Shehzad et al., 2014](https://doi.org/10.1016/j.neuroimage.2014.02.024)]
+ ]
+]
+.pull-right[
+.center[
+  [![:scale 77%](images/1-s2.0-S1053811911013164-gr4.jpg)](https://doi.org/10.1016/j.neuroimage.2011.11.035)  
+  .small[[Fig. 4 from Alexander-Bloch et al., 2012](https://doi.org/10.1016/j.neuroimage.2011.11.035)]
+ ]
+]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;McArdle and Anderson, 2001](https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282001%29082%5B0290%3AFMMTCD%5D2.0.CO%3B2)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;McArtor et al., 2017](https://doi.org/10.1007/s11336-016-9527-8)
+]
+---
+
+## MDMR intuition
+- Let `\(Y\)` be a `\(n \times q\)` matrix of independent variables and `\(X\)` be a `\(n \times p\)` design matrix
+- The null hypothesis of no effect of covariates can then tested via a psuedo-F statistic
+`$$\DeclareMathOperator{\tr}{tr} 
+\begin{aligned} 
+F &amp;= \frac{\tr(Y^THY)/(p-1)}{\tr[Y^T(I-H)Y]/(n-p)} \\
+  &amp;= \frac{\tr(HYY^TH)/(p-1)}{\tr[(I-H)YY^T(I-H)]/(n-p)}
+\end{aligned}$$`
+- Without direct use of `\(Y\)`, we can still obtain an outer product matrix from the distance matrix via `\(G = -\frac{1}{2}(I - \mathbf{1}\mathbf{1}^T/n)D(I - \mathbf{1}\mathbf{1}^T/n)\)`
+- Substituting `\(G\)` for `\(YY^T\)` we obtain the MDMR test statistic
+`$$\DeclareMathOperator{\tr}{tr} F_{\text{MDMR}} = \frac{\tr(HGH)/(p-1)}{\tr[(I-H)G(I-H)]/(n-p)}$$`
+
+
+.footnote[
+[Gower, 1966](https://doi.org/10.2307/2333639)
+&amp;emsp; [McArdle and Anderson, 2001](https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282001%29082%5B0290%3AFMMTCD%5D2.0.CO%3B2)
+]
+---
+
+## Limitations and potential extensions
+- Current distance-based methods are limited to a single distance matrix
+
+- Combining distance matrices can improve classification performance&lt;sup&gt;1&lt;/sup&gt; but has not been attempted in PERMANOVA or MDMR
+
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Ibba et al., 2010](https://doi.org/10.1109/ICPR.2010.820)
+]
+
+--
+- We aim to extend distance-based methods to handle multiple distance matrices
+    - Enables simultaneous analysis of multiple data types and dissimilarity metrics
+    - Potentially leverages covariance between dissimilarities to detect associations of interest
+---
+
+## Classical multidimensional scaling
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Gower, 1966](https://doi.org/10.2307/2333639)
+&amp;emsp; [&lt;sup&gt;2&lt;/sup&gt;McArtor et al., 2017](https://doi.org/10.1007/s11336-016-9527-8)
+]
+
+- Using the pairwise distances, can we reconstruct points in Euclidean space that preserve distances?
+    - Can we find `\(Z = [z_1, z_2, \ldots, z_n]^T\)` such that `\(\lVert z_i - z_j \rVert = d_{ij}\)`?
+
+--
+
+- The solution&lt;sup&gt;1&lt;/sup&gt; is obtained through eigendecomposition of `\(G = U\Lambda U^T\)` as `\(Z = U\Lambda^{1/2}\)`
+    - First columns of `\(Z\)` best preserve the distances
+
+--
+
+- By noting that `\(G = ZZ^T\)`, MDMR can be thought of as regressing multidimensional scaling (MDS) scores on the predictors&lt;sup&gt;2&lt;/sup&gt;
+`$$\DeclareMathOperator{\tr}{tr} F_{\text{MDMR}} = \frac{\tr(Z^THZ)/(p-1)}{\tr[Z^T(I-H)Z]/(n-p)}$$`
+---
+
+## Regression with distance matrices
+.footnote[
+[Faraway, 2014](https://doi.org/10.1080/02664763.2014.909794)
+]
+
+- JJ Faraway proposes a general regression framework for distance matrices
+
+.center[
+  [![:scale 90%](images/faraway_2014_fig1.png)](https://doi.org/10.1080/02664763.2014.909794)  
+  .small[[Fig. 1 from Faraway, 2014](https://doi.org/10.1080/02664763.2014.909794)]
+ ]
+ 
+ 
+- He does not specify a model but suggests possible options including partial least squares, canonical correlation analysis, and multivariate multiple regression
+
+
+--
+
+- Discusses adding an additional predictor matrix `\(W\)` to `\(Y\)`
+    - Advises against working on their distance matrices (combining `\(D^W\)` and `\(D^Y\)`)
+    - Instead, recommends concatenation of `\(S^W\)` and `\(S^Y\)`
+---
+
+## Multiple MDMR (working title)
+Let `\(D_1, D_2, \ldots, D_m\)` be `\(n \times n\)` distance matrices obtained on the same subjects and `\(X\)` be a full-rank `\(n \times p\)` design matrix
+
+
+1. First, use MDS to obtain `\(m\)` sets of coordinates `\(Z_1, Z_2, \ldots, Z_m\)`
+2. Then concatenate these into an `\(n \times mn\)` matrix `\(Z = \begin{bmatrix} Z_1 &amp; Z_2 &amp; \cdots &amp; Z_m \end{bmatrix}\)`
+3. We then regress `\(Z\)` on `\(X\)` using multivariate multiple regression (MMR)
+4. Inference can be achieved through the sums of squares and cross products (SSCP) error `\(\text{SSCP}_E = Z^T (I-H) Z\)` and regression
+`$$\text{SSCP}_R = Z^T H Z = \begin{bmatrix} 
+Z_1^T H Z_1 &amp; Z_1^T H Z_2 &amp; \cdots &amp; Z_1^T H Z_m\\
+Z_2^T H Z_1 &amp; Z_2^T H Z_2 &amp; \cdots &amp; Z_2^T H Z_m\\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\
+Z_m^T H Z_1 &amp; Z_m^T H Z_2 &amp; \cdots &amp; Z_m^T H Z_m\\
+\end{bmatrix}$$`
+5. Several test statistics including Pillai's trace are based on these SSCP matrices&lt;sup&gt;1&lt;/sup&gt; and can be evaluated using permutation testing or possibly through `\(F\)` approximations (requires derivation)
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Lecture notes by Helwig, 2017](http://users.stat.umn.edu/~helwig/notes/mvlr-Notes.pdf)
+]
+---
+
+## Issues with current formulation
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Abdi et al., 2005](https://doi.org/10.1109/CVPR.2005.445)
+]
+
+- Classical MMR requires the error df to be greater than or equal to the number of MDS axes
+`$$n-p-1 \geq nm$$`
+    - Otherwise, `\(SSCP_E\)` is not full-rank and standard test statistics cannot be calculated
+
+--
+
+- We will explore several potential solutions
+    1. Discard lower `\(q\)` MDS axes from each of the `\(m\)` sets of MDS axes to yield `\((n-q)m\)` total axes
+--
+    2. Find common axes via PCA and keep the top `\(n-p-1\)` axes
+        - Similar to how DISTATIS computes a compromise matrix from multiple distance matrices&lt;sup&gt;1&lt;/sup&gt;
+--
+    3. Analogous to MDMR, ignore certain sums of cross products (e.g. replace `\(Z_1^T H Z_1\)` with `\(\DeclareMathOperator{\tr}{tr} \tr(Z_1^T H Z_1)\)` and `\(Z_1^T H Z_2\)` with a chosen summary measure)
+
+
+---
+
+## Initial steps
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Ibba et al., 2010](https://doi.org/10.1109/ICPR.2010.820)
+]
+
+
+1. Identify a multi-modal dataset, ideally of different data types (e.g. functional and matrix-valued data)
+
+--
+
+2. Assess relationship between distance matrices via Mantel's test and other exploratory analyses
+
+--
+
+3. Compare several methods for inference including combining distance matrices&lt;sup&gt;1&lt;/sup&gt;, separate MDMR runs, and the proposed multiple MDMR ideas (with permutation testing)
+
+--
+
+4. Use simulations to evaluate type I error and power, potentially comparing to common experimental designs such as reducing multi-modal features into a vector
+
+---
+class: center, middle, divider
+# Proposed real data example
+---
+
+## Philadelphia Neurodevelopmental Cohort sample
+- Sample of 727 youths aged 8 to 23 years with structural connectivity (SC) measurements and functional connectivity (FC) measurements (during an *n*-back working memory task)
+
+- Analyzed in recent work on structure-function coupling which identified connections with age, controlling for sex and motion
+&amp;nbsp;
+
+.center[
+[![:scale 40%](images/F3.large.jpg)](https://www.pnas.org/content/117/1/771.full#sec-9)  
+.small[[Fig. 3 from Baum et al., 2020](https://doi.org/10.1073/pnas.1912034117)]
+]
+
+.footnote[
+Data provided by Ted Satterthwaite and Azeez Adebimpe
+]
+---
+
+## Distances exploration
+&lt;img src="Multiple-MDMR-Proposal_files/figure-html/unnamed-chunk-2-1.png" width="100%" /&gt;
+
+- Mantel test suggests no significant correlation between the distance matrices `\((p = 0.54)\)`
+---
+
+## Separate MDMR results
+.center[Functional connectivity MDMR]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Random 25 subjects p-value &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Full sample p-value &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.06 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sex &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.08 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Motion &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.32 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+--
+.center[Structural connectivity MDMR]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Random 25 subjects p-value &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Full sample p-value &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.001 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Sex &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Motion &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.444 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+
+## Follow-up steps
+- Further exploration of distance matrices, possibly through other visualization methods (e.g. t-SNE) or correlation analyses (e.g. distance-based CCA)
+
+- Design experiments to compare aggregating separate MDMRs to proposed multiple MDMR methods
+
+- Continue development of methodology and consideration of alternatives
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

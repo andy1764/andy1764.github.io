@@ -7,15 +7,20 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Dissertation
-Candidacy Exam (9/3/2020) [Slides](Dissertation/Proposal/Dissertation-Proposal.html)  
+## Dissertation Work
+### Committee Meetings
+Candidacy Exam (9/3/2020) [Slides](Dissertation/Proposal/Dissertation-Proposal.html) 
 
-# Covariance Harmonization
+### Conferences
+OHBM 2020 CovBat Poster #1249 (6/27/2020) [PDF](../OHBM/Removal-of-Scanner-Effects-in-Covariance-Improves Multivariate-Pattern-Analysis.pdf)  
+JSM 2020 Contributed Presentation (8/6/2020) [Slides](Covariance Harmonization/12-20-20 JSM updated/CovBat-Harmonization.html)
+
+### Presentations
 PennSIVE Presentation (8/6/2019) [Slides](Covariance Harmonization/Covariance_Harmonization_PennSIVE_Presentation.html)  
 DBEI Summer Chalk Talk (8/28/2019) [Slides](Covariance Harmonization/Covariance_Harmonization_Chalk_Talk.html)  
 BSTA751 Presentation (12/5/2019) [Slides](Covariance Harmonization/Slides - Removal of Scanner Effects in Covariance.pdf)  
 PennSIVE Presentation: Covariance Projects (4/7/2020) [Slides](Covariance Harmonization/4-7 PennSIVE Meeting/Projects-Overview.html)  
-OHBM CovBat Poster #1249 [PDF](../OHBM/Removal-of-Scanner-Effects-in-Covariance-Improves Multivariate-Pattern-Analysis.pdf)  
+PennSIVE Presentation: Multiple MDMR Proposal (12/1/2020) [Slides](Multiple MDMR/12-1-20/Multiple-MDMR-Proposal.html)  
 
 ### Write-Ups
 Summer Rotation 2019 Literature Review [PDF](Covariance Harmonization/Covariance_Harmonization_Review.pdf)  
@@ -26,57 +31,69 @@ ComBat Controlling for Variance Effects [HTML](Covariance Harmonization/6-25/Com
 Implementing ComBat in MVPA [HTML](Covariance Harmonization/7-9/ComBat_MVPA.html)
 
 ### Meetings
-9/3: Initial CovBat Simulations [Slides](Covariance Harmonization/9-3_CovBat_Simulations.html)  
+#### Multiple MDMR
+11/18/20: Multiple MDMR Initial Proposal [Slides](Multiple MDMR/11-18-20/Multiple-MDMR-Proposal.html)  
+12/16: Multiple Test Statistics and Initial Simulations [Slides](Multiple MDMR/12-15-20/MMDMR-Test-Statistics.html)  
+1/13/21: Simulation Updates and PNC Real Data Examples [Slides](Multiple MDMR/1-13-21/MMDMR-Test-Statistics.html) [1/5](Multiple MDMR/1-5-20/MMDMR-Test-Statistics.html) [12/30](Multiple MDMR/12-30-20/MMDMR-Test-Statistics.html)  
+1/26: Evaluating Dempster's Trace [Slides](Multiple MDMR/1-26-21/MMDMR-Dempster.html) [1/20](Multiple MDMR/1-20-21/MMDMR-Dempster.html)  
+2/9: Type I Error and Model Selection [Slides](Multiple MDMR/2-9-21/MMDMR-Type-I-Updates.html)  
+
+#### FC Harmonization
+10/30/19: FC CovBat Initial Tests [Slides](Covariance Harmonization/10-30-FC-CovBat-Updates-and-Manuscript-Simulations.html)  
+1/15/20: FC CovBat with Log Transform [Slides](Covariance Harmonization/1-15/1-15-FC-Log-transformed.html)  
+1/22: ABCD and FC CovBat Updates [Slides](Covariance Harmonization/1-22/1-22-ABCD-and-BLSA-CARDIA-Updates.html)  
+2/5: FC CovBat Distance and MDMR [Slides](Covariance Harmonization/2-5/2-5-FC-CovBat-Norms-and-MDMR.html)   
+4/2: FC Harmonization Methods Comparison [Slides](Covariance Harmonization/4-2-update/FC-Harmonization-Comparisons-Update.html) [4/2](Covariance Harmonization/4-2/4-2-FC-Harmonization-Comparisons.html)  
+4/17: FC Harmonization: Log Methods [Slides](Covariance Harmonization/4-17/FC-Log-Methods.html) [Updates](Covariance Harmonization/4-17/FC-Log-Methods_update.html)  
+4/30: FC Harmonization: Network Analyses [Slides](Covariance Harmonization/4-30/FC-Network-Analyses.html) [Abridged](Covariance Harmonization/4-30-edit/FC-Network-Analyses.html)  
+5/6: FC Harmonization: Regression [Slides](Covariance Harmonization/5-6/FC-Site-Differences.html)  
+5/20: FC Harmonization: Communities [Slides](Covariance Harmonization/5-13/FC-Communities.html)  
+5/30: Harmonization of Functional Connectivity [Slides](Covariance Harmonization/5-30/FC-Communities.html)  
+7/15: Next Steps in FC Harmonization (WIP) [Slides](Covariance Harmonization/7-15/FC-Communities-Updates.html) [7/8](Covariance Harmonization/7-8/FC-Communities-Updates.html) [7/1](Covariance Harmonization/7-1/FC-Communities-Updates.html) [6/10](Covariance Harmonization/6-11/FC-Communities-Updates.html)  
+8/5: Additional Investigations for FC Harmonization [Slides](Covariance Harmonization/8-5/FC-Additional-Analyses.html)  
+8/19: Addressing Site Effects in Communities [Slides](Covariance Harmonization/8-19/FC-Communities-Updates.html) [7/29](Covariance Harmonization/7-29/FC-Communities-Updates.html) [7/22](Covariance Harmonization/7-22/FC-Communities-Updates.html)  
+8/21: Investigating Number of Communities [Slides](Covariance Harmonization/8-21/FC-Community-Number.html)  
+11/11: FC Harmonization Follow-Up Analyses [Slides](Covariance Harmonization/11-11-20/FC-Harmonization-Investigations.html)  
+
+#### CovBat
+9/3/19: Initial CovBat Simulations [Slides](Covariance Harmonization/9-3_CovBat_Simulations.html)  
 9/10: Power Tests for ComBat vs. CovBat [Slides](Covariance Harmonization/9-10-CovBat-Power-Simulations.html)  
 9/17: CovBat Investigation and MVPA [Slides](Covariance Harmonization/9-17-CovBat-Power-and-Multilevel.html)  
 9/24: PC Exploration and MVPA Results [Slides](Covariance Harmonization/9-24-2019/9-24-ADNI-PC-Exploration-and-Multilevel.html)  
 10/2: Multilevel and Additive Simulations [Slides](Covariance Harmonization/10-1-Multilevel-and-Additive-Simulations.html)  
 10/9: Preliminary FC and Multilevel CovBat Findings [Slides](Covariance Harmonization/10-9-Preliminary-FC-and-Multilevel-CovBat.html)  
 10/23: Manuscript Simulation Investigation [Slides](Covariance Harmonization/10-23-Manuscript-Simulations.html)  
-10/30: FC CovBat Initial Tests [Slides](Covariance Harmonization/10-30-FC-CovBat-Updates-and-Manuscript-Simulations.html)  
 11/12: CovBat Controlling for Variance Parameters [Slides](Covariance Harmonization/11-12/11-12-CovBat-Controlling-for-Covariates.html)  
 11/19: CovBat using Training Set and Controlling for Variance [Slides](Covariance Harmonization/11-19/11-19-CovBat-Improvements.html)  
 12/11: ABCD Dataset CovBat Initial Results [Slides](Covariance Harmonization/12-11/12-11-ABCD-Preliminary-Results.html)  
-1/15: FC CovBat with Log Transform [Slides](Covariance Harmonization/1-15/1-15-FC-Log-transformed.html)  
-1/22: ABCD and FC CovBat Updates [Slides](Covariance Harmonization/1-22/1-22-ABCD-and-BLSA-CARDIA-Updates.html)  
-1/29: Toward a Covariance Regression Model [Slides](Covariance Harmonization/1-29/1-29-Toward-a-Covariance-Regression-Model.html)  
-2/5: FC CovBat Distance and MDMR [Slides](Covariance Harmonization/2-5/2-5-FC-CovBat-Norms-and-MDMR.html)  
-2/12: Proposed Covariance Regression vs. CAP [Slides](Covariance Regression/2-12/2-12-Comparison-to-CAP.html)  
-2/19: CovBat vs Wachinger [Slides](Covariance Harmonization/2-19/2-19-CovBat-vs-Wachinger.html)  
-3/19: General Updates and Potential Directions [Slides](Covariance Harmonization/3-19/3-19-Next-Steps.html)  
-4/2: FC Harmonization Methods Comparison [Slides](Covariance Harmonization/4-2-update/FC-Harmonization-Comparisons-Update.html) [4/2](Covariance Harmonization/4-2/4-2-FC-Harmonization-Comparisons.html)  
-4/9: ABCD Differences in Correlation [Slides](Covariance Harmonization/4-9/ABCD-Correlation-Investigation.html) [2/28](Covariance Harmonization/2-28/2-28-ABCD-Correlation-Investigation.html) [2/18](Covariance Harmonization/2-18/2-18-ABCD-Correlation-Investigation.html)  
-4/17: FC Harmonization: Log Methods [Slides](Covariance Harmonization/4-17/FC-Log-Methods.html) [Updates](Covariance Harmonization/4-17/FC-Log-Methods_update.html)  
-4/30: FC Harmonization: Network Analyses [Slides](Covariance Harmonization/4-30/FC-Network-Analyses.html) [Abridged](Covariance Harmonization/4-30-edit/FC-Network-Analyses.html)  
-5/6: FC Harmonization: Regression [Slides](Covariance Harmonization/5-6/FC-Site-Differences.html)  
+2/19/20: CovBat vs Wachinger [Slides](Covariance Harmonization/2-19/2-19-CovBat-vs-Wachinger.html)  
 5/20: CovBat Simulations: Additional Parameters [HTML](Covariance Harmonization/5-20/covbat_param_summary_static.html)  
-5/20: FC Harmonization: Communities [Slides](Covariance Harmonization/5-13/FC-Communities.html)  
-5/30: Harmonization of Functional Connectivity [Slides](Covariance Harmonization/5-30/FC-Communities.html)  
+6/24: ABCD Harmonization Updates [Slides](Covariance Harmonization/6-24/ABCD-Harmonization.html) [6/10](Covariance Harmonization/6-10/ABCD-Harmonization.html)  
+
+#### Other
+1/29/20: Toward a Covariance Regression Model [Slides](Covariance Harmonization/1-29/1-29-Toward-a-Covariance-Regression-Model.html)  
+2/12: Proposed Covariance Regression vs. CAP [Slides](Covariance Regression/2-12/2-12-Comparison-to-CAP.html)  
+3/19: General Updates and Potential Directions [Slides](Covariance Harmonization/3-19/3-19-Next-Steps.html)  
+4/9: ABCD Differences in Correlation [Slides](Covariance Harmonization/4-9/ABCD-Correlation-Investigation.html) [2/28](Covariance Harmonization/2-28/2-28-ABCD-Correlation-Investigation.html) [2/18](Covariance Harmonization/2-18/2-18-ABCD-Correlation-Investigation.html)  
 6/3: t-SNE and Related Work (WIP) [Slides](Dimension Reduction/6-3/t-SNE-Introduction.html)  
 6/17: Longitudinal CovBat Proposal [Slides](Covariance Harmonization/6-17/Longitudinal-CovBat-Proposal.html)  
-6/24: ABCD Harmonization Updates [Slides](Covariance Harmonization/6-24/ABCD-Harmonization.html) [6/10](Covariance Harmonization/6-10/ABCD-Harmonization.html)  
-7/15: Next Steps in FC Harmonization (WIP) [Slides](Covariance Harmonization/7-15/FC-Communities-Updates.html) [7/8](Covariance Harmonization/7-8/FC-Communities-Updates.html) [7/1](Covariance Harmonization/7-1/FC-Communities-Updates.html) [6/10](Covariance Harmonization/6-11/FC-Communities-Updates.html)  
 7/23: Applying ComBat in MVPA [Slides](Covariance Harmonization/7-23/ComBat-for-MVPA.html)  
-8/5: Additional Investigations for FC Harmonization [Slides](Covariance Harmonization/8-5/FC-Additional-Analyses.html)  
-8/19: Addressing Site Effects in Communities [Slides](Covariance Harmonization/8-19/FC-Communities-Updates.html) [7/29](Covariance Harmonization/7-29/FC-Communities-Updates.html) [7/22](Covariance Harmonization/7-22/FC-Communities-Updates.html)  
-8/21: Investigating Number of Communities [Slides](Covariance Harmonization/8-21/FC-Community-Number.html)  
-11/11: FC Harmonization Follow-Up Analyses [Slides](Covariance Harmonization/11-11-20/FC-Harmonization-Investigations.html)  
-11/18: Multiple MDMR Initial Proposal [Slides](Multiple MDMR/11-18-20/Multiple-MDMR-Proposal.html)  
-12/16: Multiple Test Statistics and Initial Simulations [Slides](Multiple MDMR/12-15-20/MMDMR-Test-Statistics.html)
 
-# Fall Rotation 2018: Distributed vs. Mega Analysis
-DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
-
-# Spring Rotation 2019: Penalized Co-Inertia Analysis
-DBEI Chalk Talk (4/23/2019) [Slides](Spring Rotation 2019/ADNI_CIA_presentation_abridged.html)
-
-# Master's Thesis: Functional Clustering of Pediatric CD
-BIP Presentation (4/15/2020) [Slides](Master's Thesis/MS-Thesis-Presentation.html)
-
-# Other Projects
+---
+## Other Projects
 PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template/PennSIVE-Slides-using-Xaringan.html)  [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template)  
 Widescreen PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template-Wide/PennSIVE-Slides-using-Xaringan-Wide.html) [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template-Wide)  
+3/4: Why Residual Regression is Bad [Slides](../Data-Club/3-4/Residual-Regression.html)
 4/7: GPU Computing in R [Slides](../GPU Computing in R/Special-Topic-Presentation.html)
 
-### Data Club Meetings
-3/4: Why Residual Regression is Bad [Slides](../Data-Club/3-4/Residual-Regression.html)
+### Fall Rotation 2018: Distributed vs. Mega Analysis
+DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
+
+### Spring Rotation 2019: Penalized Co-Inertia Analysis
+DBEI Chalk Talk (4/23/2019) [Slides](Spring Rotation 2019/ADNI_CIA_presentation_abridged.html)
+
+### Master's Thesis: Functional Clustering of Pediatric CD
+BIP Presentation (4/15/2020) [Slides](Master's Thesis/MS-Thesis-Presentation.html)
+
+
+
