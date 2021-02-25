@@ -322,6 +322,10 @@ git remote add origin git@github.com:andrewac/motivateR.git
 ---
 
 ## Editing your `DESCRIPTION`
+.footnote[
+Documentation on version numbering: https://r-pkgs.org/description.html#version
+]
+
 ```{txt, eval = FALSE}
 Package: motivateR
 Title: A Package Full of Motivation
@@ -588,7 +592,8 @@ https://www.tidyverse.org/blog/2020/04/usethis-1-6-0/
 
 ## Package webpage with `pkgdown`
 .footnote[
-https://pkgdown.r-lib.org/articles/pkgdown.html
+https://pkgdown.r-lib.org/articles/pkgdown.html  
+If you get a invalid 'times' length error, make your terminal wider ([actually though](https://github.com/r-lib/pkgdown/issues/1435))
 ]
 
 - Automatically create your own package website, which can be readily hosted on a personal website ([GitHub pages](https://pages.github.com/) are free by the way)
@@ -611,7 +616,7 @@ pkgdown::build_site()
 - And thanks to Kristin for letting me present on this, hope it's helpful!
 --
 
-- I'll be keeping these slides hosted on my GitHub page at , so feel free to keep the link as a reference
+- I'll be keeping these slides hosted on my GitHub page, so feel free to keep the link as a reference
 --
 
 
