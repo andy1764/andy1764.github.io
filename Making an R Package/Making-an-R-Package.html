@@ -282,11 +282,20 @@ usethis::use_readme_rmd()
 ```
 ---
 
-## Setting up version control via git
+## Setting up version control via Git
 .footnote[
 https://cfss.uchicago.edu/setup/git-with-rstudio/
 ]
 
+First, make sure to initialize Git in your package directory via
+
+
+```r
+usethis::use_git()
+```
+--
+
+To connect your new repository with GitHub:
 1. Go to GitHub and make a new repository with the name of your package
 2. Don't make a `README.md` file
 3. With your package directory as the working directory, run
@@ -433,7 +442,7 @@ https://r-pkgs.org/data.html#documenting-data
 
 
 ```r
-usethis::use_r("manateequotes")
+usethis::use_r("data")
 ```
 
 
@@ -456,10 +465,6 @@ usethis::use_r("manateequotes")
 usethis::use_r("motivate_me")
 ```
 
-- To tell `roxygen2` to automatically generate function documentation and `NAMESPACE` updates, insert a Roxygen skeleton via `Code &gt; Insert Roxygen Skeleton`
----
-
-## `motivate_me`
 
 ```r
 motivate_me &lt;- function(n = 1, score.me = TRUE, 
@@ -470,9 +475,7 @@ motivate_me &lt;- function(n = 1, score.me = TRUE,
   } else {
     score &lt;- 9 + round(rbeta(1, 5, 1), 1)
   }
-
   if (!score.me) {score &lt;- NULL}
-
   sapply(quote, message)
   if (score.me) {
     message(paste("You deserve a", score))
@@ -480,9 +483,29 @@ motivate_me &lt;- function(n = 1, score.me = TRUE,
   score
 }
 ```
+
+
 ---
 
 ## Don't forget the header!
+- To tell `roxygen2` to automatically generate function documentation and `NAMESPACE` updates, insert a Roxygen skeleton via `Code &gt; Insert Roxygen Skeleton`
+
+
+```r
+#' Title
+#'
+#' @param n 
+#' @param score.me 
+#' @param i.am.the.best 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+```
+---
+
+## Completed header for `motivate_me`
 
 ```r
 #' Motivate me!
@@ -509,12 +532,13 @@ motivate_me(n = 5)
 ```
 
 ```
-You look great today!
+Everything will be OK
+Keep your head up
+I'd hug you if I had arms
 Hey, you got this
-You look great today!
-You look great today!
-Hey, you got this
-You are definitely a 9.9
+Everything will be OK
+You deserve a 9.9
+[1] 9.9
 ```
 
 ---
