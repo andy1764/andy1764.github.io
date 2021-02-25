@@ -83,8 +83,9 @@ Implementing ComBat in MVPA [HTML](Covariance Harmonization/7-9/ComBat_MVPA.html
 ## Other Projects
 PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template/PennSIVE-Slides-using-Xaringan.html)  [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template)  
 Widescreen PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template-Wide/PennSIVE-Slides-using-Xaringan-Wide.html) [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template-Wide)  
-3/4: Why Residual Regression is Bad [Slides](../Data-Club/3-4/Residual-Regression.html)
-4/7: GPU Computing in R [Slides](../GPU Computing in R/Special-Topic-Presentation.html)
+3/4/20: Why Residual Regression is Bad [Slides](../Data-Club/3-4/Residual-Regression.html)
+4/7: GPU Computing in R [Slides](../GPU Computing in R/Special-Topic-Presentation.html)  
+2/25/21: Making an R package from scratch [Slides](../Making an R Package/Making-an-R-Package.html)
 
 ### Fall Rotation 2018: Distributed vs. Mega Analysis
 DBEI Chalk Talk (1/15/2019) [Slides](Fall Rotation 2019/Distributed_v_Meta_20190115.pdf)
