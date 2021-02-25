@@ -1,0 +1,620 @@
+---
+title: "Making an R package from scratch in less than 1.5 hours"
+author: "Andrew Chen </br> for BSTA 670"
+date: "February 25, 2021"
+output:
+  xaringan::moon_reader:
+    css: ["AC_theme.css", "AC_theme_add.css"]
+    nature:
+      highlightStyle: tomorrow-night-bright
+      beforeInit: "macros.js"
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
+header_includes:
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.retina = 2, # higher quality plots
+  dev = "svg", # vector graphics device
+  dev.args=list(bg="transparent"), # transparent plot backgrounds
+  warning = FALSE, 
+  cache = TRUE,
+  eval = FALSE
+)
+
+library(ggplot2)
+# Dark Theme
+theme_set(theme_minimal())
+theme_update(
+  panel.background = element_rect(fill = "transparent", colour = NA),
+  plot.background = element_rect(fill = "transparent", colour = NA),
+  legend.background = element_rect(fill = "transparent", colour = NA),
+  legend.key = element_rect(fill = "transparent", colour = NA),
+  text = element_text(colour = "white"),
+  axis.text = element_text(colour = "white"))
+```
+
+## References and credits
+- Huge thanks to Ali Varcarcel (alval@pennmedicine.upenn.edu, https://www.alessandravalcarcel.com/) for giving this R package tutorial last year, with the R package available on [GitHub](https://github.com/avalcarcel9/blink182)
+    - The introduction section for this lecture is almost directly from her slides, with minor edits and updates
+
+--
+Other very useful resources for me:
+
+[Comprehensive R package guide by Hadley Wickham and Jenny Bryan](https://r-pkgs.org/)  
+
+[usethis tutorial by Emil Hvitfeldt](https://www.hvitfeldt.me/blog/usethis-workflow-for-package-development/)  
+
+[A cooler R package tutorial by Matt Dray](https://matt-dray.github.io/r-pkg-slides/)
+
+
+
+---
+class: inverse, middle, center
+
+## Introduction to R packages
+.left[.footnote[Directly pulled from slides by Ali Varcarcel presented on February 13th, 2020  
+]]
+---
+
+## What is an R package?
+
+A package is a suitable way to organize work for yourself and others
+
+--
+
+.pull-left[
+A package is a bundled set of:
+
+1. Functions
+2. Documentation
+3. Data
+4. Vignettes
+5. Versions
+6. Dependencies
+7. Tests and checks
+]
+
+.pull-right[
+```{r, out.width = "100%", echo = FALSE, fig.align = 'center'}
+knitr::include_graphics("figs/hex.png")
+```
+]
+
+--
+
+Packages save you time, allow others to easily implement your methods, and make work more reproducible
+
+---
+
+## What are repositories?
+
+A repository (a.k.a. repo) is a storage location from which software packages may be hosted for retrieval and installation on a computer.
+
+The most popular repositories for R packages are:
+
+--
+
+1. [Comprehensive R Archive Network (CRAN)](https://cran.r-project.org/) is the official repository for R and is a network of ftp and web servers maintained by the R community around the world.
+
+--
+
+2. [GitHub](https://www.github.com) is a web-based hosting service for version control, software development, and software management. Contributions can be of any language not just R.
+
+--
+
+3. [Bioconductor](https://www.bioconductor.org/) is a free and open source development software project for the analysis and comprehension of genomic data. Bioconductor is based primarily in R but does contain some contributions in other programming languages.
+
+--
+
+4. [Neuroconductor](https://neuroconductor.org/) is an open-source platform for rapid testing and dissemination of reproducible computational imaging software.
+
+---
+
+## Which repository to choose?
+
+#### GitHub
+
+Almost all modern packages are hosted on GitHub at least as a development version due to ease of use and version control capabilities
+
+GitHub is completely user checked and tested so while the package may be hosted it could be broken
+
+--
+#### Bioconductor and Neuroconductor
+
+Bioconductor and Neuroconductor have some checks and tests in order to host the package but they are more lenient than CRAN because they are field (genomic and imaging) specific
+
+--
+
+#### CRAN 
+
+CRAN is the most strict repo and requires packages pass lots of checks and tests. CRAN also takes a lot of upkeep effort since any changes made to packages you depend will require you to update
+
+```{css, echo = FALSE}
+.mediumpage {
+  font-size: 12px;
+}
+```
+
+---
+class: mediumpage
+## Packages to Create R Packages
+
+1. [`usethis`](https://github.com/r-lib/usethis) is used for creating and developing packages
+
+--
+
+2. [`devtools`](https://github.com/r-lib/devtools) is used for creating and developing, updating, checking, and testing packages
+
+--
+
+3. [`roxygen2`](https://github.com/yihui/roxygen2) is mainly for documenting the package you're creating
+
+--
+
+4. [`spelling`](https://github.com/ropensci/spelling) a package to check spelling in your package
+
+--
+
+5. [`todor`](https://github.com/dokato/todor) a package to find your `TODO`s, `FIXME`s, and other notes
+
+--
+
+6. [`testthat`](https://github.com/r-lib/testthat) a package to help make unit tests
+
+--
+
+7. [`pkgdown`](https://github.com/r-lib/pkgdown) a package to make documentation beautiful and online
+
+--
+
+8. [`available`](https://github.com/ropenscilabs/available) is used to check if your package name is already taken
+
+--
+
+9. [`hexSticker`](https://github.com/GuangchuangYu/hexSticker) is used to create hex stickers for your package really easily
+
+--
+
+10. [`aliviateR`](https://github.com/avalcarcel9/aliviateR) is a wrapper around `devtools` and `usethis` functions to create a package quickly
+---
+class: inverse, middle, center
+
+## Making an R package from scratch
+---
+
+## What to make a package for
+- Anything really
+- As soon as you have one function for a new method, doesn't hurt to make a package
+
+
+--
+
+- A long time ago, I used to frequent a website that generated very useful images: https://calmingmanatee.com/, including ones like
+
+
+--
+![:scale 45%](https://metro.co.uk/wp-content/uploads/2016/02/sea-cow.jpg?quality=90&strip=all&zoom=1&resize=644%2C432)
+--
+&nbsp; or	&nbsp; ![:scale 40%](https://sadanduseless.b-cdn.net/wp-content/uploads/2012/06/manatee3.jpg)
+--
+
+- But it's just a dead link now
+
+---
+
+## Introducing `motivateR`
+- We're going to make a simple package that motivates you to be your best self
+    - Including printing random motivational phrases
+    - And telling you the score you deserve in life
+--
+
+
+- Through this minimal example, we will learn the following:
+
+--
+    - Creating and documenting functions
+--
+    - Including data in your R package
+--
+    - Unit tests
+--
+    - Building and checking your package
+--
+    - Continuous integration
+--
+
+
+- You can do this!
+
+---
+
+## Demo setup
+- Packages used in this demo can be installed via
+
+```{r, eval = FALSE}
+install.packages(c("available", "usethis", "testthat",
+                   "pkgdown", "roxygen2", "devtools",
+                   "covr"))
+```
+
+- But feel free to install other packages that you find helpful, it's worth browsing through Ali's recommended packages
+--
+
+
+- The source for this slide set can be downloaded [here](Making-an-R-Package.Rmd) and placed in your package directory, but feel free to just copy paste code blocks too
+
+---
+
+## Checking name availability
+.footnote[
+https://www.rdocumentation.org/packages/available/versions/1.0.4
+]
+
+```{r, eval = FALSE}
+available::available("motivateR")
+```
+
+```
+## ── motivateR ───────────────────────────────────────────────────────────────────
+## Name valid: ✔
+## Available on CRAN: ✔ 
+## Available on Bioconductor: ✔
+## Available on GitHub:  ✔ 
+## Abbreviations: http://www.abbreviations.com/motivate
+## Wikipedia: https://en.wikipedia.org/wiki/motivate
+## Wiktionary: https://en.wiktionary.org/wiki/motivate
+## Urban Dictionary:
+##   to provide with a [motive] or [motives], [incite], impel.
+##   http://motivate.urbanup.com/8323713
+## Sentiment:???
+## Abbreviations: http://www.abbreviations.com/motivateR
+## Wikipedia: https://en.wikipedia.org/wiki/motivateR
+## Wiktionary: https://en.wiktionary.org/wiki/motivateR
+## Urban Dictionary:
+##   Not found.
+## Sentiment:???
+```
+
+---
+
+## Creating the package
+.footnote[
+https://usethis.r-lib.org/
+]
+
+- `usethis::create_package` is a great way to start a new package using an R command
+- RStudio also provides a great GUI for package creation via `File > New Project...`
+
+```{r, eval=FALSE}
+usethis::create_package("~/Documents/GitHub/motivateR")
+```
+--
+
+- Make sure to include a README!
+```{r}
+usethis::use_readme_rmd()
+```
+---
+
+## Setting up version control via git
+.footnote[
+https://cfss.uchicago.edu/setup/git-with-rstudio/
+]
+
+1. Go to GitHub and make a new repository with the name of your package
+2. Don't make a `README.md` file
+3. With your package directory as the working directory, run
+
+```{bash, eval = FALSE}
+git remote add origin git@github.com:andrewac/motivateR.git
+```
+
+- Or use the GitHub Desktop app and go to `Add Existing Repository...` (I highly recommend this desktop app, by the way)
+--
+
+
+- Once this is done, RStudio provides a great interface to GitHub (will show you all later)
+---
+
+## Editing your `DESCRIPTION`
+```{txt, eval = FALSE}
+Package: motivateR
+Title: A Package Full of Motivation
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "First",
+           family = "Last",
+           role = c("aut", "cre"),
+           email = "first.last@example.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: When you have been coding for the past 8
+hours straight, sometimes you need a little
+pick-me-up. motivateR is here for you.
+License: Artistic-2.0
+Encoding: UTF-8
+Depends: R (>= 3.1.0)
+LazyData: true
+```
+
+---
+
+## Adding dependencies
+.footnote[
+https://kbroman.org/pkg_primer/pages/depends.html  
+https://r-pkgs.org/description.html 
+]
+
+- No harm in doing this manually
+    - `Depends:` dependency on a version of R and any package loaded using `library()`
+    - `Imports:` other required packages
+    - `Suggests:` suggested packages (for tests, vignettes, etc.)
+--
+
+
+- But there's also a `usethis` function for this, so why not use this:
+```{r}
+usethis::use_package("testthat", "Suggests")
+```
+---
+
+## Editing your `NAMESPACE`
+- Actually don't do this, `devtools` and `roxygen2` will handle this all for you automatically as you properly document your functions
+- But it might look something like this
+
+```{txt}
+export("motivateR")
+
+import("dplyr")
+importFrom("stats", "lm", "var")
+```
+
+- The `NAMESPACE` specifies which packages/functions are imported and which functions your package exports (makes available to the user)
+--
+
+
+
+- Fun fact: even if you don't export the function, users can still access your internal functions via `:::`
+
+---
+
+## Adding a vignette
+- All good R packages come with at least one vignette, otherwise how are people supposed to know how to use your package
+--
+
+
+- We won't actually fill out a vignette for this package, but here's the function to make one that you can edit later
+```{r}
+usethis::use_vignette("motivater", title = "How to get motivated")
+```
+---
+
+## Including data with your package
+.footnote[
+https://r-pkgs.org/data.html
+]
+
+- Ever wonder why you can always type `mtcars` and magically have data
+
+--
+- R by default loads the `datasets` package, which has ton of datasets which you can check by running `data()`
+--
+
+- Can easily include an R object with your package via
+
+```{r}
+usethis::use_data(...)
+```
+--
+- Best practice is to document how your dataset was created, so instead you should run
+```{r}
+usethis::use_data_raw(name = "manateequotes")
+```
+---
+
+## What would a manatee say?
+```{r}
+## code to prepare `manateequotes` dataset goes here
+manateequotes <- c("I'd hug you if I had arms",
+                   "Everything will be OK",
+                   "Hey, you got this",
+                   "Keep your head up",
+                   "Just take deep breaths, it's all right",
+                   "You look great today!")
+
+usethis::use_data(manateequotes)
+```
+
+- Feel free to add your own!
+---
+
+## Documenting data
+.footnote[
+https://r-pkgs.org/data.html#documenting-data
+]
+
+- Don't forget to document your data, much like a function (see for example `?mtcars`)
+
+```{r}
+usethis::use_r("manateequotes")
+```
+
+```{r}
+#' Things manatees tell you to lift your spirits
+#'
+#' A dataset containing several manatee quotes
+#'
+#' @format A character vector
+#'
+#' @source "Motivational manatee" Google image search
+"manateequotes"
+```
+---
+## Making your first function
+- Just make a file in the `/R` directory, or
+
+```{r}
+usethis::use_r("motivate_me")
+```
+
+- To tell `roxygen2` to automatically generate function documentation and `NAMESPACE` updates, insert a Roxygen skeleton via `Code > Insert Roxygen Skeleton`
+---
+
+## `motivate_me`
+```{r}
+motivate_me <- function(n = 1, score.me = TRUE, 
+                        i.am.the.best = FALSE) {
+  quote <- sample(manateequotes, n, replace = TRUE)
+  if (i.am.the.best) {
+    score <- 10
+  } else {
+    score <- 9 + round(rbeta(1, 5, 1), 1)
+  }
+
+  if (!score.me) {score <- NULL}
+
+  sapply(quote, message)
+  if (score.me) {
+    message(paste("You deserve a", score))
+  }
+  score
+}
+```
+---
+
+## Don't forget the header!
+```{r}
+#' Motivate me!
+#'
+#' @param n Number of motivational phrases
+#' @param score.me TRUE if numbers make you feel warm and fuzzy.
+#' @param i.am.the.best Are you the best?
+#'
+#' @return
+#' @importFrom stats rbeta
+#'
+#' @export
+#'
+#' @examples
+#' motivate_me(5, score.me = TRUE)
+#' motivate_me(50, score.me = TRUE, i.am.the.best = TRUE)
+```
+---
+
+## Quick check
+```{r}
+motivate_me(n = 5)
+```
+
+```
+You look great today!
+Hey, you got this
+You look great today!
+You look great today!
+Hey, you got this
+You are definitely a 9.9
+```
+
+---
+
+## Unit testing
+- Code your own checks to make sure your functions work as intended
+- Very useful to make sure your changes are not messing up necessary outputs
+--
+
+```{r}
+# Initialize `testthat` package
+usethis::use_testthat
+
+usethis::use_test('do_i_deserve_a_10')
+```
+
+```{r}
+test_that("i am the best and 10 is the number for me", {
+  expect_equal(motivate_me(0, i.am.the.best = TRUE), 
+               10)
+})
+```
+
+--
+
+- If your unit test fails, the package will not build
+---
+
+## And now you're done
+- Actually though
+--
+
+
+- To make sure your `NAMESPACE` and documentation are updated, make sure to first run
+```{r}
+devtools::document()
+```
+--
+
+- Then, press **Check** in the **Build** tab of RStudio
+    - You'll probably get some notes, but no errors or warnings
+    - In case of errors or warnings, carefully review the logs
+--
+
+
+- Any time you want to quickly test your package, use **Install and Restart**
+    - Loads the package without having to build it for distribution
+---
+
+### Continuous integration via GitHub actions
+.footnote[
+https://ropenscilabs.github.io/actions_sandbox/index.html  
+https://docs.github.com/en/actions/guides/about-continuous-integration  
+https://www.tidyverse.org/blog/2020/04/usethis-1-6-0/
+]
+
+- Automates a wide array of checks every time you push code to GitHub
+    - Catch errors early, especially with multiple contributors
+--
+
+
+- From `usethis 1.6.0` release notes [here](https://www.tidyverse.org/blog/2020/04/usethis-1-6-0/):
+
+
+- `use_github_action("check-standard")` (may have been replaced by `usethis::use_github_action_check_full()`) runs R CMD check on the latest R release on Linux, Windows, and macOS, and R-devel on macOS. This ensures that your package works on all major operating systems, and alerts you to any potential problems in the next version of R.
+- `use_github_action("test-coverage")` uses covr to measure the test coverage of your package and publishes it to http://codecov.io/.
+- `use_github_action("pkgdown")` uses pkgdown to build your package website and publishes it to the gh-pages branch.
+---
+
+## Package webpage with `pkgdown`
+.footnote[
+https://pkgdown.r-lib.org/articles/pkgdown.html
+]
+
+- Automatically create your own package website, which can be readily hosted on a personal website ([GitHub pages](https://pages.github.com/) are free by the way)
+
+```{r}
+usethis::use_pkgdown()
+pkgdown::build_site()
+```
+
+.center[![:scale 80%](figs/pkgdown_ex.png)]
+---
+
+## And that's all!
+- Congratulations, **you did it!**
+--
+
+- Again, huge thanks to Ali Varcarcel who taught me how to make an R package in about 1.5 hours
+--
+
+- And thanks to Kristin for letting me present on this, hope it's helpful!
+--
+
+- I'll be keeping these slides hosted on my GitHub page at , so feel free to keep the link as a reference
+--
+
+
+.center[![:scale 70%](https://media1.popsugar-assets.com/files/thumbor/Rfe-lraG0ivnqRto8qZDy6Anju8/fit-in/1024x1024/filters:format_auto-!!-:strip_icc-!!-/2015/08/11/224/n/1922283/76a4b61a6730ccf2_xmanatee14.jpg.pagespeed.ic.MPKUOt4C0d/i/When-You-Get-Gym.jpg)]
+
+
