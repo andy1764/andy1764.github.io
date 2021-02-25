@@ -323,7 +323,7 @@ git remote add origin git@github.com:andrewac/motivateR.git
 
 ## Editing your `DESCRIPTION`
 .footnote[
-Documentation on version numbering: https://r-pkgs.org/description.html#version
+Documentation on version numbering: https://r-pkgs.org/description.html#version  
 Some information about licenses: https://r-pkgs.org/license.html
 ]
 
