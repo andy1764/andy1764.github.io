@@ -9,7 +9,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Dissertation Work
 ### Committee Meetings
-Candidacy Exam (9/3/2020) [Slides](Dissertation/Proposal/Dissertation-Proposal.html) 
+Candidacy Exam (9/3/2020) [Slides](Dissertation/Proposal/Dissertation-Proposal.html)  
+Second Committee Meeting (3/8/2020) [Slides](Dissertation/second/Committee-Meeting-2.html)  
 
 ### Conferences
 OHBM 2020 CovBat Poster #1249 (6/27/2020) [PDF](../OHBM/Removal-of-Scanner-Effects-in-Covariance-Improves Multivariate-Pattern-Analysis.pdf)  
@@ -83,7 +84,7 @@ Implementing ComBat in MVPA [HTML](Covariance Harmonization/7-9/ComBat_MVPA.html
 ## Other Projects
 PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template/PennSIVE-Slides-using-Xaringan.html)  [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template)  
 Widescreen PennSIVE Slide Template [Slides](../PennSIVE-Slide-Template-Wide/PennSIVE-Slides-using-Xaringan-Wide.html) [Source](https://github.com/andy1764/andy1764.github.io/tree/master/PennSIVE-Slide-Template-Wide)  
-3/4/20: Why Residual Regression is Bad [Slides](../Data-Club/3-4/Residual-Regression.html)
+3/4/20: Why Residual Regression is Bad [Slides](../Data-Club/3-4/Residual-Regression.html)  
 4/7: GPU Computing in R [Slides](../GPU Computing in R/Special-Topic-Presentation.html)  
 2/25/21: Making an R package from scratch [Slides](../Making an R Package/Making-an-R-Package.html)
 

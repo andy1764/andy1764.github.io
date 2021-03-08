@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Novel Methods for Statistical Analysis of Covariance Structures</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <script src="Committee-Meeting-2_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="Committee-Meeting-2_files/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Novel Methods for Statistical Analysis of Covariance Structures
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 70%}
+.tiny{font-size: 60%}
+.bottomright {
+  position: absolute;
+  top: 66%;
+  left: 61%;
+}
+&lt;/style&gt;
+
+
+## Updated progress summary and timeline
+**Aim 1:** Addressing batch effects in the covariance of multivariate observations
+- Identified covariance site effects and developed a novel method to address them
+- Paper resubmitted to *Biostatistics* after major revisions at *NeuroImage*, pending journal response
+
+
+--
+***
+**Aim 2:** Assessing the impact of batch effects in covariance matrix observations and developing methods to mitigate these effects
+- Preliminary analyses show promising results for proposed harmonization methods
+- Organizing results and performing follow-up analyses, aiming for submission **within the next 6 months**
+
+
+--
+***
+**Aim 3:** Developing novel methods for simultaneous inference on multiple data types
+- Initial method performs well in both simulation and real data
+- Ongoing methodological development and additional real data examples, aiming for submisssion **within the next year**
+
+---
+class: center, middle, divider
+# Developing novel methods for simultaneous inference on multiple data types
+---
+
+## Motivation
+.pull-left[
+- Large-scale studies including the [UKBB](https://www.ukbiobank.ac.uk/)&lt;sup&gt;1&lt;/sup&gt; and upcoming [RURAL (Risk Underlying Rural Areas Longitudinal) Cohort Study](https://www.theruralstudy.org/) are increasingly collecting a wide range of data
+
+- Incorporation of multiple imaging modalities shown to improve multiple sclerosis lesion detection&lt;sup&gt;2&lt;/sup&gt; and reveal developmental patterns&lt;sup&gt;3&lt;/sup&gt;
+
+- Dearth of methodologies available for regression of multiple types of outcome data
+]
+.pull-right[
+[![:scale 85%](images/41586_2018_579_Fig1_HTML.webp)](https://www.nature.com/articles/s41586-018-0579-z/figures/1)
+]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Sudlow et al., 2015](https://doi.org/10.1371/journal.pmed.1001779)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;Valcarcel et al., 2018](https://doi.org/10.1111/jon.12506) 
+&amp;emsp;[&lt;sup&gt;3&lt;/sup&gt;Vandekar et al., 2016](https://doi.org/10.1016/j.neuroimage.2016.03.002)
+
+]
+
+&lt;style type="text/css"&gt;
+.teal {
+  background-color: #9DE4DB;
+}
+
+.teal .remark-slide-number {
+  display: none;
+}
+&lt;/style&gt;
+
+---
+class: hide-logo, teal
+
+.center[[![:scale 70%](images/breadth-and-depth-enable.jpeg)](https://www.ukbiobank.ac.uk/media/5b5aqozc/breadth-and-depth-enable.jpg)]
+
+.footnote[https://www.ukbiobank.ac.uk/enable-your-research
+]
+---
+
+## Distance-based regression methods
+- Permutational multivariate analysis of variance (PERMANOVA)&lt;sup&gt;1&lt;/sup&gt; tests for differences between `\(K\)` groups using within-group sum of squared distances `\(SS_W\)` and across-group sum of squared distances `\(SS_A\)` via the test statistic
+`$$F_{\text{PERMANOVA}} = \frac{SS_A/(K-1)}{SS_W/(n-K)}$$`
+- Significance tests performed either via permutations or using the asymptotic null distribution&lt;sup&gt;2&lt;/sup&gt;
+
+
+.pull-left[
+.center[
+[![:scale 75%](images/1-s2.0-S1053811914001232-gr3.jpg)](https://doi.org/10.1016/j.neuroimage.2014.02.024)  
+.small[[Fig. 3 from Shehzad et al., 2014](https://doi.org/10.1016/j.neuroimage.2014.02.024)]
+ ]
+]
+.pull-right[
+.center[
+  [![:scale 70%](images/1-s2.0-S1053811911013164-gr4.jpg)](https://doi.org/10.1016/j.neuroimage.2011.11.035)  
+  .small[[Fig. 4 from Alexander-Bloch et al., 2012](https://doi.org/10.1016/j.neuroimage.2011.11.035)]
+ ]
+]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Anderson, 2001](https://doi.org/10.1111/j.1442-9993.2001.01070.pp.x)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;Shinohara, Shou, et al., 2020](https://doi.org/10.1111/biom.13123)
+]
+---
+
+## Distance-based regression methods
+&lt;!-- - Define Gower's centered matrix `\(G = (I - \mathbf{1}\mathbf{1}^T/n)D(I - \mathbf{1}\mathbf{1}^T/n)\)` and the hat matrix `\(H = X(X^TX)^{-1}X^T\)` --&gt;
+- Multivariate distance matrix regression (MDMR) tests for associations with an `\(n\times p\)` design matrix `\(X\)` via the pseudo-F statistic
+`$$\DeclareMathOperator{\tr}{tr} F_{\text{MDMR}} = \frac{\tr(HGH)/(p-1)}{\tr[(I-H)G(I-H)]/(n-p)}$$`
+which can be tested via permutation&lt;sup&gt;1&lt;/sup&gt;
+
+- By noting that `\(G = ZZ^T\)`, MDMR can be thought of as regressing multidimensional scaling (MDS) scores on the predictors&lt;sup&gt;2&lt;/sup&gt;
+`$$\DeclareMathOperator{\tr}{tr} F_{\text{MDMR}} = \frac{\tr(Z^THZ)/(p-1)}{\tr[Z^T(I-H)Z]/(n-p)}$$`
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;McArdle and Anderson, 2001](https://esajournals.onlinelibrary.wiley.com/doi/abs/10.1890/0012-9658%282001%29082%5B0290%3AFMMTCD%5D2.0.CO%3B2)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;McArtor et al., 2017](https://doi.org/10.1007/s11336-016-9527-8)
+]
+---
+
+## Multiple MDMR
+![](images/MMDMR illustration/Slide1.jpeg)
+---
+
+## Multiple MDMR
+![](images/MMDMR illustration/Slide2.jpeg)
+---
+
+## Multiple MDMR
+![](images/MMDMR illustration/Slide3.jpeg)
+---
+
+## Multiple MDMR
+![](images/MMDMR illustration/Slide4.jpeg)
+---
+
+## Multiple MDMR
+![](images/MMDMR illustration/Slide5.jpeg)
+---
+
+
+## High-dimensional multivariate multiple regression
+- Denote `\(\hat{E} = Z(I-H)Z\)` as the sum of squares and cross products (SSCP) error matrix and `\(\hat{H}\)` as the hypothesis SSCP matrix
+- In high dimensional settings, `\(\hat{E}\)` is not necessarily invertible and classic multivariate multiple regression (MMR) cannot be performed
+
+--
+- Proposed methods generally fall into four major categories:
+
+
+- **Alternative test statistics**
+    - Dempster's trace&lt;sup&gt;1&lt;/sup&gt;: `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H})/\tr(\hat{E})\)`
+- **PCA regression**&lt;sup&gt;2&lt;/sup&gt;
+- **Generalized inverse**&lt;sup&gt;3&lt;/sup&gt;
+- **Regularization**
+    - Both ridge&lt;sup&gt;4&lt;/sup&gt; and LASSO&lt;sup&gt;5&lt;/sup&gt; have been used to obtain regularized estimates `\(\tilde{E}\)`
+    
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Fujikoshi et al., 2004](https://doi.org/10.14490/jjss.34.19)
+&amp;emsp; [&lt;sup&gt;2&lt;/sup&gt;Tomfohr et al., 2005](https://doi.org/10.1186/1471-2105-6-225)
+&amp;emsp; [&lt;sup&gt;3&lt;/sup&gt;Srivastava and Fujikoshi, 2006](https://doi.org/10.1016/j.jmva.2005.08.010)
+&amp;emsp; [&lt;sup&gt;4&lt;/sup&gt;Warton, 2008](https://doi.org/10.1198/016214508000000021)
+&amp;emsp; [&lt;sup&gt;5&lt;/sup&gt;Ullah and Jones, 2015](https://doi.org/10.1109/CVPR.2005.445)
+]
+---
+
+## Proposed test statistics
+- After applying PCA to obtain an `\(n \times k\)` score matrix, denote `\(\hat{E}_{PC}\)` and `\(\hat{H}_{PC}\)` the associated SSCP error matrix and hypothesis SSCP matrix
+    - PCA is applied after dividing the Gower's matrices `\(G_1, G_2, \ldots, G_m\)` by their top eigenvalue&lt;sup&gt;1&lt;/sup&gt;
+
+
+| Statistic            | Equation
+|:---------------------|----------
+| Psuedo-F (Dempster's)| `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H})/\tr(\hat{E})\)`
+| Top PCs              | `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H}_{PC}(\hat{E}_{PC}+\hat{H}_{PC})^{-1})\)`
+| Generalized inverse  | `\(\DeclareMathOperator{\tr}{tr} \tr(\hat{H}(\hat{E}+\hat{H})^+)\)`
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Abdi et al., 2005](https://doi.org/10.1109/CVPR.2005.445)
+]
+---
+
+## Simulation settings
+- Let `\(n\)` be the number of subjects, `\(m\)` be the number of feature sets, and `\(q\)` be the number of features within each set
+    - To generate separate feature sets with dependencies, we simulate `\(m\times q\)` dimensional features `\(Y \sim N(0, \Sigma)\)`, then split them evenly into `\(Y_1, Y_2, \ldots, Y_m\)`
+    - A simple binary covariate `\(x \sim \text{Bernoulli}\,(1/2)\)` induces shifts along PC axes of `\(\Sigma\)`, `\(\sum_{k \in K} \gamma\boldsymbol{\phi}_k\)`, where `\(K\)` is selected depending on the setting
+--
+
+
+- For each simulation settings, we conduct 1000 simulations
+    - `\(n = 25\)` simulated subjects
+    - `\(999\)` permutations to compute `\(p\)`-values
+    - `\(\Sigma\)` as an exchangeable correlation matrix with correlation `\(\rho\)`
+    - `\(\rho = 0.25, 0.75\)`: low or high correlation
+    - `\(m = 2, 3, 10\)`: varying number of feature sets
+    - `\(q = 5, 10, 15, 20, 25, 50, 100, 200\)`: potentially high dimensional features
+---
+
+## 2 Feature sets, type I error
+&lt;img src="Committee-Meeting-2_files/figure-html/unnamed-chunk-3-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Power with 2 feature sets 
+&lt;img src="Committee-Meeting-2_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+
+## Philadelphia Neurodevelopmental Cohort connectivity
+- Sample of 727 youths aged 8 to 23 years with structural connectivity (SC) measurements and functional connectivity (FC) measurements
+- Each connectivity observation contains 79800 distinct elements
+
+.center[
+[![:scale 40%](images/F3.large.jpg)](https://www.pnas.org/content/117/1/771.full#sec-9)  
+.small[[Fig. 3 from Baum et al., 2020](https://doi.org/10.1073/pnas.1912034117)]
+]
+
+.footnote[
+Data provided by Ted Satterthwaite and Azeez Adebimpe
+]
+---
+
+## Evaluating association with age
+- In each model, we control for relevant quality metrics and sex
+
+&lt;img src="Committee-Meeting-2_files/figure-html/unnamed-chunk-5-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Psuedo type I error evaluation
+- We do not expect strong associations between FC motion and DTI motion metrics
+
+&lt;img src="Committee-Meeting-2_files/figure-html/unnamed-chunk-6-1.png" width="35%" style="display: block; margin: auto;" /&gt;
+---
+
+## PNC cortical thickness and sulcal depth
+- Sample of 912 youths aged 8 to 22 years with cortical thickness and sulcal depth measurements on 20486 ROIs (10243 in each hemisphere)
+
+- Correlation among these features across subjects is relatively low
+
+&lt;img src="Committee-Meeting-2_files/figure-html/unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+Data provided by Ted Satterthwaite and Sarah Weinstein
+]
+---
+
+## Cortical thickness and sulcal depth power test
+- Previous PNC analyses found age effects in cortical thickness&lt;sup&gt;1&lt;/sup&gt; and both age and sex effects in coupling between cortical thickness and sulcal depth&lt;sup&gt;2&lt;/sup&gt;
+
+&lt;img src="Committee-Meeting-2_files/figure-html/unnamed-chunk-8-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Vandekar et al., 2015](https://doi.org/10.1016/j.neuroimage.2016.03.002)
+&amp;emsp; [&lt;sup&gt;2&lt;/sup&gt;Vandekar et al., 2016](https://doi.org/10.1016/j.neuroimage.2016.03.002)]
+---
+
+## Choice of PCs influences performance
+&lt;img src="Committee-Meeting-2_files/figure-html/unnamed-chunk-9-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+---
+
+## Open questions
+- How to choose number of PCs for PC-based test statistics?
+
+--
+
+
+- Alternatives to selecting a number of PCs?
+    - minP or maxT testing across all feasible numbers of PCs
+
+
+
+--
+
+
+- Why do PC-based test statistics perform subpar in real data applications?
+    - Warrants further investigation of correlation structure and covariate effects
+
+
+
+--
+
+- What kind of multimodal data may show higher correlations between modalities?
+    - We are investigating data from the National Institute of Mental Health Family Study of Affective Spectrum Disorder, which includes physical activity and ecological momentary assessment data&lt;sup&gt;1&lt;/sup&gt;
+
+
+
+.footnote[
+[Merikangas et al., 2014](https://doi.org/10.1038/mp.2013.116)]
+---
+
+## Acknowledgements
+.pull-left[
+**Advisors**  
+Taki Shinohara  
+Haochang Shou
+
+**PNC Sharing/Preprocessing**  
+Azeez Adebimpe  
+Sarah Weinstein
+
+**BLSA/CARDIA Preprocessing**  
+Raymond Pomponio  
+Dhivya Srinivasan
+
+**Advice and Feedback on Network Analyses**  
+Theodore D. Satterthwaite  
+Danielle S. Bassett
+]
+
+.pull-right[
+**Dissertation Committee**  
+Kristin A. Linn  
+Jing Huang  
+Theodore D. Satterthwaite  
+
+And all of PennSIVE for the support!
+
+![:scale 90%](images/PennSIVE_group.jpeg)
+]
+
+---
+class: center, middle, divider
+# Questions?
+---
+class: center, middle, divider
+# Appendix
+---
+
+## Proposed harmonization methods
+- Modularity depends on the relationship between sets of edge weights
+
+- FC-ComBat does not handle site effects in the covariance of connectivity values
+
+
+- We propose two extensions:  
+    - **FC-CovBat** to harmonize the mean and covariance of edge weights
+    - **Block-ComBat** to utilize prior subnetwork information in harmonization
+
+--
+***
+**Steps**
+1. Starting from correlation matrices, vectorize off-diagonal elements
+
+2. Fisher-transform connectivity values
+
+3. Apply ComBat (FC-ComBat) or CovBat (**FC-CovBat**)
+
+4. (Optional) After ComBat, apply ComBat again within prespecified blocks (**Block-ComBat**)
+---
+
+## BLSA/CARDIA sample
+- For our analyses, we are using data from the Baltimore Longitudinal Study of Aging (BLSA) and the Coronary Artery Risk Development in Young Adults (CARDIA) study
+
+- These studies are part of the Imaging-based coordinate SysTem for AGing and NeurodeGenerative diseases (iSTAGING) consortium led by the Center for Biomedical Image Computing and Analytics
+
+- Functional connectivity matrices are computed using the Power atlas&lt;sup&gt;1&lt;/sup&gt; with 264 regions of interest across 14 subnetworks
+
+
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA 1 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA 3 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA 4 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Scanner &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Philips Achieva 3T &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Philips Achieva 3T &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Siemens Trio 3T &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Siemens Trio 3T &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Number of Subjects &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 357 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 57 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 139 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age (mean (SD)) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 65.42 (15.25) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50.12 (3.42) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50.30 (3.31) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50.12 (3.64) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 161 (45.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 22 (38.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 79 (42.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 55 (39.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.622 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Power et al., 2011](https://doi.org/10.1016/j.neuron.2011.09.006)
+]
+---
+
+## Updates on other projects
+- **Distributed ComBat** with Yong Chen and Chongliang Luo:
+    - Aiming for submission in the near future
+
+
+--
+- **Longitudinal CovBat** with Joanne Beer and Kristin Linn
+    - Delayed due to CovBat revisions and other projects, but aiming to pick up with preliminary tests in simulation and real data
+
+
+--
+- Numerous collaborations including
+    - **Effects of reliability on Pearson Correlation** with Aki Nikolaidis from Child Mind Institute
+    - **Accuracy and replicability analyses of BraTS ratings** with Spyridon (Spyros) Bakas from CBICA
+    - **iStaging longitudinal harmonization** with Christos Davatzikos and Guray Erus from CBICA
+
+---
+
+## Multiple MDMR (working title)
+Let `\(D_1, D_2, \ldots, D_m\)` be `\(n \times n\)` distance matrices obtained on the same subjects and `\(X\)` be a full-rank `\(n \times p\)` design matrix
+
+
+1. First, use MDS to obtain `\(m\)` sets of coordinates `\(Z_1, Z_2, \ldots, Z_m\)`
+2. Then concatenate these into an `\(n \times mn\)` matrix `\(Z = \begin{bmatrix} Z_1 &amp; Z_2 &amp; \cdots &amp; Z_m \end{bmatrix}\)`
+3. We then regress `\(Z\)` on `\(X\)` using multivariate multiple regression (MMR)
+4. Inference can be achieved through the sums of squares and cross products (SSCP) error `\(\text{SSCP}_E = Z^T (I-H) Z\)` and regression
+`$$\text{SSCP}_R = Z^T H Z = \begin{bmatrix} 
+Z_1^T H Z_1 &amp; Z_1^T H Z_2 &amp; \cdots &amp; Z_1^T H Z_m\\
+Z_2^T H Z_1 &amp; Z_2^T H Z_2 &amp; \cdots &amp; Z_2^T H Z_m\\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\
+Z_m^T H Z_1 &amp; Z_m^T H Z_2 &amp; \cdots &amp; Z_m^T H Z_m\\
+\end{bmatrix}$$`
+5. Several test statistics including Pillai's trace are based on these SSCP matrices&lt;sup&gt;1&lt;/sup&gt; and can be evaluated using permutation testing or possibly through `\(F\)` approximations (requires derivation)
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Lecture notes by Helwig, 2017](http://users.stat.umn.edu/~helwig/notes/mvlr-Notes.pdf)
+]
+---
+
+## Proposed simulation settings
+- Let `\(n\)` be the number of subjects, `\(m\)` be the number of feature sets, and `\(q_j\)` be the number of features within each set indexed by `\(j\)`
+    - We generate separate feature sets via `\(Y_j \sim N(0, \Sigma_j)\)`, where `\(\Sigma_j\)` may vary to simulate feature sets with different scales and covariance structures
+    - Simple continuous and binary covariates can induce mean/variance shifts
+    
+    
+- Potential simulation settings could vary across the following
+    - Magnitude of covariate-induced shifts in mean/variance
+    - Differences in variability within feature sets
+    - Dependence among feature sets (possibly not as important)
+    
+    
+- We now compare three methods
+    - Traditional MMR (for `\(nq \leq n-2\)`)
+    - Separate MDMRs
+    - Psuedo-F statistic (Dempster's trace)
+        - With various scaling options
+---
+
+## Simulation settings
+- Let `\(n\)` be the number of subjects, `\(m\)` be the number of feature sets, and `\(q\)` be the number of features within each set
+    - To generate separate feature sets with dependencies, we simulate `\(m\times q\)` dimensional features `\(Y \sim N(0, \Sigma)\)`, then split them evenly into `\(Y_1, Y_2, \ldots, Y_m\)`
+    - A simple binary covariate `\(x \sim \text{Bernoulli}\,(1/2)\)` induces shifts along PC axes of `\(\Sigma\)`, `\(\sum_{k \in K} \gamma\boldsymbol{\phi}_k\)`, where `\(K\)` is selected depending on the setting
+--
+
+
+- For each simulation settings, we conduct 1000 simulations
+    - `\(999\)` permutations to compute `\(p\)`-values
+    - `\(\rho = 0.25, 0.75\)`: low or high correlation of `\(\Sigma\)`
+    - AR(1) or between correlations, other structures for `\(\Sigma\)`
+    - `\(m = 2, 3, 10\)`: varying number of feature sets
+    - `\(q = 5, 10, 15, 20, 25, 50, 100, 200\)`: potentially high dimensional features
+--
+- **Simple effects**
+    - `\(K = 1\)` and `\(\gamma = 3\)`
+    - 25% of PCs and `\(\gamma = 0.7\)`
+- **Complex effects**
+    - 50% of PCs and `\(\gamma = 0.5\)`
+    - `\(K = mq\)` and `\(\gamma = 0.15\)`
+    
+---
+
+## Evaluating association with sex
+- In each model, we control for relevant quality metrics and sex
+
+&lt;img src="Committee-Meeting-2_files/figure-html/unnamed-chunk-12-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle, divider
+# Assessing and mitigating the impact of batch effects in covariance matrix observations
+
+.footnote[
+.left[Joint work with Danielle Bassett and Theodore Satterthwaite  
+Data provided by CBICA led by Christos Davatzikos with preprocessing by Raymond Pomponio and Dhivya Srinivasan]]
+---
+
+## Community detection in rsfMRI
+- Changes in brain subnetworks identified through resting-state fMRI associated with conditions including depression&lt;sup&gt;1&lt;/sup&gt; and Alzheimer's disease&lt;sup&gt;2&lt;/sup&gt;
+- Major impact of scanner effects found for several network properties&lt;sup&gt;3&lt;/sup&gt;, but effects on community detection have not been investigated
+
+.center[[![:scale 92%](images/8-Figure2-1.png)](https://www.semanticscholar.org/paper/A-Network-Based-Perspective-in-Alzheimer%27s-Disease%3A-Dragomir-Vrahatis/4629661519f1598c3284ad7eec5d8f2c588081d7/figure/1)]
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;He et al., 2018](https://doi.org/10.1093/cercor/bhx335)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;Dragomir et al., 2019](https://doi.org/10.1109/JBHI.2018.2863202)
+&amp;emsp;[&lt;sup&gt;3&lt;/sup&gt;Yu et al., 2018](https://doi.org/10.1002/hbm.24241)
+&amp;emsp;[Figure 2 from Dragomir et al., 2019](https://doi.org/10.1109/JBHI.2018.2863202)
+]
+---
+
+## Community detection via modularity maximization
+.pull-left[
+- Many community detection methods including the Louvain algorithm&lt;sup&gt;1&lt;/sup&gt; maximize modularity
+
+.center[![:scale 90%](images/modularity.png)  
+.small[[Peter Gleeson, Revolut.](https://www.kdnuggets.com/2019/04/introduction-clustering-algorithms.html)]
+]
+]
+.pull-right[
+.center[![:scale 72%](images/fnsys-04-00016-g002.jpg)  
+.small[[Fig. 2 from Wang et al., 2010](https://www.frontiersin.org/articles/10.3389/fnsys.2010.00016/full#B57)]
+]
+]
+
+
+    
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Blondel et al., 2008](https://doi.org/10.1088/1742-5468/2008/10/P10008)
+]
+---
+
+## ComBat for functional connectivity (FC-ComBat)
+**Steps**
+1. Starting from correlation matrices, vectorize off-diagonal elements
+
+2. Fisher-transform connectivity values
+
+3. Apply ComBat and reconstruct connectivity matrices
+
+.center[[![:scale 45%](images/hbm24241-fig-0005-m.jpg)](https://onlinelibrary.wiley.com/doi/full/10.1002/hbm.24241#)]
+
+.footnote[
+[Yu et al., 2018](https://doi.org/10.1002/hbm.24241)
+]
+---
+
+## Assessing scanner effects in community detection
+&lt;!-- **Analysis 1**: Identify representative communities for each site and compare them across sites --&gt;
+
+
+&lt;!-- -- --&gt;
+&lt;!-- **Analysis 2**: Find communities for each subject and compare across subjects using distance-based methods --&gt;
+
+
+&lt;!-- -- --&gt;
+&lt;!-- **Analysis 3**: Assess metrics of network organization for site effects --&gt;
+
+We assess the scanner differences in community measures on three scales:
+
+--
+1. Concordance of population-average communities between scanners
+
+
+--
+2. Distances of subject-specific communities (tested using distance-based methods)
+
+
+--
+3. Differences in the summary network statistics derived from subject-specific networks
+
+---
+
+## Analysis 1: Site-level communities
+1. Obtain scanner-level matrices as average of Fisher-transformed FC matrices&lt;sup&gt;1,2&lt;/sup&gt;
+
+2. Form fully-connected signed networks using Fisher-transformed connectivity values as edge weights
+
+3. Apply signed Louvain 100 times on each scanner-level network with `\(\gamma = 4.25\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations&lt;sup&gt;3&lt;/sup&gt;
+
+4. Compare scanner-level communities visually and using adjusted Rand index (ARI)
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Betzel et al., 2013](https://doi.org/10.1017/nws.2013.19)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;He et al., 2018](https://doi.org/10.1093/cercor/bhx335)
+&amp;emsp;[&lt;sup&gt;3&lt;/sup&gt;Lancichinetti and Fortunato, 2012](https://doi.org/10.1038/srep00336)
+]
+---
+
+## Scanner-level communities results
+
+
+
+&lt;img src="Committee-Meeting-2_files/figure-html/unnamed-chunk-14-1.png" width="100%" /&gt;
+---
+
+## Analysis 2: Subject-level communities
+1. For every subject, use 100 repetitions of signed Louvain with `\(\gamma = 4.75\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations
+
+2. Compute distance matrix using variation of information (VI)
+
+3. Run permutational multivariate analysis of variance (PERMANOVA) and multivariate distance matrix regression (MDMR) with 1000 permutations each and report `\(p\)`-values&lt;sup&gt;1&lt;/sup&gt;
+    
+4. Repeat procedure after applying FC-ComBat, Block-ComBat, and FC-CovBat
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Alexander-Bloch et al., 2012](https://doi.org/10.1016/j.neuroimage.2011.11.035)
+]
+---
+
+## Associations with site and demographic variables
+.pull-left[
+.center[PERMANOVA *p*-values for scanner]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All Scanners &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA Only &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.56&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.88&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+--
+.pull-right[
+.center[MDMR *p*-values for scanner, age, and sex]
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Scanner &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.04&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Analysis 3: Network organization metrics
+1. Form subject-level networks as in **Analysis 2**
+
+2. Calculate signed modularity for the `\(\gamma = 4.75\)` consensus communities and for the Power atlas
+
+3. Compute signed clustering coefficient
+
+4. Derive participation coefficients in positive subgraph
+
+5. Calculate within/between connectivities and participation coefficients for auditory subnetwork,
+previously found to be significantly associated with age&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Varangis et al. 2019](https://doi.org/10.3389/fnagi.2019.00234)
+]
+---
+
+## Network metric associations
+.center[*p*-values for age association]
+.medium[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Within &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Between &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Comm Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Atlas Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Pos Part Coeff &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Clust Coeff &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.37&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.78&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.54&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.44&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.87&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.55&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.32&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.88&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.56&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.52&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+
+--
+.center[*p*-values for scanner assocations]
+.medium[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Within &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Between &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Comm Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Atlas Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Pos Part Coeff &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Clust Coeff &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.25&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.76&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.33&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.13&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.69&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.46&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.99&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.69&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.14&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
