@@ -1,0 +1,199 @@
+---
+title: "Distance Correlation and NIMH Family Study <html><div style='float:center'></div><hr color='#82bbdc' size=2em width=100%></html>"
+pagetitle: "Distance Correlation and NIMH Family Study"
+author:
+  - Andrew Chen
+  - Advised by Haochang Shou and Taki Shinohara
+output:
+  xaringan::moon_reader:
+    css: ["PennSIVE-theme-wide.css"]
+    nature:
+      ratio: "16:9"
+      beforeInit: "macros.js"
+      countIncrementalSlides: false
+      slideNumberFormat: "%current%"
+header_includes:
+  - \usepackage{amsmath}
+  - \usepackage{bm}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  dev = "png",
+  fig.retina = 3,
+  fig.height = 7,
+  fig.width = 7,
+  out.width = "100%",
+  cache = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+
+library(ggplot2)
+library(patchwork)
+library(reshape2)
+library(dplyr)
+library(tableone)
+library(FCharmony)
+library(kableExtra)
+library(RColorBrewer)
+
+gghist <- function(input) {
+  df <- data.frame(x = c(input))
+  ggplot(df, aes(x = x)) + geom_histogram(color = "black", fill = "white") + theme_minimal()
+}
+```
+
+```{r kable_setup, include=FALSE, cache=FALSE}
+options("kableExtra.html.bsTable" = T)
+options(knitr.kable.NA = '',
+        digits = 3)
+```
+
+```{css}
+.medium{font-size: 85%}
+.small{font-size: 70%}
+.tiny{font-size: 60%}
+.bottomright {
+  position: absolute;
+  top: 66%;
+  left: 61%;
+}
+```
+
+## Distance correlation
+- Measure of dependence between random vectors $X$ and $Y$ in arbitrary dimensions<sup>1</sup>
+    - $0 \leq \mathcal{R}(X,Y) \leq 1$
+    - $\mathcal{R}(X,Y) = 0$ if and only if $X$ and $Y$ are independent
+- Empirical distance covariance is estimated via their Gower's matrices $A$ and $B$ as
+$$\mathcal{V}^2_n(X,Y) = \frac{1}{n^2} \sum_{j=1}^n \sum_{k=1}^n A_{j,k}B_{j,k}$$
+- Distance correlation calculated via
+$$\mathcal{R}^2_n(X,Y) = \frac{\mathcal{V}^2_n(X,Y)}{\sqrt{\mathcal{V}^2_n(X)\mathcal{V}^2_n(Y)}}$$
+
+.footnote[
+[Székely, Rizzo, and Bakirov, 2007](https://doi.org/10.1214/009053607000000505)]
+---
+
+## Real data distance correlations
+```{r, message = FALSE, fig.align="center", out.width = "100%", fig.width = 7, fig.height = 3}
+load("results/plots/dcors.Rdata")
+
+wrap_plots(dcorplots[2:3]) + plot_layout(guides = "collect")
+```
+---
+
+## NIMH Family Study
+- Cohort study collecting activity and ecological momentary assessment (EMA) data
+- For now, removed subjects with missing activity or EMA data and missing diagnosis group
+
+```{r, include = FALSE, cache = FALSE}
+load("results/nimh_demo.Rdata")
+
+demo_df$SEX <- dplyr::recode(demo_df$SEX, 
+                               `1` = "Male", `2` = "Female")
+demo_df$dxgp4 <- dplyr::recode(demo_df$dxgp4, 
+                               `1` = "Control", `2` = "MDD", 
+                               `3` = "Bipolar Type I", `4` = "Bipolar Type II")
+demotab <- CreateTableOne(vars = c("Age", "SEX", "dxgp4"), data = demo_df)
+tabout <- print(demotab)
+rownames(tabout)[1:4] <- c("Number of Subjects", "Age, Mean(SD)", "Male, n(%)", 
+                           "Diagnosis, n(%)")
+```
+
+```{r, results="asis", cache = FALSE}
+knitr::kable(tabout, "html", booktabs = T) %>% 
+  kable_styling(bootstrap_options = "hover") %>%
+  add_indent(5:8)
+```
+---
+
+## NIMH distance correlations
+```{r, message = FALSE, fig.align="center", out.width = "70%", fig.width = 8, fig.height = 6}
+load("results/plots/dcors.Rdata")
+dcorplots[[1]]
+```
+---
+
+## NIMH power tests
+```{r, message = FALSE, fig.align="center", out.width = "100%", fig.width = 9, fig.height = 5}
+load("results/plots/nimh.Rdata")
+
+plots$`m=1,2,3,4,5,6,7,dx` + labs(title = "All data") +
+  plots$`m=3,4,7,dx` + labs(title = "Sad, anxious, distract") +
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+
+---
+
+## Philadelphia Neurodevelopmental Cohort connectivity
+- Sample of 727 youths aged 8 to 23 years with structural connectivity (SC) measurements and functional connectivity (FC) measurements
+- Each connectivity observation contains 79800 distinct elements
+
+.center[
+[![:scale 40%](images/F3.large.jpg)](https://www.pnas.org/content/117/1/771.full#sec-9)  
+.small[[Fig. 3 from Baum et al., 2020](https://doi.org/10.1073/pnas.1912034117)]
+]
+
+.footnote[
+Data provided by Ted Satterthwaite and Azeez Adebimpe
+]
+---
+
+## Evaluating association with age
+- In each model, we control for relevant quality metrics and sex
+
+```{r fig.align="center", fig.height=4.5, fig.width=10, message=FALSE, out.width="100%"}
+load("results/plots/coupling.Rdata")
+
+plots$`m=2,age` + labs(title = "n-back FC and SC on age") +
+  plots$`m=4,age` + labs(title = "n-back FC and rsFC on age") +
+  plots$`m=3,age` + labs(title = "n-back FC, rsFC, and SC on age") +
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+
+---
+
+## Psuedo type I error evaluation
+- We do not expect strong associations between FC motion and DTI motion metrics
+
+```{r, message = FALSE, fig.align="center", out.width = "35%", fig.width = 3.5, fig.height = 4}
+load("results/plots/coupling.Rdata")
+
+plots$`m=4,dti64MeanRelRMS` + labs(title = "n-back FC and rsFC on DTI motion") +
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom') & labs(y = "Rejection rate")
+```
+---
+
+## PNC cortical thickness and sulcal depth
+- Sample of 912 youths aged 8 to 22 years with cortical thickness and sulcal depth measurements on 20486 ROIs (10243 in each hemisphere)
+
+- Correlation among these features across subjects is relatively low
+
+```{r, message = FALSE, fig.align="center", out.width = "50%", fig.width = 5, fig.height = 3}
+load("results/cort_sulc_subj_corr.Rdata")
+
+gghist(subj_corr) + 
+  labs(title = "Cortical thickness and sulcal depth", x = "Correlation", y = "") +
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+
+.footnote[
+Data provided by Ted Satterthwaite and Sarah Weinstein
+]
+---
+
+## Cortical thickness and sulcal depth power test
+- Previous PNC analyses found age effects in cortical thickness<sup>1</sup> and both age and sex effects in coupling between cortical thickness and sulcal depth<sup>2</sup>
+
+```{r, message = FALSE, fig.align="center", out.width = "75%", fig.width = 7, fig.height = 4}
+load("results/plots/cort_sulc.Rdata")
+
+plots$age + labs(title = "Association with age") +
+  plots$sex + labs(title = "Association with sex") +
+  plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+```
+
+.footnote[
+[<sup>1</sup>Vandekar et al., 2015](https://doi.org/10.1016/j.neuroimage.2016.03.002)
+&emsp; [<sup>2</sup>Vandekar et al., 2016](https://doi.org/10.1016/j.neuroimage.2016.03.002)]

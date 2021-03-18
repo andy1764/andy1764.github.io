@@ -38,6 +38,7 @@ Implementing ComBat in MVPA [HTML](Covariance Harmonization/7-9/ComBat_MVPA.html
 1/13/21: Simulation Updates and PNC Real Data Examples [Slides](Multiple MDMR/1-13-21/MMDMR-Test-Statistics.html) [1/5](Multiple MDMR/1-5-20/MMDMR-Test-Statistics.html) [12/30](Multiple MDMR/12-30-20/MMDMR-Test-Statistics.html)  
 1/26: Evaluating Dempster's Trace [Slides](Multiple MDMR/1-26-21/MMDMR-Dempster.html) [1/20](Multiple MDMR/1-20-21/MMDMR-Dempster.html)  
 2/9: Type I Error and Model Selection [Slides](Multiple MDMR/2-9-21/MMDMR-Type-I-Updates.html)  
+3/17: Distance Correlation and Preliminary NIMH Study [Slides](Multiple MDMR/3-17-21/NIMH-Dist-Corr.html)  
 
 #### FC Harmonization
 10/30/19: FC CovBat Initial Tests [Slides](Covariance Harmonization/10-30-FC-CovBat-Updates-and-Manuscript-Simulations.html)  
@@ -55,6 +56,7 @@ Implementing ComBat in MVPA [HTML](Covariance Harmonization/7-9/ComBat_MVPA.html
 8/19: Addressing Site Effects in Communities [Slides](Covariance Harmonization/8-19/FC-Communities-Updates.html) [7/29](Covariance Harmonization/7-29/FC-Communities-Updates.html) [7/22](Covariance Harmonization/7-22/FC-Communities-Updates.html)  
 8/21: Investigating Number of Communities [Slides](Covariance Harmonization/8-21/FC-Community-Number.html)  
 11/11: FC Harmonization Follow-Up Analyses [Slides](Covariance Harmonization/11-11-20/FC-Harmonization-Investigations.html)  
+3/21/21: FC Harmonization: More Follow-Up Analyses [Slides](FC Harmonization/3-19-21/Follow-Up-Analysis.html)  
 
 #### CovBat
 9/3/19: Initial CovBat Simulations [Slides](Covariance Harmonization/9-3_CovBat_Simulations.html)  

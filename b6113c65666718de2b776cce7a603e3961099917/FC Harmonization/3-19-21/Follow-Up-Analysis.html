@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Functional Connectivity Harmonization: Follow-Up Analyses</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Andrew Chen" />
+    <meta name="author" content="Advised by Haochang Shou and Taki Shinohara" />
+    <script src="Follow-Up-Analysis_files/kePrint-0.0.1/kePrint.js"></script>
+    <link href="Follow-Up-Analysis_files/bsTable-3.3.7/bootstrapTable.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="PennSIVE-theme-wide.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Functional Connectivity Harmonization: Follow-Up Analyses
+<html>
+<div style="float:center">
+
+</div>
+<hr color='#82bbdc' size=2em width=100%>
+</html>
+### Andrew Chen
+### Advised by Haochang Shou and Taki Shinohara
+
+---
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.medium{font-size: 85%}
+.small{font-size: 70%}
+.tiny{font-size: 60%}
+.bottomright {
+  position: absolute;
+  top: 66%;
+  left: 61%;
+}
+&lt;/style&gt;
+
+## Outline
+- Review of previous results
+--
+
+
+- Association between edge weight and number of Louvain communities
+--
+
+
+- Updated visualizations of network analyses
+---
+
+## ComBat for functional connectivity (FC-ComBat)
+**Steps**
+1. Starting from correlation matrices, vectorize off-diagonal elements
+
+2. Fisher-transform connectivity values
+
+3. Apply ComBat and reconstruct connectivity matrices
+
+.center[[![:scale 45%](images/hbm24241-fig-0005-m.jpg)](https://onlinelibrary.wiley.com/doi/full/10.1002/hbm.24241#)]
+
+.footnote[
+[Yu et al., 2018](https://doi.org/10.1002/hbm.24241)
+]
+---
+
+## Proposed harmonization methods
+- Modularity depends on the relationship between sets of edge weights
+
+- FC-ComBat does not handle site effects in the covariance of connectivity values
+
+
+- We propose two extensions:  
+    - **FC-CovBat** to harmonize the mean and covariance of edge weights
+    - **Block-ComBat** to utilize prior subnetwork information in harmonization
+
+--
+***
+**Steps**
+1. Starting from correlation matrices, vectorize off-diagonal elements
+
+2. Fisher-transform connectivity values
+
+3. Apply ComBat (FC-ComBat) or CovBat (**FC-CovBat**)
+
+4. (Optional) After ComBat, apply ComBat again within prespecified blocks (**Block-ComBat**)
+---
+
+## BLSA/CARDIA sample
+- For our analyses, we are using data from the Baltimore Longitudinal Study of Aging (BLSA) and the Coronary Artery Risk Development in Young Adults (CARDIA) study
+
+- These studies are part of the Imaging-based coordinate SysTem for AGing and NeurodeGenerative diseases (iSTAGING) consortium led by the Center for Biomedical Image Computing and Analytics
+
+- Functional connectivity matrices are computed using the Power atlas&lt;sup&gt;1&lt;/sup&gt; with 264 regions of interest across 14 subnetworks
+
+
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; BLSA &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA 1 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA 3 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA 4 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; p &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Scanner &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Philips Achieva 3T &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Philips Achieva 3T &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Siemens Trio 3T &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Siemens Trio 3T &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Number of Subjects &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 357 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 57 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 185 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 139 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age (mean (SD)) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 65.42 (15.25) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50.12 (3.42) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50.30 (3.31) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50.12 (3.64) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &amp;lt;0.001 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male (%) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 161 (45.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 22 (38.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 79 (42.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 55 (39.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.622 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Power et al., 2011](https://doi.org/10.1016/j.neuron.2011.09.006)
+]
+---
+
+## Assessing scanner effects in community detection
+&lt;!-- **Analysis 1**: Identify representative communities for each site and compare them across sites --&gt;
+
+
+&lt;!-- -- --&gt;
+&lt;!-- **Analysis 2**: Find communities for each subject and compare across subjects using distance-based methods --&gt;
+
+
+&lt;!-- -- --&gt;
+&lt;!-- **Analysis 3**: Assess metrics of network organization for site effects --&gt;
+
+We assess the scanner differences in community measures on three scales:
+
+--
+1. Concordance of population-average communities between scanners
+
+
+--
+2. Distances of subject-specific communities (tested using distance-based methods)
+
+
+--
+3. Differences in the summary network statistics derived from subject-specific networks
+
+---
+
+## Analysis 1: Site-level communities
+1. Obtain scanner-level matrices as average of Fisher-transformed FC matrices&lt;sup&gt;1,2&lt;/sup&gt;
+
+2. Form fully-connected signed networks using Fisher-transformed connectivity values as edge weights
+
+3. Apply signed Louvain 100 times on each scanner-level network with `\(\gamma = 4.25\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations&lt;sup&gt;3&lt;/sup&gt;
+
+4. Compare scanner-level communities visually and using adjusted Rand index (ARI)
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Betzel et al., 2013](https://doi.org/10.1017/nws.2013.19)
+&amp;emsp;[&lt;sup&gt;2&lt;/sup&gt;He et al., 2018](https://doi.org/10.1093/cercor/bhx335)
+&amp;emsp;[&lt;sup&gt;3&lt;/sup&gt;Lancichinetti and Fortunato, 2012](https://doi.org/10.1038/srep00336)
+]
+---
+
+## Louvain communities
+&lt;img src="Follow-Up-Analysis_files/figure-html/unnamed-chunk-4-1.png" width="100%" /&gt;
+---
+
+## WSBM with 14 communities
+&lt;img src="Follow-Up-Analysis_files/figure-html/unnamed-chunk-5-1.png" width="100%" /&gt;
+---
+
+## Stochastic block model follow-up
+- Previously fitted the weighted stochastic block model with 7 and 14 communities
+- Using log-evidence as a criteria, we investigated other potential numbers
+
+&lt;img src="Follow-Up-Analysis_files/figure-html/unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;" /&gt;
+---
+
+## Analysis 2: Subject-level communities
+1. For every subject, use 100 repetitions of signed Louvain with `\(\gamma = 4.75\)` and obtain consensus with `\(\tau = 0.5\)` and 100 iterations
+
+2. Compute distance matrix using variation of information (VI)
+
+3. Run permutational multivariate analysis of variance (PERMANOVA) and multivariate distance matrix regression (MDMR) with 1000 permutations each and report `\(p\)`-values&lt;sup&gt;1&lt;/sup&gt;
+    
+4. Repeat procedure after applying FC-ComBat, Block-ComBat, and FC-CovBat
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Alexander-Bloch et al., 2012](https://doi.org/10.1016/j.neuroimage.2011.11.035)
+]
+---
+
+## Associations with site and demographic variables
+.pull-left[
+.center[PERMANOVA *p*-values for scanner]
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; All Scanners &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; CARDIA Only &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.56&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.88&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+--
+.pull-right[
+.center[MDMR *p*-values for scanner, age, and sex]
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Scanner &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.04&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+## Analysis 3: Network organization metrics
+1. Form subject-level networks as in **Analysis 2**
+
+2. Calculate signed modularity for the `\(\gamma = 4.75\)` consensus communities and for the Power atlas
+
+3. Compute signed clustering coefficient
+
+4. Derive participation coefficients in positive subgraph
+
+5. Calculate within/between connectivities and participation coefficients for auditory subnetwork,
+previously found to be significantly associated with age&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[
+[&lt;sup&gt;1&lt;/sup&gt;Varangis et al. 2019](https://doi.org/10.3389/fnagi.2019.00234)
+]
+---
+
+## Network metric associations
+.center[*p*-values for age association]
+.medium[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Within &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Between &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Comm Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Atlas Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Pos Part Coeff &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Clust Coeff &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.37&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.78&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.54&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.44&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.87&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.55&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.32&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.88&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.56&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.31&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #009999 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.52&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+
+--
+.center[*p*-values for scanner assocations]
+.medium[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Within &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Between &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Comm Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Atlas Modularity &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Pos Part Coeff &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Clust Coeff &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Raw &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.03&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #990000 !important;" &gt;&amp;lt;0.01&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.25&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.76&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.33&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.13&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Bl-ComBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.9&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.69&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.46&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.1&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FC-CovBat &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.86&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.99&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.69&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;1&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.34&lt;/span&gt; &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; &lt;span style="     color: #000000 !important;" &gt;0.14&lt;/span&gt; &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+class: center, middle, divider
+# Association between edge weight and number of Louvain communities
+---
+
+## Mean edge weight and communities
+&lt;img src="Follow-Up-Analysis_files/figure-html/unnamed-chunk-11-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+- Communities obtained as consensus communities over 100 repetitions of signed Louvain with `\(\gamma=4.75\)`
+    - `\(\gamma\)` chosen to yield median 14 communities
+- Can potentially address by normalizing each subject's edge weights prior to community detection
+---
+
+## Association with edge weights after rescaling
+&lt;img src="Follow-Up-Analysis_files/figure-html/unnamed-chunk-12-1.png" width="33%" /&gt;&lt;img src="Follow-Up-Analysis_files/figure-html/unnamed-chunk-12-2.png" width="33%" /&gt;&lt;img src="Follow-Up-Analysis_files/figure-html/unnamed-chunk-12-3.png" width="33%" /&gt;
+
+- Surprisingly, both dividing by within-subject mean edge weight and standardizing to variance 1 (that is, keep the mean the same but rescale using the standard deviation) do not address the high variance in the number of communities
+- Results suggest that both fixing mean and fixing variance in edge weights are insufficient
+
+---
+
+## Association with positive edges after rescaling
+&lt;img src="Follow-Up-Analysis_files/figure-html/unnamed-chunk-13-1.png" width="33%" /&gt;&lt;img src="Follow-Up-Analysis_files/figure-html/unnamed-chunk-13-2.png" width="33%" /&gt;&lt;img src="Follow-Up-Analysis_files/figure-html/unnamed-chunk-13-3.png" width="33%" /&gt;
+
+- Higher communities are associated with a much higher proportion of positive edges
+---
+class: center, middle, divider
+# Interactive visualizations of network analyses
+
+&lt;!-- &lt;iframe src="https://andrew-a-chen.shinyapps.io/FCHarmonyApp/" width=90% height=120% frameBorder="0"&gt;&lt;/iframe&gt; --&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  /* Replace <script> tags in slides area to make them executable
+   *
+   * Runs after post-processing of markdown source into slides and replaces only
+   * <script>s on the last slide of continued slides using the .has-continuation
+   * class added by xaringan. Finally, any <script>s in the slides area that
+   * aren't executed are commented out.
+   */
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container:not(.has-continuation) script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+  var scriptsNotExecuted = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container.has-continuation script'
+  );
+  if (!scriptsNotExecuted.length) return;
+  for (var i = 0; i < scriptsNotExecuted.length; i++) {
+    var comment = document.createComment(scriptsNotExecuted[i].outerHTML)
+    scriptsNotExecuted[i].parentElement.replaceChild(comment, scriptsNotExecuted[i])
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
